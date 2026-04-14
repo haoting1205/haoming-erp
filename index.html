@@ -243,7 +243,7 @@ body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',-apple-system
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v1.0.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><span class="nav-divider">│</span><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><span class="nav-divider">│</span><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><span class="nav-divider">│</span><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -482,6 +482,9 @@ window.delBuy=function(id){if(!confirm('確定刪除？'))return;state.buyLog=st
 // ── SETTINGS ───
 function renderRef(){const pg=dv({});const sw=sopBox('ref');if(sw)pg.appendChild(sw);pg.appendChild(dv({cls:'page-title'},'⚙️ 系統設定'));
 const mc=dv({cls:'card'});mc.appendChild(dv({cls:'card-title'},'🏢 公司基本資訊'));mc.innerHTML+=`<div class="form-row c2"><div class="fg"><label>公司名稱</label><input id="mc-name" value="${esc(state.meta.company||'')}"></div><div class="fg"><label>統一編號</label><input id="mc-taxid" value="${esc(state.meta.taxId||'')}"></div></div><div class="form-row c2"><div class="fg"><label>電話</label><input id="mc-phone" value="${esc(state.meta.phone||'')}"></div><div class="fg"><label>地址</label><input id="mc-addr" value="${esc(state.meta.address||'')}"></div></div><div class="fg" style="margin-bottom:10px"><label>門市列表（逗號分隔）</label><input id="mc-stores" value="${esc((state.meta.stores||[]).join(', '))}"></div><div class="form-row c2"><div class="fg"><label>目標毛利率 (%)</label><input id="mc-margin" type="number" min="1" max="99" value="${Math.round((state.meta.targetMargin||0.65)*100)}"></div><div class="fg"><label>貨幣符號</label><input id="mc-cur" value="${esc(state.meta.currency||'NT$')}"></div></div><div><button class="btn btn-primary" onclick="saveMetaSettings()">💾 儲存公司設定</button></div>`;pg.appendChild(mc);
+var verCard=dv({cls:'card'});verCard.appendChild(dv({cls:'card-title'},'📌 系統版本'));
+verCard.innerHTML+='<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:1.1rem;font-weight:700;color:#0A5A46">v'+SYSTEM_VERSION+'</span><span style="font-size:0.82rem;color:#706E68;margin-left:8px">Build '+BUILD_NUMBER+'</span></div><button class="btn btn-sm btn-outline" onclick="showVersionInfo()">查看修改紀錄</button></div>';
+pg.appendChild(verCard);
 var permCard=dv({cls:'card'});permCard.appendChild(dv({cls:'card-title'},'🔐 權限管理 / 救援碼'));
 var permDesc=dv({style:'font-size:0.88rem;color:#555350;margin-bottom:12px'});
 permDesc.textContent='設定各角色（老闆/店長/員工）可存取的功能模組';
@@ -2147,6 +2150,74 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();doUndo()}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();doRedo()}
 });
+
+
+
+
+// ══════════════════════════════════════════════════════
+// 📌 系統版本管理
+// ══════════════════════════════════════════════════════
+var SYSTEM_VERSION='1.0.0';
+var BUILD_NUMBER='20260414-001';
+var VERSION_HISTORY=[
+  {ver:'1.0.0',build:'20260414-001',date:'2026-04-14',changes:[
+    '🎉 系統初始化完成，共 25 個功能模組',
+    '📊 儀表板：庫存警示、毛利率、進貨損耗統計、快速動作',
+    '🥬 食材庫存：30 筆食材 CRUD、庫存調整、食材替代建議',
+    '📋 配方卡：23 筆配方（R001-R023）、成本計算、營養標示、版本歷史',
+    '🍽️ 菜單成本：售價毛利率、建議售價（55/60/65%）',
+    '♻️ 損耗管理：損耗記錄、損耗率、月度趨勢、進貨連動分析、異常警示（>8%）',
+    '🏪 供應商：5 筆供應商、匯款帳戶、銀行自動帶入（44 家）',
+    '🛍️ 進貨記錄：進貨登錄、自動更新庫存',
+    '🏬 門市庫存：食材/包材分類、批發/零售來源、庫存總覽',
+    '🔄 調撥：門市間調撥、待確認→已完成→已取消',
+    '📋 採購單：申請→核准→下單→到貨、退貨、供應商比價',
+    '💳 應付帳款：未付/已付/逾期追蹤、到期日警示',
+    '📅 效期管理：批號 FIFO、領用扣減、過期報廢→損耗',
+    '🏭 生產扣料：配方連動庫存、扣料預覽（充足/不足）',
+    '⚠️ 過敏原：12 種過敏原標記、配方過敏原報告',
+    '📄 合約/報價單：CRUD、狀態管理、到期提醒',
+    '👤 帳號管理：帳號 CRUD、三級角色（老闆/店長/員工）',
+    '🏷️ 標籤：3 種標籤（單一/批次/配方）、6 種尺寸+自訂、標籤機列印',
+    '📋 叫/出貨表：4 張表 231 項、Excel 匯出匯入、出貨單列印',
+    '🔍 品管：IQC 進貨檢驗（7 項）、HACCP 管制點（CCP1-6）、品管報告',
+    '🔄 追溯：依批號/配方/門市三種追溯查詢',
+    '📅 排程：生產排程（4 時段）、待生產→生產中→已完成',
+    '🔧 設備：設備保養週期、逾期警示、完成保養自動排下次',
+    '💹 預算/KPI：月度預算設定、實際 vs 預算差異、8 項 KPI 指標',
+    '🔔 警示中心：自動掃描全系統（缺貨/過期/逾期/設備/採購/合約/損耗）',
+    '☁️ 雲端：三種雲端（Supabase/Firebase SDK/JSONBin.io）',
+    '🔐 登入系統：帳號密碼驗證、記住帳密、忘記密碼（救援碼/公司驗證/緊急重設）',
+    '🔐 權限管理：三級角色權限矩陣、模組級存取控管、goPage 攔截',
+    '↩️ Undo/Redo：30 步歷史 + Ctrl+Z/Y 快捷鍵',
+    '💾 備份管理中心：自動備份（每 3 分鐘/保留 14 天）、還原/下載/手動備份',
+    '🔐 加密備份：base64+密碼保護 .enc 檔',
+    '📋 剪貼簿同步：跨電腦傳輸方案',
+    '📱 RWD 行動版：480px + 360px 兩組斷點',
+    '🎓 新手引導：8 步驟導覽',
+    '📖 SOP 操作說明：24 個模組全部含 SOP',
+    '📱 門市 APP：獨立 HTML、Firebase SDK 同步、5 分頁（首頁/庫存/叫貨/檢查/更多）'
+  ]}
+];
+
+window.showVersionInfo=function(){
+  var html='<div style="text-align:center;margin-bottom:16px"><div style="width:48px;height:48px;background:#D4950F;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem">好</div><div style="font-size:1.1rem;font-weight:700">好洺餐飲事業有限公司</div><div style="font-size:0.88rem;color:#706E68">生產管理系統</div><div style="margin-top:8px"><span class="badge badge-green" style="font-size:0.88rem;padding:4px 14px">v'+SYSTEM_VERSION+'</span></div><div style="font-size:0.78rem;color:#706E68;margin-top:6px">Build '+BUILD_NUMBER+'</div></div>';
+  
+  html+='<div style="font-weight:700;font-size:0.92rem;margin-bottom:10px">📋 版本修改紀錄</div>';
+  html+='<div style="max-height:400px;overflow-y:auto">';
+  VERSION_HISTORY.forEach(function(v){
+    html+='<div style="border:1px solid #D6D4CC;border-radius:10px;padding:12px 14px;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:1rem;color:#0A5A46">v'+v.ver+'</span><span style="font-size:0.78rem;color:#706E68">'+v.date+' ｜ Build '+v.build+'</span></div><div style="font-size:0.82rem;line-height:1.7;color:#555350">';
+    v.changes.forEach(function(c){
+      html+='<div style="padding:2px 0;border-bottom:0.5px solid #ECEAE4">'+c+'</div>';
+    });
+    html+='</div></div>';
+  });
+  html+='</div>';
+  
+  html+='<div style="background:#F3F1EB;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:0.82rem;color:#555350"><b>系統統計：</b> 25 個功能模組 ｜ 24 份 SOP ｜ 約 '+Math.round(document.documentElement.outerHTML.length/1024)+' KB ｜ Firebase SDK 雲端同步</div>';
+  html+='<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
+  modal(html,true);
+};
 
 
 
