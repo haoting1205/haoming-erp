@@ -6,244 +6,194 @@
 <title>好洺餐飲事業有限公司 — 生產管理系統</title>
 <style>
 /* ══════════════════════════════════════════════════════
-   好洺餐飲 — 高對比 · 易讀 · 優化操作介面
+   好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
+   溫暖專業 · 高對比 · 易讀 · 快速上手
    ══════════════════════════════════════════════════════ */
-html{font-size:clamp(14px,1.4vw,17px)}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+html{font-size:clamp(14px,1.4vw,16.5px)}
 :root{
-  --amber:#9A6210;--amber-d:#7A4D0B;--amber-l:#FFF4E0;--amber-m:#F0C060;
+  --pri:#0A6847;--pri-d:#064535;--pri-l:#E8F5EE;--pri-bg:#F0FAF5;
+  --amber:#9A6210;--amber-d:#7A4D0B;--amber-l:#FFF8ED;--amber-m:#F0C060;--amber-bg:#FFFDF7;
   --teal:#0A5A46;--teal-d:#064535;--teal-l:#DFF5EC;
-  --g50:#FAFAF8;--g100:#F3F1EB;--g200:#D6D4CC;--g300:#B0AEA6;--g400:#706E68;--g500:#555350;--g600:#3E3D3A;--g700:#2C2C2A;--g800:#1E1E1C;
-  --red:#B82525;--red-l:#FDE8E8;--red-d:#8C1A1A;
-  --blue:#1455A0;--blue-l:#E0EDFB;
-  --brd:1px solid #C8C6BE;--r:10px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 12px rgba(0,0,0,.1);--shadow-lg:0 8px 32px rgba(0,0,0,.18)
+  --g50:#FAFAF8;--g100:#F5F3EF;--g200:#E8E6E0;--g300:#B0AEA6;--g400:#706E68;--g500:#555350;--g600:#3E3D3A;--g700:#2C2C2A;--g800:#1E1E1C;
+  --red:#C02828;--red-l:#FEF0F0;--red-d:#8C1A1A;
+  --blue:#1460A8;--blue-l:#EDF4FC;
+  --card:#FFFFFF;--bg:#F0EDE7;--bg2:#E8E5DF;
+  --brd:1px solid #D4D2CC;--brd-l:1px solid #E8E6E0;--r:12px;--r-sm:8px;--r-lg:16px;
+  --shadow-sm:0 1px 4px rgba(0,0,0,.06);--shadow-md:0 4px 16px rgba(0,0,0,.08);--shadow-lg:0 8px 32px rgba(0,0,0,.14);
+  --font:'Noto Sans TC','PingFang TC','Microsoft JhengHei',-apple-system,sans-serif
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',-apple-system,BlinkMacSystemFont,sans-serif;font-size:1rem;background:#ECEAE4;color:#1E1E1C;min-height:100vh;line-height:1.6}
+body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g800);min-height:100vh;line-height:1.65;letter-spacing:.02em;-webkit-font-smoothing:antialiased}
 
 /* ── Top Bar ── */
-#topbar{background:#1E1E1C;color:#F3F1EB;position:sticky;top:0;z-index:999;box-shadow:0 3px 12px rgba(0,0,0,.35)}
-#topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
-.logo{font-size:1.1rem;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:10px;letter-spacing:.03em}
-.logo-dot{width:10px;height:10px;background:#D4950F;border-radius:50%;box-shadow:0 0 8px rgba(212,149,15,.5)}
-#topbar-row2{display:flex;align-items:center;padding:0 12px}
-#nav-bar{display:flex;gap:2px;flex-wrap:wrap;flex:1;padding:4px 0;-webkit-overflow-scrolling:touch}
-.nav-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.75);padding:5px 10px;cursor:pointer;font-size:0.82rem;font-family:inherit;transition:.2s;white-space:nowrap;border-radius:6px;font-weight:500;letter-spacing:.01em;margin:2px 0}
-.nav-btn:hover{color:#fff;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.25)}
-.nav-btn.active{color:#fff;background:rgba(212,149,15,.25);border-color:#D4950F;font-weight:700}
-.nav-divider{color:rgba(255,255,255,.15);padding:0 2px;align-self:center;user-select:none;flex-shrink:0;font-size:0.7rem}
-#topbar-right{margin-left:auto;font-size:0.82rem;color:rgba(255,255,255,.65);flex-shrink:0;padding-left:12px;font-weight:600}
+#topbar{background:linear-gradient(180deg,#1A1A18 0%,#252523 100%);color:#F3F1EB;position:sticky;top:0;z-index:999;box-shadow:0 2px 16px rgba(0,0,0,.3)}
+#topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo{font-size:1.08rem;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:10px;letter-spacing:.04em;cursor:pointer}
+.logo-dot{width:10px;height:10px;background:#D4950F;border-radius:50%;box-shadow:0 0 8px rgba(212,149,15,.45)}
+#topbar-row2{display:flex;align-items:center;padding:4px 16px 6px}
+#nav-bar{display:flex;gap:3px;flex-wrap:wrap;flex:1;padding:2px 0;-webkit-overflow-scrolling:touch}
+.nav-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.68);padding:6px 12px;cursor:pointer;font-size:0.8rem;font-family:var(--font);transition:all .2s;white-space:nowrap;border-radius:var(--r-sm);font-weight:500;letter-spacing:.02em;margin:1px 0}
+.nav-btn:hover{color:#fff;background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
+.nav-btn.active{color:#FFF;background:rgba(212,149,15,.2);border-color:rgba(212,149,15,.6);font-weight:700;box-shadow:0 0 8px rgba(212,149,15,.15)}
+.nav-divider{color:rgba(255,255,255,.12);padding:0 3px;align-self:center;user-select:none;flex-shrink:0;font-size:0.65rem}
+#topbar-right{margin-left:auto;font-size:0.82rem;color:rgba(255,255,255,.6);flex-shrink:0;padding-left:12px;font-weight:500}
 
 /* ── Layout ── */
 #cost-section{display:block}#order-section{display:none}
-#cost-content{padding:24px;max-width:1440px;margin:0 auto}
+#cost-content{padding:20px 28px;max-width:1440px;margin:0 auto}
+.page-title{font-size:1.25rem;font-weight:700;color:var(--g800);margin-bottom:20px;letter-spacing:.03em;line-height:1.3}
 
 /* ── Cards ── */
-.card{background:#fff;border-radius:var(--r);border:1px solid #D6D4CC;padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
-.card-title{font-size:0.95rem;font-weight:600;color:#1E1E1C;margin-bottom:14px;padding-bottom:10px;border-bottom:1.5px solid #ECEAE4;letter-spacing:.01em}
+.card{background:var(--card);border-radius:var(--r);border:var(--brd-l);padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow-sm);transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-md)}
+.card-title{font-size:0.92rem;font-weight:700;color:var(--g700);margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--g100);letter-spacing:.02em;display:flex;align-items:center;gap:6px}
 
 /* ── Grids ── */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 
 /* ── Metrics ── */
-.metric{background:#F3F1EB;border-radius:8px;padding:14px 16px;border:1px solid #D6D4CC}
-.metric-label{font-size:0.82rem;color:#555350;display:block;margin-bottom:6px;font-weight:600;letter-spacing:.02em}
-.metric-val{font-size:1.65rem;font-weight:700;color:#1E1E1C;line-height:1}
-
-/* ── Page Title ── */
-.page-title{font-size:1.2rem;font-weight:700;color:#1E1E1C;margin-bottom:18px;letter-spacing:.01em}
+.metric{background:var(--g50);border-radius:var(--r-sm);padding:14px 16px;border:var(--brd-l);text-align:center;transition:transform .15s}
+.metric:hover{transform:translateY(-2px)}
+.metric-label{font-size:0.75rem;color:var(--g400);font-weight:500;margin-bottom:6px;text-transform:none;letter-spacing:.03em}
+.metric-val{font-size:1.55rem;font-weight:700;color:var(--teal);line-height:1.2}
+.metric-sub{font-size:0.72rem;color:var(--g300);margin-top:3px}
 
 /* ── Tables ── */
-.tbl{width:100%;border-collapse:collapse;font-size:0.9rem}
-.tbl th{background:#2C2C2A;color:#fff;padding:10px 12px;text-align:left;font-weight:600;font-size:0.84rem;white-space:nowrap;letter-spacing:.02em}
-.tbl td{padding:9px 12px;border-bottom:1px solid #E8E6E0;vertical-align:middle;color:#1E1E1C}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:nth-child(even) td{background:#FAFAF8}
-.tbl tr:hover td{background:#E8E5DC}
-
-/* ── Badges (HIGH CONTRAST) ── */
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:0.8rem;font-weight:600;white-space:nowrap;letter-spacing:.01em}
-.badge-green{background:#C8F0D8;color:#0A5A2E;border:1px solid #8CD4A8}
-.badge-red{background:#FDD;color:#8C1A1A;border:1px solid #F5AAAA}
-.badge-blue{background:#D0E4F7;color:#0D3B6F;border:1px solid #90BAE0}
-.badge-warn{background:#FFF0CC;color:#6B3A00;border:1px solid #F0C860}
-.badge-gray{background:#E8E6E0;color:#3E3D3A;border:1px solid #C8C6BE}
-.badge-order{background:var(--amber-l);color:var(--amber-d);border:1px solid var(--amber-m);font-weight:700}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:0.88rem}
+.tbl th{background:var(--g100);padding:10px 14px;text-align:left;font-weight:600;color:var(--g500);font-size:0.8rem;letter-spacing:.04em;text-transform:none;border-bottom:2px solid var(--g200);position:sticky;top:0;z-index:1}
+.tbl td{padding:10px 14px;border-bottom:var(--brd-l);color:var(--g700);vertical-align:middle;line-height:1.5}
+.tbl tbody tr{transition:background .15s}
+.tbl tbody tr:hover{background:var(--g50)}
+.tbl tbody tr:nth-child(even){background:rgba(245,243,239,.5)}
+.tbl tbody tr:nth-child(even):hover{background:var(--g50)}
 
 /* ── Buttons ── */
-.btn{border:none;border-radius:7px;padding:9px 16px;font-size:0.9rem;cursor:pointer;font-family:inherit;transition:.2s;display:inline-flex;align-items:center;gap:6px;font-weight:600;line-height:1;white-space:nowrap;letter-spacing:.01em}
-.btn-primary{background:#0A5A46;color:#fff;box-shadow:0 2px 6px rgba(10,90,70,.25)}.btn-primary:hover{background:#064535;box-shadow:0 3px 10px rgba(10,90,70,.35)}
-.btn-sm{padding:6px 14px;font-size:0.84rem;border-radius:6px}
-.btn-outline{background:#fff;border:1.5px solid #B0AEA6;color:#1E1E1C}.btn-outline:hover{border-color:#0A5A46;color:#0A5A46;background:#DFF5EC}
-.btn-danger{background:#B82525;color:#fff;box-shadow:0 2px 6px rgba(184,37,37,.2)}.btn-danger:hover{background:#8C1A1A}
-.btn-success{background:#0A6B30;color:#fff}.btn-success:hover{background:#085525}
-.btn-reset{background:#fff;border:1.5px solid #B0AEA6;color:#555350}.btn-reset:hover{border-color:#B82525;color:#B82525;background:#FDE8E8}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:var(--r-sm);padding:10px 20px;font-size:0.9rem;cursor:pointer;font-family:var(--font);font-weight:600;transition:all .2s;letter-spacing:.02em;line-height:1.3}
+.btn:active{transform:scale(.97)}
+.btn-primary,.btn-pri{background:var(--pri);color:#fff;box-shadow:0 2px 6px rgba(10,104,71,.2)}
+.btn-primary:hover,.btn-pri:hover{background:var(--pri-d);box-shadow:0 4px 12px rgba(10,104,71,.25)}
+.btn-outline{background:var(--card);border:1.5px solid var(--g200);color:var(--g600)}
+.btn-outline:hover{border-color:var(--g300);background:var(--g50);color:var(--g800)}
+.btn-danger{background:var(--red);color:#fff;box-shadow:0 2px 6px rgba(192,40,40,.2)}
+.btn-danger:hover{background:var(--red-d)}
+.btn-success{background:var(--pri);color:#fff}.btn-success:hover{background:var(--pri-d)}
+.btn-sm{padding:6px 14px;font-size:0.82rem;font-weight:600;border-radius:6px}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;letter-spacing:.02em}
+.badge-green{background:var(--pri-l);color:var(--pri)}
+.badge-red{background:var(--red-l);color:var(--red)}
+.badge-warn{background:var(--amber-l);color:var(--amber)}
+.badge-blue{background:var(--blue-l);color:var(--blue)}
+.badge-gray{background:var(--g100);color:var(--g400)}
 
 /* ── Forms ── */
-.form-row{display:grid;gap:12px;margin-bottom:12px}
-.form-row.c2{grid-template-columns:1fr 1fr}.form-row.c3{grid-template-columns:1fr 1fr 1fr}
-.form-row.c4{grid-template-columns:1fr 1fr 1fr 1fr}.form-row.c5{grid-template-columns:repeat(5,1fr)}
-.fg label{font-size:0.82rem;color:#3E3D3A;display:block;margin-bottom:5px;font-weight:600}
-.fg input,.fg select,.fg textarea{width:100%;border:1.5px solid #C8C6BE;border-radius:7px;padding:8px 12px;font-size:0.92rem;font-family:inherit;outline:none;background:#FAFAF8;color:#1E1E1C;transition:.2s}
-.fg input:focus,.fg select:focus{border-color:#0A5A46;box-shadow:0 0 0 3px rgba(10,90,70,.12);background:#fff}
-.fg input::placeholder{color:#B0AEA6}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:0.82rem;font-weight:600;color:var(--g500);margin-bottom:5px;letter-spacing:.02em}
+.fg input,.fg select,.fg textarea{width:100%;border:1.5px solid var(--g200);border-radius:var(--r-sm);padding:10px 14px;font-size:0.92rem;font-family:var(--font);background:var(--card);color:var(--g800);transition:all .2s;outline:none;line-height:1.4}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(10,104,71,.1);background:#fff}
+.fg input::placeholder{color:var(--g300);font-weight:400}
+.form-row{display:grid;gap:12px;margin-bottom:4px}
+.form-row.c2{grid-template-columns:1fr 1fr}
+.form-row.c3{grid-template-columns:1fr 1fr 1fr}
+.form-row.c4{grid-template-columns:repeat(4,1fr)}
+.form-row.c5{grid-template-columns:repeat(5,1fr)}
 
 /* ── Modal ── */
-.modal-title{font-size:1.1rem;font-weight:700;color:#1E1E1C;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #ECEAE4;display:flex;justify-content:space-between;align-items:center}
-.save-btns{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;padding-top:14px;border-top:2px solid #ECEAE4}
-
-/* ── Recipe Ingredient Row ── */
-.recipe-ing-row{display:grid;grid-template-columns:2fr 90px 65px 100px 36px;gap:8px;align-items:center;margin-bottom:8px}
-.recipe-ing-row select,.recipe-ing-row input{border:1.5px solid #C8C6BE;border-radius:6px;padding:6px 8px;font-size:0.86rem;font-family:inherit;outline:none;width:100%;background:#FAFAF8;color:#1E1E1C}
-.recipe-ing-row select:focus,.recipe-ing-row input:focus{border-color:#0A5A46;background:#fff}
-
-/* ── Tips & Warnings ── */
-.tip{background:#DFF5EC;border-left:4px solid #0A5A46;border-radius:0 8px 8px 0;padding:10px 14px;font-size:0.88rem;color:#064535;margin:10px 0;font-weight:600}
-.warn-box{background:#FFF0CC;border-left:4px solid #9A6210;border-radius:0 8px 8px 0;padding:10px 14px;font-size:0.88rem;color:#6B3A00;margin:10px 0;font-weight:600}
-
-/* ══════════════════════════════════════════
-   ORDER SECTION
-   ══════════════════════════════════════════ */
-#order-section{background:#ECEAE4;min-height:calc(100vh - 54px)}
-.tab-nav{background:#fff;border-bottom:2px solid #D6D4CC;padding:0 24px;display:flex;overflow-x:auto}
-.tab-btn{padding:14px 18px;font-size:0.92rem;cursor:pointer;border:none;background:none;color:#555350;border-bottom:3px solid transparent;white-space:nowrap;transition:.2s;font-family:inherit;font-weight:600}
-.tab-btn:hover{color:#1E1E1C;background:#F3F1EB}
-.tab-btn.active{color:#7A4D0B;border-bottom-color:#9A6210;font-weight:700;background:#FFF8ED}
-
-.sheet{display:none;padding:24px;max-width:1100px;margin:0 auto}
-.sheet.active{display:block}
-.form-header{background:#fff;border:1px solid #D6D4CC;border-radius:var(--r);padding:18px 22px;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.form-header .company{font-size:1.25rem;font-weight:700;color:#1E1E1C;margin-bottom:12px;display:flex;align-items:center;gap:10px}
-.form-header .company::before{content:'';width:5px;height:22px;background:#9A6210;border-radius:3px;display:inline-block}
-.header-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.header-field label{font-size:0.82rem;color:#555350;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;font-weight:600}
-.header-field input,.header-field select{width:100%;border:1.5px solid #C8C6BE;border-radius:7px;padding:8px 12px;font-size:0.92rem;font-family:inherit;background:#F3F1EB;color:#1E1E1C;font-weight:600}
-.header-field input:focus,.header-field select:focus{outline:none;border-color:#9A6210;background:#fff;box-shadow:0 0 0 3px rgba(154,98,16,.1)}
-
-.table-wrap{background:#fff;border:1px solid #D6D4CC;border-radius:var(--r);overflow:hidden;margin-bottom:18px;box-shadow:var(--shadow-sm)}
-.table-title{padding:12px 18px;background:#F3F1EB;border-bottom:1.5px solid #D6D4CC;font-size:0.88rem;color:#3E3D3A;display:flex;align-items:center;justify-content:space-between;font-weight:600}
-
-.sheet table{width:100%;border-collapse:collapse}
-.sheet thead th{background:#2C2C2A;color:#fff;padding:10px 12px;font-size:0.86rem;font-weight:600;text-align:center;white-space:nowrap;letter-spacing:.02em}
-.sheet thead th.left{text-align:left}
-.sheet tbody tr{border-bottom:1px solid #E8E6E0;transition:background .15s}
-.sheet tbody tr:nth-child(even){background:#FAFAF8}
-.sheet tbody tr:hover{background:#F0EDE5}
-.sheet tbody tr:last-child{border-bottom:none}
-.sheet td{padding:8px 12px;font-size:0.92rem;vertical-align:middle;color:#1E1E1C}
-.sheet td.seq{color:#706E68;text-align:center;width:40px;font-size:0.84rem;font-weight:600}
-.sheet td.name{min-width:180px;font-weight:600}
-.sheet td.unit{text-align:center;color:#555350;font-weight:600}
-.sheet td.price{text-align:center;color:#7A4D0B;font-weight:700}
-.sheet td.amount{text-align:right;font-weight:700;color:#0A5A46;min-width:70px}
-
-.qty-input{width:68px;border:1.5px solid #C8C6BE;border-radius:7px;padding:6px 8px;text-align:center;font-size:0.92rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C;transition:.2s;font-weight:600}
-.qty-input:focus{outline:none;border-color:#9A6210;background:#fff;box-shadow:0 0 0 3px rgba(154,98,16,.12)}
-.qty-input.has-value{background:#FFF4E0;border-color:#D4950F;font-weight:700;color:#5C3A00}
-
-.note-input{width:100%;border:1.5px solid #D6D4CC;border-radius:7px;padding:6px 10px;font-size:0.86rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C}
-.note-input:focus{outline:none;border-color:#706E68;background:#fff}
-.note-input::placeholder{color:#B0AEA6}
-
-.footer-card{background:#fff;border:1px solid #D6D4CC;border-radius:var(--r);padding:18px 22px;display:grid;gap:18px;box-shadow:var(--shadow-sm)}
-.sig-block{display:block}
-.sig-block label{font-size:0.82rem;color:#555350;letter-spacing:.06em;margin-bottom:5px;display:block;font-weight:600}
-.sig-row{display:flex;gap:18px}
-.sig-field{flex:1}
-.sig-field span{font-size:0.88rem;color:#3E3D3A;font-weight:600}
-.sig-field input{width:100%;border:none;border-bottom:2px solid #D6D4CC;padding:6px 0;font-size:0.92rem;font-family:inherit;background:transparent;margin-top:4px;color:#1E1E1C}
-.sig-field input:focus{outline:none;border-bottom-color:#9A6210}
-
-/* ── Action Bar ── */
-.action-bar{position:sticky;bottom:0;background:#fff;border-top:2px solid #D6D4CC;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;z-index:10;box-shadow:0 -3px 12px rgba(0,0,0,.06)}
-.total-summary{font-size:1rem;color:#3E3D3A;font-weight:600}
-.grand-total{color:#7A4D0B;font-size:1.3rem;font-weight:800}
-.btns{display:flex;gap:10px}
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-box{background:var(--card);border-radius:var(--r-lg);width:auto;min-width:460px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:1.05rem;font-weight:700;padding:18px 24px;border-bottom:2px solid var(--g100);color:var(--g800);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--card);z-index:1;border-radius:var(--r-lg) var(--r-lg) 0 0}
+.modal-body{padding:20px 24px}
+.save-btns{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;border-top:var(--brd-l);background:var(--g50);border-radius:0 0 var(--r-lg) var(--r-lg)}
 
 /* ── Toast ── */
-.save-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1E1E1C;color:#fff;padding:10px 24px;border-radius:24px;font-size:0.92rem;font-weight:600;opacity:0;transition:opacity .3s;pointer-events:none;z-index:300;white-space:nowrap;box-shadow:var(--shadow-lg)}
-.save-toast.show{opacity:1}
+.toast-wrap{position:fixed;top:80px;right:24px;z-index:9000}
+.toast-item{background:var(--g800);color:#fff;padding:12px 22px;border-radius:var(--r);font-size:0.9rem;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;margin-bottom:8px}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
 
-/* ── Excel Modal ── */
-.xl-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center}
-.xl-overlay.open{display:flex}
-.xl-modal{background:#fff;border-radius:14px;padding:28px 32px;width:420px;max-width:95vw;box-shadow:var(--shadow-lg)}
-.xl-modal h3{font-size:1.15rem;font-weight:700;margin-bottom:8px;color:#1E1E1C}
-.xl-modal p{font-size:0.92rem;color:#555350;margin-bottom:22px}
-.xl-section{margin-bottom:22px}
-.xl-section-title{font-size:0.86rem;font-weight:700;color:#3E3D3A;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #ECEAE4}
-.xl-btn-row{display:flex;gap:10px;flex-wrap:wrap}
-.xl-action-btn{display:flex;align-items:center;gap:10px;padding:12px 18px;border:1.5px solid #D6D4CC;border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;font-size:0.92rem;color:#1E1E1C;transition:.2s;flex:1;min-width:140px}
-.xl-action-btn:hover{background:#F3F1EB;border-color:#706E68}
-.xl-action-btn.green{border-color:#8CD4A8;color:#0A5A46;background:#F0FAF4}
-.xl-action-btn.green:hover{background:#DFF5EC;border-color:#0A5A46}
-.xl-action-btn .xl-icon{font-size:1.3rem;flex-shrink:0}
-.xl-action-btn .xl-text{text-align:left}
-.xl-action-btn .xl-text b{display:block;font-weight:700;color:#1E1E1C}
-.xl-action-btn .xl-text span{font-size:0.82rem;color:#706E68}
+/* ── Tips / Warnings ── */
+.tip{background:var(--amber-l);border-left:4px solid var(--amber);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:10px 16px;font-size:0.86rem;color:var(--amber-d);margin-bottom:14px;line-height:1.6}
+.warn-box{background:var(--red-l);border-left:4px solid var(--red);border-radius:0 var(--r-sm) var(--r-sm) 0;padding:10px 16px;font-size:0.86rem;color:var(--red-d);margin-bottom:14px;line-height:1.6}
 
-.xl-drop{border:2.5px dashed #C8C6BE;border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:.2s;position:relative;margin-top:12px}
-.xl-drop:hover,.xl-drop.drag{border-color:#9A6210;background:#FFF8ED}
-.xl-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.xl-drop-text{font-size:0.92rem;color:#555350;pointer-events:none}
-.xl-drop-text b{display:block;font-size:1rem;color:#1E1E1C;margin-bottom:6px;font-weight:700}
-.xl-result{margin-top:12px;font-size:0.88rem;padding:10px 14px;border-radius:8px;display:none;font-weight:600}
-.xl-result.ok{background:#DFF5EC;color:#064535;display:block;border:1px solid #8CD4A8}
-.xl-result.err{background:#FDE8E8;color:#8C1A1A;display:block;border:1px solid #F5AAAA}
+/* ── SOP ── */
+.sop-toggle{background:var(--pri-l);border:1.5px solid rgba(10,104,71,.15);border-radius:var(--r-sm);padding:10px 16px;cursor:pointer;font-size:0.86rem;color:var(--pri);font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+.sop-toggle:hover{background:var(--pri-bg);border-color:rgba(10,104,71,.25)}
+.sop-content{background:var(--card);border:var(--brd-l);border-radius:0 0 var(--r-sm) var(--r-sm);padding:16px 20px;margin-top:-14px;margin-bottom:14px;font-size:0.86rem;line-height:1.7}
+.sop-flow{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.sop-step{background:var(--pri-l);color:var(--pri);padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:600}
+.sop-arrow{color:var(--g300);font-size:0.7rem}
+.sop-section-title{font-weight:700;color:var(--g700);margin:10px 0 6px;font-size:0.88rem}
+.sop-steps{padding-left:20px;color:var(--g500);margin-bottom:8px}
+.sop-steps li{margin-bottom:4px;line-height:1.6}
+.sop-tip{background:var(--amber-l);border-radius:6px;padding:8px 12px;font-size:0.82rem;color:var(--amber-d);margin-top:6px}
+.sop-warn{background:var(--red-l);border-radius:6px;padding:8px 12px;font-size:0.82rem;color:var(--red-d);margin-top:6px}
 
-/* ── Print Modal ── */
-.print-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center}
-.print-overlay.open{display:flex}
-.print-modal{background:#fff;border-radius:14px;padding:28px 32px;width:400px;max-width:95vw;box-shadow:var(--shadow-lg)}
-.print-modal h3{font-size:1.15rem;font-weight:700;margin-bottom:8px;color:#1E1E1C}
-.print-modal p{font-size:0.92rem;color:#555350;margin-bottom:22px}
-.print-choices{display:flex;flex-direction:column;gap:12px;margin-bottom:22px}
-.print-choice{border:1.5px solid #D6D4CC;border-radius:10px;padding:16px 18px;cursor:pointer;transition:.2s;display:flex;align-items:flex-start;gap:14px}
-.print-choice:hover{border-color:#9A6210;background:#FFF8ED}
-.print-choice.selected{border-color:#9A6210;background:#FFF4E0;box-shadow:0 0 0 3px rgba(154,98,16,.1)}
-.print-choice-icon{font-size:1.5rem;line-height:1;flex-shrink:0;margin-top:2px}
-.print-choice-title{font-size:0.95rem;font-weight:700;color:#1E1E1C;margin-bottom:4px}
-.print-choice-desc{font-size:0.82rem;color:#555350;line-height:1.6}
-.print-modal-btns{display:flex;gap:10px;justify-content:flex-end}
+/* ── Recipe ── */
+.recipe-list{border-right:var(--brd);overflow-y:auto;max-height:70vh}
+.recipe-item{padding:10px 14px;cursor:pointer;border-bottom:var(--brd-l);transition:background .15s;font-size:0.88rem}
+.recipe-item:hover{background:var(--g50)}
+.recipe-item.active{background:var(--pri-l);border-left:3px solid var(--pri)}
+.recipe-detail{padding:16px 20px;overflow-y:auto;max-height:70vh}
+.recipe-ing-row{display:grid;grid-template-columns:2fr 80px 60px 90px 36px;gap:6px;align-items:center;padding:6px 0;border-bottom:var(--brd-l);font-size:0.88rem}
 
-/* ── SOP Box (HIGH CONTRAST) ── */
-.sop-box{border-radius:var(--r);border:1.5px solid #90BAE0;background:#EBF3FC;margin-bottom:16px;overflow:hidden}
-.sop-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer;user-select:none;transition:.2s}
-.sop-header:hover{background:#D0E4F7}
-.sop-header-left{display:flex;align-items:center;gap:10px;font-size:0.95rem;font-weight:700;color:#0D3B6F}
-.sop-badge{font-size:0.76rem;background:#1455A0;color:#fff;border-radius:20px;padding:3px 10px;font-weight:600}
-.sop-toggle{font-size:0.88rem;color:#1455A0;transition:transform .2s;font-weight:700}
-.sop-toggle.open{transform:rotate(180deg)}
-.sop-body{padding:0 16px 16px;display:none}
-.sop-body.open{display:block}
-.sop-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.sop-section{margin-bottom:10px}
-.sop-section-title{font-size:0.82rem;font-weight:700;color:#0D3B6F;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #90BAE0}
-.sop-steps{list-style:none;padding:0;margin:0}
-.sop-steps li{display:flex;gap:10px;align-items:flex-start;font-size:0.88rem;color:#1E1E1C;margin-bottom:8px;line-height:1.6}
-.sop-num{min-width:22px;height:22px;background:#1455A0;color:#fff;border-radius:50%;font-size:0.76rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
-.sop-warn{background:#FFF0CC;border-left:4px solid #9A6210;border-radius:0 8px 8px 0;padding:8px 12px;font-size:0.84rem;color:#6B3A00;margin-top:10px;line-height:1.6;font-weight:600}
-.sop-tip{background:#DFF5EC;border-left:4px solid #0A5A46;border-radius:0 8px 8px 0;padding:8px 12px;font-size:0.84rem;color:#064535;margin-top:8px;line-height:1.6;font-weight:600}
-.sop-flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:10px 0}
-.sop-flow-step{background:#1455A0;color:#fff;border-radius:7px;padding:5px 12px;font-size:0.82rem;font-weight:600;white-space:nowrap}
-.sop-flow-arrow{color:#1455A0;font-size:1.1rem;font-weight:800}
+/* ── Action Bar (叫貨表) ── */
+.action-bar{background:var(--card);padding:14px 24px;border-bottom:var(--brd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tab-nav{display:flex;gap:2px;overflow-x:auto;padding-bottom:4px}
+.tab-nav button{padding:10px 18px;border:none;background:transparent;color:var(--g400);font-weight:600;cursor:pointer;font-family:var(--font);font-size:0.88rem;border-bottom:2.5px solid transparent;transition:.2s;white-space:nowrap}
+.tab-nav button.active{color:var(--pri);border-bottom-color:var(--pri)}
+.tab-nav button:hover{color:var(--g700)}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--g200);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--g300)}
 
 /* ── Print ── */
-@media print{@page{size:A4 portrait;margin:8mm}#topbar,.tab-nav,.action-bar,.save-toast,.print-overlay,.xl-overlay{display:none!important}#cost-section{display:none!important}#order-section{display:block!important}.sheet{display:block!important;padding:0;width:100%}html,body{background:#fff;font-size:0.8rem}.sheet table{font-size:0.74rem}.sheet thead th,.sheet td{padding:4px 7px;font-size:0.74rem}.qty-input{border:1px solid #999!important;background:transparent!important;font-size:0.74rem;width:54px}.note-input{border-bottom:1px solid #999!important;background:transparent!important}.sig-field input{border-bottom:1px solid #999!important}}
+@media print{#topbar,.nav-btn,.btn,.sop-toggle{display:none!important}body{background:#fff}.card{box-shadow:none;border:1px solid #ddd}}
 
-/* ── Responsive ── */
-@media(max-width:700px){.header-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:640px){.grid4,.grid3{grid-template-columns:1fr 1fr}.form-row.c4,.form-row.c3{grid-template-columns:1fr 1fr}.logo{font-size:0.95rem}.nav-btn{padding:4px 8px;font-size:0.78rem}#topbar-row1{padding:6px 12px}#cost-content{padding:14px}.sop-cols{grid-template-columns:1fr}.btns{flex-wrap:wrap}}
-@media(max-width:480px){html{font-size:clamp(13px,4vw,15px)}.grid4,.grid3{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.form-row.c4,.form-row.c5,.form-row.c3{grid-template-columns:1fr 1fr}.form-row.c2{grid-template-columns:1fr}#topbar-row1{padding:6px 10px}#topbar-row2{padding:0 6px}.logo{font-size:0.92rem}.nav-btn{padding:4px 7px;font-size:0.76rem}.action-bar{padding:10px 14px;flex-direction:column;gap:10px}.btns{width:100%;justify-content:center;flex-wrap:wrap}.card{padding:12px 14px}.page-title{font-size:1.05rem}.modal-title{font-size:1rem}.tbl th,.tbl td{padding:6px 8px;font-size:0.82rem}.metric-val{font-size:1.3rem}.metric{padding:10px 12px}.recipe-ing-row{grid-template-columns:1fr 70px 55px 80px 30px;gap:4px}#cost-content{padding:10px}}
-@media(max-width:360px){.grid4,.grid3,.grid2{grid-template-columns:1fr}.form-row.c4,.form-row.c5,.form-row.c3,.form-row.c2{grid-template-columns:1fr}.nav-btn{padding:4px 6px;font-size:0.76rem}.metric-val{font-size:1.1rem}}
+/* ── RWD 480px ── */
+@media(max-width:480px){
+  html{font-size:clamp(13px,4vw,15px)}
+  .grid4,.grid3{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .form-row.c4,.form-row.c5,.form-row.c3{grid-template-columns:1fr 1fr}
+  .form-row.c2{grid-template-columns:1fr}
+  #topbar-row1{padding:6px 12px}
+  #topbar-row2{padding:2px 8px 4px}
+  .logo{font-size:0.92rem}
+  .nav-btn{padding:4px 8px;font-size:0.76rem}
+  .action-bar{padding:10px 14px;flex-direction:column;gap:10px}
+  .btns{width:100%;justify-content:center;flex-wrap:wrap}
+  .card{padding:14px 16px;border-radius:var(--r-sm)}
+  .page-title{font-size:1.05rem}
+  .modal-title{font-size:1rem;padding:14px 16px}
+  .modal-body{padding:14px 16px}
+  .tbl th,.tbl td{padding:7px 10px;font-size:0.82rem}
+  .metric-val{font-size:1.3rem}
+  .metric{padding:10px 12px}
+  .recipe-ing-row{grid-template-columns:1fr 70px 55px 80px 30px;gap:4px}
+  #cost-content{padding:12px}
+  .btn{padding:8px 14px;font-size:0.86rem}
+  .save-btns{padding:12px 16px}
+}
+/* ── RWD 360px ── */
+@media(max-width:360px){
+  .grid4,.grid3,.grid2{grid-template-columns:1fr}
+  .form-row.c4,.form-row.c5,.form-row.c3,.form-row.c2{grid-template-columns:1fr}
+  .nav-btn{padding:3px 6px;font-size:0.74rem}
+  .metric-val{font-size:1.1rem}
+}
 </style>
 </head>
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v1.0.0</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v1.1.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><span class="nav-divider">│</span><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><span class="nav-divider">│</span><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><span class="nav-divider">│</span><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -267,7 +217,9 @@ body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',-apple-system
 const DB_INGS=[{"id": "I002", "name": "鮭魚片", "cat": "海鮮", "unit": "公斤", "stock": 8, "safety": 5, "price": 520, "sup": "S002", "form": "整顆/原形", "meatSrc": "", "kcal": 208, "prot": 20, "fat": 13.4, "carb": 0, "sodium": 59}, {"id": "I003", "name": "高麗菜", "cat": "蔬菜", "unit": "公斤", "stock": 20, "safety": 8, "price": 25, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 25, "prot": 1.3, "fat": 0.1, "carb": 5.8, "sodium": 18}, {"id": "I004", "name": "白米", "cat": "穀物", "unit": "公斤", "stock": 50, "safety": 20, "price": 45, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 360, "prot": 7.5, "fat": 0.7, "carb": 78.9, "sodium": 2}, {"id": "I005", "name": "雞胸肉", "cat": "肉類", "unit": "公斤", "stock": 12, "safety": 8, "price": 120, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 106, "prot": 22.5, "fat": 1.7, "carb": 0, "sodium": 74}, {"id": "I006", "name": "豆腐", "cat": "豆製品", "unit": "塊", "stock": 30, "safety": 15, "price": 20, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I007", "name": "蝦仁", "cat": "海鮮", "unit": "公斤", "stock": 6, "safety": 4, "price": 380, "sup": "S002", "form": "整顆/原形", "meatSrc": "", "kcal": 99, "prot": 20.9, "fat": 1.4, "carb": 0.2, "sodium": 228}, {"id": "I008", "name": "醬油", "cat": "調味料", "unit": "公升", "stock": 10, "safety": 3, "price": 55, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 61, "prot": 8.1, "fat": 0.1, "carb": 7.5, "sodium": 5493}, {"id": "I009", "name": "玄米油", "cat": "食用油", "unit": "公升", "stock": 8, "safety": 3, "price": 120, "sup": "S005", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I010", "name": "洋蔥", "cat": "蔬菜", "unit": "公斤", "stock": 15, "safety": 5, "price": 30, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 40, "prot": 1.1, "fat": 0.1, "carb": 9.3, "sodium": 4}, {"id": "I011", "name": "雞蛋", "cat": "蛋類", "unit": "顆", "stock": 120, "safety": 60, "price": 7, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 143, "prot": 12.6, "fat": 9.5, "carb": 1.1, "sodium": 142}, {"id": "I012", "name": "麵粉", "cat": "穀物", "unit": "公斤", "stock": 25, "safety": 10, "price": 40, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 364, "prot": 9.9, "fat": 1.1, "carb": 76.3, "sodium": 2}, {"id": "I013", "name": "番茄", "cat": "蔬菜", "unit": "公斤", "stock": 10, "safety": 5, "price": 35, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 18, "prot": 0.9, "fat": 0.2, "carb": 3.9, "sodium": 5}, {"id": "I014", "name": "牛里肌", "cat": "肉類", "unit": "公斤", "stock": 5, "safety": 3, "price": 680, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 158, "prot": 22.8, "fat": 6.9, "carb": 0, "sodium": 55}, {"id": "I015", "name": "奶油", "cat": "乳製品", "unit": "公克", "stock": 500, "safety": 200, "price": 0.28, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 717, "prot": 0.9, "fat": 81.1, "carb": 0.1, "sodium": 643}, {"id": "I023", "name": "雞腿排", "cat": "肉類", "unit": "公斤", "stock": 30, "safety": 10, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I024", "name": "大蒜", "cat": "蔬菜", "unit": "公斤", "stock": 2, "safety": 1, "price": 158.75, "sup": "S001", "form": "泥狀", "meatSrc": "", "kcal": 149, "prot": 6.4, "fat": 0.5, "carb": 33.1, "sodium": 17}, {"id": "I025", "name": "沙拉油", "cat": "食用油", "unit": "公升", "stock": 5, "safety": 2, "price": 53.75, "sup": "S005", "form": "整顆/原形", "meatSrc": "", "kcal": 884, "prot": 0, "fat": 100, "carb": 0, "sodium": 0}, {"id": "I041", "name": "豬梅花肉片", "cat": "肉類", "unit": "公斤", "stock": 20, "safety": 8, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I044", "name": "芝麻香油", "cat": "食用油", "unit": "公升", "stock": 2, "safety": 1, "price": 80, "sup": "S005", "form": "整顆/原形", "meatSrc": "", "kcal": 884, "prot": 0, "fat": 100, "carb": 0, "sodium": 0}, {"id": "I080", "name": "三層肉", "cat": "肉類", "unit": "公斤", "stock": 20, "safety": 5, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 339, "prot": 14.6, "fat": 30.3, "carb": 0, "sodium": 59}, {"id": "I083", "name": "醬油膏", "cat": "調味料", "unit": "公斤", "stock": 5, "safety": 1, "price": 40, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 78, "prot": 6.2, "fat": 0.2, "carb": 11, "sodium": 3965}, {"id": "I087", "name": "酸菜絲(甲級)", "cat": "蔬菜", "unit": "公斤", "stock": 10, "safety": 2, "price": 200, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I089", "name": "老薑", "cat": "蔬菜", "unit": "公斤", "stock": 2, "safety": 0.5, "price": 27, "sup": "S001", "form": "切碎", "meatSrc": "", "kcal": 80, "prot": 1.8, "fat": 0.8, "carb": 17.8, "sodium": 13}, {"id": "I090", "name": "二砂", "cat": "穀物", "unit": "公斤", "stock": 5, "safety": 1, "price": 50, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 394, "prot": 0, "fat": 0, "carb": 98.9, "sodium": 4}, {"id": "I092", "name": "蘿蔔乾", "cat": "蔬菜", "unit": "公斤", "stock": 20, "safety": 5, "price": 36.33, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I094", "name": "大辣椒", "cat": "蔬菜", "unit": "公斤", "stock": 2, "safety": 0.5, "price": 167.5, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 40, "prot": 1.9, "fat": 0.4, "carb": 8.8, "sodium": 9}, {"id": "I111", "name": "豬絞肉", "cat": "肉類", "unit": "公斤", "stock": 10, "safety": 3, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 218, "prot": 17.2, "fat": 16.2, "carb": 0, "sodium": 70}, {"id": "I118", "name": "紅蘿蔔", "cat": "蔬菜", "unit": "公斤", "stock": 3, "safety": 1, "price": 0, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 41, "prot": 0.9, "fat": 0.2, "carb": 9.6, "sodium": 69}, {"id": "I125", "name": "杏鮑菇", "cat": "蔬菜", "unit": "公斤", "stock": 5, "safety": 2, "price": 0, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 38, "prot": 2.9, "fat": 0.4, "carb": 7.3, "sodium": 5}, {"id": "I129", "name": "鮪魚罐頭", "cat": "海鮮", "unit": "公克", "stock": 2000, "safety": 500, "price": 0, "sup": "S002", "form": "整顆/原形", "meatSrc": "", "kcal": 184, "prot": 25.5, "fat": 8.2, "carb": 0, "sodium": 396}];
 const DB_RECIPES=[{"id": "R001", "code": "M011", "name": "藍莓優格醬", "multiplier": 1, "perBatch": 3, "unit": "包", "cat": "醬料", "ings": [{"name": "桑葚果醬", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "藍莓果醬", "qty": 550, "unit": "g", "form": "整顆/原形"}, {"name": "優格", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 1200, "unit": "g", "form": "整顆/原形"}, {"name": "檸檬汁", "qty": 60, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3, "unit": "張", "form": "整顆/原形"}]}, {"id": "R002", "code": "M012", "name": "紐澳良雞腿排", "multiplier": 5, "perBatch": 65, "unit": "包", "cat": "醬料", "ings": [{"name": "雞腿排", "qty": 2400, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 28, "unit": "g", "form": "泥狀"}, {"name": "沙拉油", "qty": 72, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 24, "unit": "g", "form": "整顆/原形"}, {"name": "肯瓊粉", "qty": 24, "unit": "g", "form": "整顆/原形"}, {"name": "匈牙利紅椒粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 8, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 28, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "太白粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 2.6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R003", "code": "M013", "name": "蒜香雞肉", "multiplier": 5, "perBatch": 75, "unit": "包", "cat": "醬料", "ings": [{"name": "清雞胸肉片", "qty": 2400, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "牛奶", "qty": 140, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 80, "unit": "g", "form": "泥狀"}, {"name": "雞蛋", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "墨西哥香料粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "匈牙利紅椒粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "洋蔥粉", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "香蒜粉", "qty": 14, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 16, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 12, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "太白粉", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3, "unit": "張", "form": "整顆/原形"}]}, {"id": "R004", "code": "M014", "name": "炭香燒肉", "multiplier": 5, "perBatch": 40, "unit": "包", "cat": "醬料", "ings": [{"name": "豬梅花肉片", "qty": 1200, "unit": "g", "form": "整顆/原形"}, {"name": "炭燒醬", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "老抽", "qty": 6, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "芝麻香油", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 16, "unit": "g", "form": "整顆/原形"}, {"name": "生飲水", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 1.8, "unit": "g", "form": "整顆/原形"}, {"name": "太白粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 1.6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R005", "code": "M015", "name": "羅勒青醬", "multiplier": 4.5, "perBatch": 20, "unit": "包", "cat": "醬料", "ings": [{"name": "葵花油", "qty": 222.222, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 222.222, "unit": "g", "form": "整顆/原形"}, {"name": "蒜味花生", "qty": 37.778, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 40, "unit": "g", "form": "整瓣"}, {"name": "九層塔", "qty": 333.333, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 11.111, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 8.889, "unit": "g", "form": "整顆/原形"}, {"name": "起司粉", "qty": 111.111, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 3.333, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 1.111, "unit": "張", "form": "整顆/原形"}]}, {"id": "R006", "code": "M016", "name": "凱薩醬", "multiplier": 2, "perBatch": 10, "unit": "包", "cat": "醬料", "ings": [{"name": "鯷魚泥", "qty": 48, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 115, "unit": "g", "form": "泥狀"}, {"name": "酸豆泥", "qty": 115, "unit": "g", "form": "整顆/原形"}, {"name": "起司粉", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "芥籽醬", "qty": 115, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "檸檬汁", "qty": 125, "unit": "g", "form": "整顆/原形"}, {"name": "梅林醬油", "qty": 22.5, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 1750, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 2.5, "unit": "張", "form": "整顆/原形"}]}, {"id": "R007", "code": "M017", "name": "蜂蜜芥末醬", "multiplier": 1, "perBatch": 5, "unit": "包", "cat": "醬料", "ings": [{"name": "黃芥末醬", "qty": 800, "unit": "g", "form": "整顆/原形"}, {"name": "芥籽醬", "qty": 230, "unit": "g", "form": "整顆/原形"}, {"name": "蜂蜜", "qty": 370, "unit": "g", "form": "整顆/原形"}, {"name": "檸檬汁", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 3500, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 5, "unit": "張", "form": "整顆/原形"}]}, {"id": "R008", "code": "M018", "name": "檸香塔塔醬", "multiplier": 1, "perBatch": 6, "unit": "包", "cat": "醬料", "ings": [{"name": "洋蔥", "qty": 700, "unit": "g", "form": "泥狀"}, {"name": "酸豆泥", "qty": 120, "unit": "g", "form": "整顆/原形"}, {"name": "酸黃瓜", "qty": 350, "unit": "g", "form": "泥狀"}, {"name": "雞蛋", "qty": 1380, "unit": "g", "form": "水煮"}, {"name": "檸檬汁", "qty": 240, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 120, "unit": "g", "form": "整顆/原形"}, {"name": "橙酒", "qty": 140, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 3500, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R009", "code": "M019", "name": "杏仁奶酥醬", "multiplier": 1, "perBatch": 7, "unit": "盒", "cat": "醬料", "ings": [{"name": "杏仁角", "qty": 250, "unit": "g", "form": "整顆/原形"}, {"name": "發酵無鹽奶油", "qty": 2000, "unit": "g", "form": "整顆/原形"}, {"name": "糖粉", "qty": 650, "unit": "g", "form": "整顆/原形"}, {"name": "奶粉", "qty": 750, "unit": "g", "form": "整顆/原形"}, {"name": "玉米粉", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 12, "unit": "g", "form": "整顆/原形"}, {"name": "煉乳", "qty": 80, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 7, "unit": "盒", "form": "整顆/原形"}]}, {"id": "R010", "code": "M020", "name": "料理調味粉", "multiplier": 1, "perBatch": 11, "unit": "包", "cat": "醬料", "ings": [{"name": "雞粉", "qty": 4000, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 4000, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 3000, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 11, "unit": "張", "form": "整顆/原形"}]}, {"id": "R011", "code": "M021", "name": "匈牙利調味粉", "multiplier": 1, "perBatch": 4, "unit": "包", "cat": "醬料", "ings": [{"name": "鹽", "qty": 290, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 220, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 220, "unit": "g", "form": "整顆/原形"}, {"name": "匈牙利紅椒粉", "qty": 145, "unit": "g", "form": "整顆/原形"}, {"name": "義大利香料", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "俄力岡葉", "qty": 15, "unit": "g", "form": "整顆/原形"}, {"name": "羅勒葉", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 4, "unit": "張", "form": "整顆/原形"}]}, {"id": "R012", "code": "M022", "name": "爌肉", "multiplier": 1, "perBatch": 25, "unit": "份", "cat": "主食", "ings": [{"name": "三層肉", "qty": 24000, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 900, "unit": "g", "form": "整瓣"}, {"name": "青蔥", "qty": 1200, "unit": "g", "form": "整束"}, {"name": "醬油膏", "qty": 10000, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 16000, "unit": "g", "form": "整顆/原形"}, {"name": "味素", "qty": 170, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 25, "unit": "張", "form": "整顆/原形"}]}, {"id": "R013", "code": "M023", "name": "酸菜", "multiplier": 2, "perBatch": 11, "unit": "包", "cat": "配料", "ings": [{"name": "酸菜絲(甲級)", "qty": 1500, "unit": "g", "form": "整顆/原形"}, {"name": "酸菜絲(乙級)", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 300, "unit": "g", "form": "整顆/原形"}, {"name": "老薑", "qty": 100, "unit": "g", "form": "切碎"}, {"name": "二砂", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3, "unit": "張", "form": "整顆/原形"}]}, {"id": "R014", "code": "M024", "name": "菜脯", "multiplier": 1, "perBatch": 12, "unit": "包", "cat": "配料", "ings": [{"name": "蘿蔔乾", "qty": 12000, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 800, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 800, "unit": "g", "form": "切碎"}, {"name": "大辣椒", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 600, "unit": "g", "form": "整顆/原形"}, {"name": "醬油膏", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "芝麻香油", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 12, "unit": "張", "form": "整顆/原形"}]}, {"id": "R015", "code": "M025", "name": "茄汁紅醬", "multiplier": 2, "perBatch": 36, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "低筋麵粉", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "番茄糊", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 150, "unit": "g", "form": "切碎"}, {"name": "洋蔥", "qty": 1000, "unit": "g", "form": "切碎"}, {"name": "西洋芹", "qty": 500, "unit": "g", "form": "切碎"}, {"name": "整粒番茄", "qty": 2500, "unit": "g", "form": "泥狀"}, {"name": "濃縮番茄", "qty": 2000, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 1750, "unit": "g", "form": "整顆/原形"}, {"name": "番茄(醬)", "qty": 500, "unit": "g", "form": "整顆/原形"}, {"name": "義大利香料", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "料理調味粉(成品包)", "qty": 45, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 9, "unit": "張", "form": "整顆/原形"}]}, {"id": "R016", "code": "M026", "name": "奶油白醬", "multiplier": 4, "perBatch": 10, "unit": "包", "cat": "醬料", "ings": [{"name": "調味鮮奶", "qty": 250, "unit": "g", "form": "整顆/原形"}, {"name": "鮮奶油", "qty": 250, "unit": "ml", "form": "整顆/原形"}, {"name": "水", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "奶粉", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "奶油", "qty": 12.5, "unit": "g", "form": "整顆/原形"}, {"name": "洋蔥", "qty": 50, "unit": "g", "form": "泥狀"}, {"name": "低筋麵粉", "qty": 12.5, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 2.5, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 7.5, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 0.75, "unit": "張", "form": "整顆/原形"}]}, {"id": "R017", "code": "M027", "name": "泰式打拋豬", "multiplier": 3, "perBatch": 15, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 33.333, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 33.333, "unit": "g", "form": "切碎"}, {"name": "老薑", "qty": 33.333, "unit": "g", "form": "切碎"}, {"name": "紅蔥頭", "qty": 33.333, "unit": "g", "form": "切碎"}, {"name": "豬絞肉", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "小番茄", "qty": 200, "unit": "g", "form": "切片"}, {"name": "醬油", "qty": 33.333, "unit": "g", "form": "整顆/原形"}, {"name": "醬油膏", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "魚露", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "老抽", "qty": 16.667, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 33.333, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 16.667, "unit": "g", "form": "整顆/原形"}, {"name": "九層塔", "qty": 66.667, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 1.667, "unit": "張", "form": "整顆/原形"}]}, {"id": "R018", "code": "M028", "name": "義式肉醬", "multiplier": 1, "perBatch": 31, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 450, "unit": "g", "form": "切碎"}, {"name": "洋蔥", "qty": 3000, "unit": "g", "form": "切碎"}, {"name": "西洋芹", "qty": 750, "unit": "g", "form": "切碎"}, {"name": "紅蘿蔔", "qty": 750, "unit": "g", "form": "切碎"}, {"name": "豬絞肉", "qty": 9000, "unit": "g", "form": "整顆/原形"}, {"name": "紅酒", "qty": 750, "unit": "g", "form": "整顆/原形"}, {"name": "墨西哥辣椒", "qty": 300, "unit": "g", "form": "切碎"}, {"name": "培根", "qty": 450, "unit": "g", "form": "切碎"}, {"name": "整粒番茄", "qty": 7500, "unit": "g", "form": "泥狀"}, {"name": "濃縮番茄", "qty": 6000, "unit": "g", "form": "醬狀"}, {"name": "番茄醬", "qty": 1500, "unit": "g", "form": "醬狀"}, {"name": "醬油膏", "qty": 300, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 1500, "unit": "g", "form": "整顆/原形"}, {"name": "荳蔻粉", "qty": 15, "unit": "g", "form": "整顆/原形"}, {"name": "俄力岡葉", "qty": 45, "unit": "g", "form": "整顆/原形"}, {"name": "羅勒葉", "qty": 45, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 90, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 240, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 75, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 90, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 31, "unit": "張", "form": "整顆/原形"}]}, {"id": "R019", "code": "M029", "name": "義式鮮菇", "multiplier": 2, "perBatch": 36, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "杏鮑菇", "qty": 6000, "unit": "g", "form": "切片"}, {"name": "秀珍菇", "qty": 1500, "unit": "g", "form": "切片"}, {"name": "香菇", "qty": 1500, "unit": "g", "form": "切片"}, {"name": "米酒", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "義大利香料", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 15, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 9, "unit": "張", "form": "整顆/原形"}]}, {"id": "R020", "code": "M030", "name": "柚柚鮪魚醬", "multiplier": 2, "perBatch": 10, "unit": "包", "cat": "醬料", "ings": [{"name": "鮪魚罐頭", "qty": 1360, "unit": "g", "form": "醬狀"}, {"name": "洋蔥", "qty": 225, "unit": "g", "form": "切碎"}, {"name": "芹菜", "qty": 90, "unit": "g", "form": "切碎"}, {"name": "鮮雞精", "qty": 12.5, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 2.5, "unit": "g", "form": "整顆/原形"}, {"name": "柚子醬", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "桂冠沙拉", "qty": 750, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 2.5, "unit": "張", "form": "整顆/原形"}]}, {"id": "R021", "code": "M031", "name": "香蒜抹醬", "multiplier": 1, "perBatch": 6, "unit": "盒", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 120, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 800, "unit": "g", "form": "泥狀"}, {"name": "奶油", "qty": 1816, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜調味粉", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "起司粉", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "洋香菜", "qty": 8, "unit": "g", "form": "乾燥/粉"}, {"name": "包材", "qty": 6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R022", "code": "M032", "name": "紅麻辣椒醬", "multiplier": 1, "perBatch": 7, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 900, "unit": "g", "form": "整顆/原形"}, {"name": "芝麻香油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "沙茶醬", "qty": 50, "unit": "g", "form": "醬狀"}, {"name": "大蒜", "qty": 200, "unit": "g", "form": "切碎"}, {"name": "紅蔥頭", "qty": 200, "unit": "g", "form": "切碎"}, {"name": "老薑", "qty": 200, "unit": "g", "form": "切碎"}, {"name": "大辣椒", "qty": 1200, "unit": "g", "form": "切碎"}, {"name": "小椒椒", "qty": 1200, "unit": "g", "form": "切碎"}, {"name": "鮮雞精", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 30, "unit": "g", "form": "整顆/原形"}, {"name": "五香粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "花椒粉", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 7, "unit": "張", "form": "整顆/原形"}]}, {"id": "R023", "code": "M033", "name": "香醇醬油膏", "multiplier": 2, "perBatch": 14, "unit": "包", "cat": "醬料", "ings": [{"name": "芝麻香油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 125, "unit": "g", "form": "泥狀"}, {"name": "大辣椒", "qty": 50, "unit": "g", "form": "泥狀"}, {"name": "醬油膏", "qty": 900, "unit": "g", "form": "醬狀"}, {"name": "醬油", "qty": 400, "unit": "g", "form": "醬狀"}, {"name": "梅林醬油", "qty": 100, "unit": "g", "form": "醬狀"}, {"name": "二砂", "qty": 250, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 1250, "unit": "g", "form": "整顆/原形"}, {"name": "糯米粉", "qty": 75, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3.5, "unit": "張", "form": "整顆/原形"}]}];
 const DB_MENU=[{"id": "M001", "code": "M001", "name": "紅燒豬里肌", "price": 280, "ing1": "豬里肌肉", "qty1": 0.2, "unit1": "公斤"}, {"id": "M002", "code": "M002", "name": "香煎鮭魚", "price": 380, "ing1": "鮭魚片", "qty1": 0.18, "unit1": "公斤"}, {"id": "M003", "code": "M003", "name": "雞肉炒飯", "price": 160, "ing1": "雞胸肉", "qty1": 0.15, "unit1": "公斤"}, {"id": "M004", "code": "M004", "name": "麻婆豆腐", "price": 150, "ing1": "豆腐", "qty1": 2, "unit1": "塊"}, {"id": "M005", "code": "M005", "name": "蝦仁炒高麗菜", "price": 220, "ing1": "蝦仁", "qty1": 0.12, "unit1": "公斤"}, {"id": "M006", "code": "M006", "name": "牛排套餐", "price": 680, "ing1": "牛里肌", "qty1": 0.25, "unit1": "公斤"}, {"id": "M007", "code": "M007", "name": "番茄炒蛋", "price": 120, "ing1": "雞蛋", "qty1": 3, "unit1": "顆"}, {"id": "M008", "code": "M008", "name": "炸蝦天婦羅", "price": 320, "ing1": "蝦仁", "qty1": 0.15, "unit1": "公斤"}, {"id": "M009", "code": "M009", "name": "滷肉飯", "price": 90, "ing1": "豬里肌肉", "qty1": 0.1, "unit1": "公斤"}, {"id": "M010", "code": "M010", "name": "海鮮炒飯", "price": 200, "ing1": "蝦仁", "qty1": 0.08, "unit1": "公斤"}];
-const DB_SUPS=[{"id": "S001", "name": "鮮蔬農場", "contact": "陳大明", "phone": "02-1234-5678", "addr": "台北市信義區農業路1號", "type": "蔬菜/水果", "pay": "月結30天", "days": 2, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S002", "name": "海鮮直送", "contact": "林小美", "phone": "02-8765-4321", "addr": "基隆市海港路88號", "type": "海鮮/魚類", "pay": "月結15天", "days": 1, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S003", "name": "肉品供應商", "contact": "王志明", "phone": "03-9876-5432", "addr": "桃園市中山路200號", "type": "豬/牛/雞肉", "pay": "月結30天", "days": 2, "score": 7, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S004", "name": "南北乾貨", "contact": "張麗華", "phone": "04-5555-1234", "addr": "台中市民生路45號", "type": "乾貨/調味料", "pay": "月結60天", "days": 3, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S005", "name": "頂級食用油", "contact": "黃建國", "phone": "07-3333-8888", "addr": "高雄市工業區三路10號", "type": "食用油/醬料", "pay": "月結30天", "days": 5, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}];
+const DB_SUPS=[{"id": "S001", "name": "鮮蔬農場", "contact": "陳大明", "phone": "02-1234-5678", "addr": "台北市信義區農業路1號", "type": "蔬菜/水果", "pay": "月結30天", "days": 2, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S002", "name": "海鮮直送", "contact": "林小美", "phone": "02-8765-4321", "addr": "基隆市海港路88號", "type": "海鮮/魚類", "pay": "月結15天", "days": 1, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S003", "name": "肉品供應商", "contact": "王志明", "phone": "03-9876-5432", "addr": "桃園市中山路200號", "type": "豬/牛/雞肉", "pay": "月結30天", "days": 2, "score": 7, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S004", "name": "南北乾貨", "contact": "張麗華", "phone": "04-5555-1234", "addr": "台中市民生路45號", "type": "乾貨/調味料", "pay": "月結60天", "days": 3, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S005", "name": "頂級食用油", "contact": "黃建國", "phone": "07-3333-8888", "addr": "高雄市工業區三路10號", "type": "食用油/醬料", "pay": "月結30天", "days": 5, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""},
+  {"id":"S006","name":"沁味(福聯)食品有限公司","contact":"業務","phone":"03-656-3850","fax":"03-551-8011","addr":"新竹縣竹北市新工三路80號","cat":"食材","score":4,"note":"早食團購 http://www.fu-join.com/shopping","bankName":"","bankCode":"","bankBranch":"","bankAcct":"","bankAcctName":"","bankNote":""},
+  {"id":"S007","name":"志祥企業社","contact":"廖文祥","phone":"03-5971723","fax":"03-5970007","addr":"新竹縣湖口鄉勝利村安宅九街43號","cat":"包材","score":4,"note":"","bankName":"","bankCode":"","bankBranch":"","bankAcct":"","bankAcctName":"","bankNote":""}];
 const DB_REFS={"cats": ["肉類", "海鮮", "蔬菜", "穀物", "乳製品", "蛋類", "調味料", "食用油", "豆製品", "其他"], "units": ["公斤", "公克", "公升", "毫升", "顆", "塊", "包", "箱", "條", "個", "張", "盒", "份", "罐"], "forms": ["整顆/原形", "切片", "切丁", "切碎", "切絲", "切塊", "切段", "泥狀", "醃漬", "醬狀", "乾燥/粉", "水煮", "去殼/去皮", "整瓣", "整束", "其他"], "supTypes": ["乳製品", "乾貨/調味料", "包材", "其他", "海鮮/魚類", "蔬菜/水果", "豬/牛/雞肉", "食用油/醬料"], "payTerms": ["現金", "貨到付款", "預付", "月結15天", "月結30天", "月結45天", "月結60天"], "lossReasons": ["備料損耗", "其他", "受潮", "撞傷", "溢出", "烹調損耗", "發芽", "碎裂", "腐爛", "過期"], "lossHandles": ["丟棄", "其他", "員工餐", "捐贈", "調整食譜", "退貨"], "meatSrc": ["其他", "國產CAS", "國產有機認證", "溯源牛肉", "溯源豬肉", "溯源雞肉", "產銷履歷", "進口加拿大", "進口巴西", "進口澳洲", "進口紐西蘭", "進口美國"]};
 const SHEETS=[{"id": "yi_food_order", "title": "義早食材叫貨", "formNo": "表格編號：1140401", "items": [{"seq": 1, "name": "紐澳良雞腿排(4支/包)", "unit": "包", "price": 200}, {"seq": 2, "name": "蒜香雞肉(1kg/包)", "unit": "包", "price": 210}, {"seq": 3, "name": "綜合鮮菇(1kg/包)", "unit": "包", "price": 180}, {"seq": 4, "name": "炭香燒肉(1kg/包)", "unit": "包", "price": 260}, {"seq": 5, "name": "鮪魚醬(1kg/包)", "unit": "包", "price": 290}, {"seq": 6, "name": "凱撒醬(1kg/包)", "unit": "包", "price": 275}, {"seq": 7, "name": "蜂蜜芥末醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 8, "name": "塔塔醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 9, "name": "藍莓優格醬(1kg/包)", "unit": "包", "price": 270}, {"seq": 10, "name": "大蒜醬(500g/盒)", "unit": "盒", "price": 230}, {"seq": 11, "name": "杏仁奶酥醬(500g/盒)", "unit": "盒", "price": 245}, {"seq": 12, "name": "紅醬(1kg/包)", "unit": "包", "price": 160}, {"seq": 13, "name": "白醬(1kg/包)", "unit": "包", "price": 160}, {"seq": 14, "name": "青醬(1kg/包)", "unit": "包", "price": 210}, {"seq": 15, "name": "肉醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 16, "name": "泰式打拋豬(1kg/包)", "unit": "包", "price": 195}, {"seq": 17, "name": "麻辣醬(1kg/包)", "unit": "包", "price": 270}, {"seq": 18, "name": "辣椒醬(500g/包)", "unit": "包", "price": 140}, {"seq": 19, "name": "醬油膏(1kg/包)", "unit": "包", "price": 95}, {"seq": 20, "name": "料理調味粉(1kg/包)", "unit": "包", "price": 130}, {"seq": 21, "name": "義大利直麵(熟)(200g/包)", "unit": "包", "price": 10}, {"seq": 22, "name": "蜜汁鴨胸(500g/23包/箱)", "unit": "包", "price": 315}, {"seq": 23, "name": "青花菜(1kg/10包/箱)", "unit": "包", "price": 70}, {"seq": 24, "name": "玉米筍(1kg/10包/箱)", "unit": "包", "price": 126}, {"seq": 25, "name": "紅蘿蔔片(1kg/10包/箱)", "unit": "包", "price": 58}, {"seq": 26, "name": "大魚排(60片/箱)(5片為單位)", "unit": "包", "price": 75}, {"seq": 27, "name": "日式雪花豬排(130g/45片/6kg箱)(5片為單位)", "unit": "包", "price": 175}, {"seq": 28, "name": "鯰魚排(5片/10包/箱)", "unit": "包", "price": 179}, {"seq": 29, "name": "鯰魚排(3片/10包/箱)", "unit": "包", "price": 95}, {"seq": 30, "name": "韓式泡菜(3kg/桶)", "unit": "包", "price": 480}, {"seq": 31, "name": "優質雞塊(1kg/12包)", "unit": "包", "price": 142}, {"seq": 32, "name": "紅皮熟栗地瓜(1kg/12包/箱)", "unit": "包", "price": 116}, {"seq": 33, "name": "玉米粒易開罐(285g/24罐/箱)", "unit": "罐", "price": 22}, {"seq": 34, "name": "義大利直麵(生)(500g/20包/箱)", "unit": "包", "price": 26}, {"seq": 35, "name": "鮮奶油23.3%(12罐/箱)", "unit": "罐", "price": 105}, {"seq": 36, "name": "原味乳酪醬(500g/盒)", "unit": "盒", "price": 194}, {"seq": 37, "name": "藍莓乳酪醬(500g/盒)", "unit": "盒", "price": 200}, {"seq": 38, "name": "青蘋果餡(2.7g/6罐/箱)", "unit": "罐", "price": 683}, {"seq": 39, "name": "美乃滋(600g/包)", "unit": "包", "price": 76}, {"seq": 40, "name": "美式鬆餅(2片/50包/箱)", "unit": "包", "price": 12}, {"seq": 41, "name": "乳酪燒餅(10片/3盒/箱)", "unit": "箱", "price": 320}, {"seq": 42, "name": "光頭堡(30顆/籃)", "unit": "顆", "price": 7}, {"seq": 43, "name": "帕尼尼(30顆/籃)", "unit": "顆", "price": 13}, {"seq": 44, "name": "帕瑪森熱狗堡(12入/包)", "unit": "包", "price": 164}, {"seq": 45, "name": "泰式紅茶葉(600g*/30包/箱)", "unit": "包", "price": 157}, {"seq": 46, "name": "奶香金萱(600g/30包/箱)", "unit": "包", "price": 224}, {"seq": 47, "name": "白葡萄風味烏龍茶包(6.5g*50入/20包/箱)", "unit": "包", "price": 242}, {"seq": 48, "name": "南非國寶茶(7g*50入/20包/箱)", "unit": "包", "price": 453}, {"seq": 49, "name": "南非綠國寶茶(3.5g*50入/20包/箱)", "unit": "包", "price": 389}, {"seq": 50, "name": "南非紫蘇綠國寶茶(4.5g*50入/20包/箱)", "unit": "包", "price": 389}, {"seq": 51, "name": "專用奶精粉(1kg/20包/箱)", "unit": "包", "price": 173}, {"seq": 52, "name": "什穀芝麻飲粉(500g/40包/箱)", "unit": "包", "price": 168}, {"seq": 53, "name": "比利時風味巧克力粉(1kg/20包/箱)", "unit": "包", "price": 420}]}, {"id": "yi_pack_order", "title": "義早包材叫貨", "formNo": "表格編號：1150325", "items": [{"seq": 1, "name": "PET8OZ透明沙拉碗(25個/20包/箱)", "unit": "包", "price": 44}, {"seq": 2, "name": "PET8OZ透明沙拉蓋(50個/10包/箱)", "unit": "包", "price": 53}, {"seq": 3, "name": "PET24OZ花型沙拉碗、蓋(50個/3組/箱)", "unit": "組", "price": 273}, {"seq": 4, "name": "500空白紙杯(50個/20包/箱)", "unit": "包", "price": 60}, {"seq": 5, "name": "400空白紙杯(50個/20包/箱)", "unit": "包", "price": 55}, {"seq": 6, "name": "360空白紙杯(50個/20包/箱)", "unit": "包", "price": 53}, {"seq": 7, "name": "8OZ空白紙杯(50個/20包/箱)", "unit": "包", "price": 54}, {"seq": 8, "name": "凸杯蓋 90mm(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 9, "name": "凸杯蓋 78mm(50個/20包/箱)", "unit": "包", "price": 57}, {"seq": 10, "name": "90熱杯套(25個/40包/箱)", "unit": "串", "price": 20}, {"seq": 11, "name": "1.5OZ PET塑膠杯蓋(100個/25包/箱)", "unit": "包", "price": 92}, {"seq": 12, "name": "902塑膠內襯(50個/12包/箱)", "unit": "包", "price": 63}, {"seq": 13, "name": "902空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 81}, {"seq": 14, "name": "902凸蓋(50個/12包/箱)", "unit": "包", "price": 66}, {"seq": 15, "name": "850透明塑膠湯碗(50個/12包/箱)", "unit": "包", "price": 103}, {"seq": 16, "name": "850空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 60}, {"seq": 17, "name": "850平蓋(50個/12包/箱)", "unit": "包", "price": 29}, {"seq": 18, "name": "L300(50個/10包/箱)", "unit": "包", "price": 276}, {"seq": 19, "name": "L500(50個/10包/箱)", "unit": "包", "price": 171}, {"seq": 20, "name": "9吋披薩盒(50個/箱)", "unit": "箱", "price": 630}, {"seq": 21, "name": "3號內折牛皮方形餐盒(50個/4包/箱)", "unit": "包", "price": 315}, {"seq": 22, "name": "空白一體小(60個/10包/箱)", "unit": "包", "price": 83}, {"seq": 23, "name": "空白點心盒(100個/10包/箱)", "unit": "包", "price": 95}, {"seq": 24, "name": "20*20CM防油牛皮L袋(100個/40包/箱)", "unit": "包", "price": 88}, {"seq": 25, "name": "#70平口金色三角袋(100只/包)", "unit": "包", "price": 91}, {"seq": 26, "name": "鐵炮竹竹籤9cm(250支/80包)", "unit": "包", "price": 58}, {"seq": 27, "name": "黑色西餐匙(100支/40包/箱)", "unit": "包", "price": 46}, {"seq": 28, "name": "黑色西餐叉(100支/30包/2箱)", "unit": "包", "price": 45}, {"seq": 29, "name": "單支膠裝斜口6*18透明吸管(200支/20包/箱)", "unit": "包", "price": 26}, {"seq": 30, "name": "單支膠裝斜口12*21透明吸管(50支/40包/箱)", "unit": "包", "price": 14}, {"seq": 31, "name": "單支紙包斜口6*21透明吸管(100支/40包/箱)", "unit": "包", "price": 40}, {"seq": 32, "name": "單支紙包斜口6*21透明吸管(100支/50包/箱)", "unit": "包", "price": 46}, {"seq": 33, "name": "單支紙包斜口12*21透明吸管(50支/40包/箱)", "unit": "包", "price": 47}, {"seq": 34, "name": "免洗筷(80雙/30包/袋)", "unit": "包", "price": 21}, {"seq": 35, "name": "環保餐巾紙23cm單層(100張/60包/箱)", "unit": "包", "price": 22}, {"seq": 36, "name": "平邊牛皮色-四折扇形紙(100張/100包/箱)", "unit": "包", "price": 16}, {"seq": 37, "name": "空白封口膜(350m/6捲/箱)", "unit": "捲", "price": 352}, {"seq": 38, "name": "感熱紙80*80mm(60捲/箱)", "unit": "捲", "price": 22}, {"seq": 39, "name": "標籤貼紙40*30mm(5捲/20包/箱)", "unit": "包", "price": 139}, {"seq": 40, "name": "保鮮膜30公分 X 500公尺", "unit": "盒", "price": 399}, {"seq": 41, "name": "透明1號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 42, "name": "透明2號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 43, "name": "透明3號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 44, "name": "透明1號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 45, "name": "透明2號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 46, "name": "透明3號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 47, "name": "PS黑色雙杯座(100個/20包/箱)", "unit": "包", "price": 56}, {"seq": 48, "name": "PS黑色四杯座(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 49, "name": "煎板清潔劑", "unit": "瓶", "price": 303}, {"seq": 50, "name": "塑膠垃圾袋66*80(10包/箱)", "unit": "包", "price": 97}, {"seq": 51, "name": "義早logo圓貼(5000張)(約1~4天)", "unit": "包", "price": 1380}, {"seq": 52, "name": "收入傳票", "unit": "本", "price": 25}, {"seq": 53, "name": "支出傳票", "unit": "本", "price": 25}, {"seq": 54, "name": "二聯收據(50組/本)", "unit": "本", "price": 35}, {"seq": 55, "name": "透明膠帶18mm(8入/捆)", "unit": "捆", "price": 95}, {"seq": 56, "name": "BUNN12.75*5.25濾紙(500pcs/箱)", "unit": "箱", "price": 1102.5}, {"seq": 57, "name": "NBR無粉手套紫S號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 58, "name": "NBR無粉手套紫M號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 59, "name": "NBR無粉手套紫L號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 60, "name": "NBR無粉手套紫XL號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 61, "name": "立領長袖反摺-淺灰襯衫(M) 義早", "unit": "件", "price": 700}, {"seq": 62, "name": "立領長袖反摺-淺灰襯衫(L) 義早", "unit": "件", "price": 700}, {"seq": 63, "name": "立領長袖反摺-淺灰襯衫(XL) 義早", "unit": "件", "price": 700}, {"seq": 64, "name": "立領長袖反摺-淺灰襯衫(2L) 義早", "unit": "件", "price": 700}, {"seq": 65, "name": "立領長袖反摺-淺灰襯衫(3L) 義早", "unit": "件", "price": 700}, {"seq": 66, "name": "雙肩銅鈎耐磨咖啡色背心圍裙", "unit": "件", "price": 600}, {"seq": 67, "name": "深麻灰打鳥帽 義早", "unit": "件", "price": 200}]}, {"id": "gu_food_order", "title": "咕咕食材叫貨", "formNo": "表格編號：1140622", "items": [{"seq": 1, "name": "蒜香雞肉(1kg/包)", "unit": "包", "price": 210}, {"seq": 2, "name": "綜合鮮菇(1kg/包)", "unit": "包", "price": 180}, {"seq": 3, "name": "炭香燒肉(1kg/包)", "unit": "包", "price": 260}, {"seq": 4, "name": "鮪魚醬(1kg/包)", "unit": "包", "price": 290}, {"seq": 5, "name": "肉醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 6, "name": "泰式打拋豬(1kg/包)", "unit": "包", "price": 195}, {"seq": 7, "name": "辣椒醬(500g/包)", "unit": "包", "price": 140}, {"seq": 8, "name": "醬油膏(1kg/包)", "unit": "包", "price": 95}, {"seq": 9, "name": "酸菜(1kg/包)", "unit": "包", "price": 110}, {"seq": 10, "name": "菜脯(1kg/包)", "unit": "包", "price": 90}, {"seq": 11, "name": "焢肉(1kg/包)", "unit": "包", "price": 185}, {"seq": 12, "name": "料理調味粉(1kg/包)", "unit": "包", "price": 130}, {"seq": 13, "name": "小熱狗(50支/20包/箱)", "unit": "包", "price": 120}, {"seq": 14, "name": "起司片(90片/12包)", "unit": "包", "price": 265}, {"seq": 15, "name": "乳酪絲(1kg/10包/箱)", "unit": "包", "price": 245}, {"seq": 16, "name": "薯餅(20片/12包/箱)", "unit": "包", "price": 150}, {"seq": 17, "name": "脆皮薯條(2kg/6包/箱)", "unit": "包", "price": 210}, {"seq": 18, "name": "鮮奶油23.3%(12罐/箱)", "unit": "罐", "price": 105}, {"seq": 19, "name": "美乃滋(600g/包)", "unit": "包", "price": 76}, {"seq": 20, "name": "老麵饅頭(6入/包)", "unit": "包", "price": 78}, {"seq": 21, "name": "黑糖饅頭(6入/包)", "unit": "包", "price": 92}, {"seq": 22, "name": "蔥捲(6入/包)", "unit": "包", "price": 135}, {"seq": 23, "name": "芋頭捲(6入/包)", "unit": "包", "price": 143}, {"seq": 24, "name": "雜糧堅果饅頭(6入/包)", "unit": "包", "price": 168}, {"seq": 25, "name": "鮮蔥黑豚包(6入/包)", "unit": "包", "price": 152}, {"seq": 26, "name": "金沙包(6入/包)", "unit": "包", "price": 152}, {"seq": 27, "name": "芝麻包(6入/包)", "unit": "包", "price": 143}, {"seq": 28, "name": "刈包(20入/8包/箱)", "unit": "包", "price": 150}, {"seq": 29, "name": "蛋餅皮(30片/12包/箱)", "unit": "包", "price": 65}, {"seq": 30, "name": "厚切蔥抓餅(10片/10包/箱)", "unit": "包", "price": 90}, {"seq": 31, "name": "河粉皮(10片/10包/箱)", "unit": "包", "price": 50}, {"seq": 32, "name": "乳酪燒餅(10片/3盒/箱)", "unit": "箱", "price": 320}, {"seq": 33, "name": "蘿蔔糕(10片/10包/箱)", "unit": "包", "price": 60}, {"seq": 34, "name": "鍋貼(50入/12包/箱)", "unit": "包", "price": 100}, {"seq": 35, "name": "生煎包(50入/12包/箱)", "unit": "包", "price": 100}, {"seq": 36, "name": "肉粽(10入/12包/箱)", "unit": "包", "price": 250}, {"seq": 37, "name": "老油條(300入/3kg/箱)", "unit": "箱", "price": 650}, {"seq": 38, "name": "肉鬆(3kg/桶)", "unit": "包", "price": 400}, {"seq": 39, "name": "優質雞塊(1kg/12包/箱)", "unit": "包", "price": 142}, {"seq": 40, "name": "黃金脆皮雞排(30片/箱)(5片/包)", "unit": "包", "price": 105}, {"seq": 41, "name": "玉米粒易開罐(285g/24罐/箱)", "unit": "罐", "price": 22}, {"seq": 42, "name": "滷蛋(30粒/8包/箱)", "unit": "包", "price": 240}, {"seq": 43, "name": "豆皮菜鬆(600g/包)", "unit": "包", "price": 110}, {"seq": 44, "name": "豆棗(3kg/包)", "unit": "包", "price": 320}, {"seq": 45, "name": "牛蒡絲(3kg/包)", "unit": "包", "price": 425}, {"seq": 46, "name": "飯糰米(5kg/1包)", "unit": "包", "price": 260}, {"seq": 47, "name": "紅藜麥(1kg/1包)", "unit": "包", "price": 165}, {"seq": 48, "name": "花生粉(600g/包)", "unit": "包", "price": 100}, {"seq": 49, "name": "低筋麵粉(3kg/包)", "unit": "包", "price": 110}, {"seq": 50, "name": "鹽(1kg/1包)", "unit": "包", "price": 20}, {"seq": 51, "name": "二砂(1kg/1包)", "unit": "包", "price": 40}, {"seq": 52, "name": "胡椒鹽(600g/包)", "unit": "包", "price": 120}, {"seq": 53, "name": "番茄醬(3.15kg/桶)", "unit": "桶", "price": 200}, {"seq": 54, "name": "醬油膏(6kg/桶)", "unit": "桶", "price": 235}, {"seq": 55, "name": "沙拉油(18L/桶)", "unit": "桶", "price": 865}, {"seq": 56, "name": "耐炸油(18L/桶)", "unit": "桶", "price": 875}, {"seq": 57, "name": "泰式紅茶葉(600g*/30包/箱)", "unit": "包", "price": 157}, {"seq": 58, "name": "蔗糖液(3kg/8包/箱)", "unit": "包", "price": 125}, {"seq": 59, "name": "專用奶精粉(1kg/20包/箱)", "unit": "包", "price": 173}]}, {"id": "gu_pack_order", "title": "咕咕包材叫貨", "formNo": "表格編號：1140401", "items": [{"seq": 1, "name": "400空白紙杯(50個/20包/箱)", "unit": "包", "price": 53}, {"seq": 2, "name": "凸杯蓋 90mm(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 3, "name": "90熱杯套(25個/40包/箱)", "unit": "串", "price": 20}, {"seq": 4, "name": "1.5OZ PET塑膠杯蓋(100個/25包/箱)", "unit": "包", "price": 92}, {"seq": 5, "name": "850空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 60}, {"seq": 6, "name": "850平蓋(50個/12包/箱)", "unit": "包", "price": 29}, {"seq": 7, "name": "260空白紙湯碗(50個/40包/箱)", "unit": "包", "price": 30}, {"seq": 8, "name": "空白一體小(60個/10包/箱)", "unit": "包", "price": 83}, {"seq": 9, "name": "空白點心盒(100個/10包/箱)", "unit": "包", "price": 95}, {"seq": 10, "name": "20*20CM防油牛皮L袋(100張/40包/箱)", "unit": "包", "price": 88}, {"seq": 11, "name": "20*20CM防油牛皮L袋(200張/25包/箱)", "unit": "包", "price": 172}, {"seq": 12, "name": "30*30CM空白淋膜紙(1000張/4包/箱)", "unit": "包", "price": 900}, {"seq": 13, "name": "4兩防油紙袋(100入/束)", "unit": "束", "price": 40}, {"seq": 14, "name": "薯條袋", "unit": "束", "price": 35}, {"seq": 15, "name": "橡皮筋小", "unit": "包", "price": 50}, {"seq": 16, "name": "0號夾鏈袋", "unit": "包", "price": 15}, {"seq": 17, "name": "擦手紙(120抽/20包/箱)", "unit": "箱", "price": 410}, {"seq": 18, "name": "黑色西餐匙(100支/40包/箱)", "unit": "包", "price": 46}, {"seq": 19, "name": "黑色西餐叉(100支/30包/2箱)", "unit": "包", "price": 45}, {"seq": 20, "name": "單支膠裝斜口6*18透明吸管(200支/20包/箱)", "unit": "包", "price": 26}, {"seq": 21, "name": "單支紙包斜口6*21透明吸管(100支/50包/箱)", "unit": "包", "price": 46}, {"seq": 22, "name": "免洗筷(80雙/30包/袋)", "unit": "包", "price": 21}, {"seq": 23, "name": "環保餐巾紙23cm單層(100張/60包/箱)", "unit": "包", "price": 22}, {"seq": 24, "name": "空白封口膜(350m/6捲/箱)", "unit": "捲", "price": 352}, {"seq": 25, "name": "感熱紙80*80mm(60捲/箱)", "unit": "捲", "price": 22}, {"seq": 26, "name": "標籤貼紙40*30mm(5捲/20包/箱)", "unit": "包", "price": 139}, {"seq": 27, "name": "保鮮膜30公分 X 500公尺", "unit": "盒", "price": 399}, {"seq": 28, "name": "4兩耐熱袋", "unit": "包", "price": 40}, {"seq": 29, "name": "6兩耐熱袋", "unit": "包", "price": 40}, {"seq": 30, "name": "6兩耐熱袋(捲)", "unit": "捲", "price": 180}, {"seq": 31, "name": "1斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 32, "name": "3斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 33, "name": "10斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 34, "name": "煎板清潔劑", "unit": "瓶", "price": 303}, {"seq": 35, "name": "水槽濾網(50入/包)", "unit": "包", "price": 35}, {"seq": 36, "name": "沙拉脫", "unit": "桶", "price": 50}, {"seq": 37, "name": "漂白水", "unit": "桶", "price": 50}, {"seq": 38, "name": "除油劑", "unit": "桶", "price": 210}, {"seq": 39, "name": "酒精", "unit": "桶", "price": 505}, {"seq": 40, "name": "3M菜瓜布(2入/包)", "unit": "包", "price": 45}, {"seq": 41, "name": "3M綠菜瓜布(2入/包)", "unit": "包", "price": 45}, {"seq": 42, "name": "好神拖布盤", "unit": "個", "price": 230}, {"seq": 43, "name": "塑膠垃圾袋66*80(10包/箱)", "unit": "包", "price": 97}, {"seq": 44, "name": "咕咕logo圓貼(5000張)(約1~4天)", "unit": "包", "price": 1380}, {"seq": 45, "name": "收入傳票", "unit": "本", "price": 25}, {"seq": 46, "name": "支出傳票", "unit": "本", "price": 25}, {"seq": 47, "name": "二聯收據(50組/本)", "unit": "本", "price": 35}, {"seq": 48, "name": "透明膠帶18mm(8入/捆)", "unit": "捆", "price": 95}, {"seq": 49, "name": "NBR無粉手套紫S號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 50, "name": "NBR無粉手套紫M號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 51, "name": "NBR無粉手套紫L號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 52, "name": "NBR無粉手套紫XL號(100入/盒)", "unit": "盒", "price": 185}]}];
 </script>
@@ -298,9 +250,9 @@ const TW_BANKS=[
 // ════════════════════════════════════════════════════════════════
 const COST_KEY='hm_cost_v3';
 const DEFAULT_META={company:'好洺餐飲事業有限公司',taxId:'',phone:'',address:'',stores:['交大店','竹北店','台積電店'],targetMargin:0.65,currency:'NT$'};
-let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}],currentUser:null,invHistory:[],recipeVersions:{},cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haoming-erp-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyDczQa3QfksohoIqf2-rW9OfYCIJXASNq4',fbAuthDomain:'haoming-erp.firebaseapp.com',fbProjectId:'haoming-erp',fbStorageBucket:'haoming-erp.firebasestorage.app',fbMessagingSenderId:'873400453045',fbAppId:'1:873400453045:web:140d7092ba8e61ce80fbfc',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[]};
+let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}],currentUser:null,invHistory:[],recipeVersions:{},cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haomin-system-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyAk8D1oXTYaq9E1t96bPW-1rMu0EhW1JzQ',fbAuthDomain:'haomin-system.firebaseapp.com',fbProjectId:'haomin-system',fbStorageBucket:'haomin-system.firebasestorage.app',fbMessagingSenderId:'348193196599',fbAppId:'1:348193196599:web:c5aa85961d929e7e39cdb2',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[]};
 
-(function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','cloudConfig','sups','buyLog','auditLog','permissions'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
+(function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
 
 // 確保管理員帳號始終存在
 (function ensureAdmin(){
@@ -311,6 +263,38 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
     if(!hasAdmin){state.users.unshift({id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true})}
   }
 })();
+
+// ── 進貨單匯入 (2026-04-18 建檔) ──
+(function initImportedPurchases(){
+  if(state.buyLog&&state.buyLog.some(function(b){return b.docNo==='309618'}))return;
+  if(!state.buyLog)state.buyLog=[];
+  var imports=[
+    {id:'BUY'+Date.now()+'a',date:'2026-04-10',supId:'S006',ingName:'味宏桶裝肉鬆30斤/箱(紫標)',qty:10,unit:'斤',unitPrice:80,total:800,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'b',date:'2026-04-10',supId:'S006',ingName:'老油條(藍)飯糰用3KG300入8CM',qty:2,unit:'箱',unitPrice:680,total:1360,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'c',date:'2026-04-10',supId:'S006',ingName:'旺昌河粉皮10盒/箱/1.2KG',qty:10,unit:'盒',unitPrice:45,total:450,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'d',date:'2026-04-10',supId:'S006',ingName:'強匠優質雞塊1KG×12包(藍)',qty:12,unit:'包',unitPrice:135,total:1620,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'e',date:'2026-04-10',supId:'S006',ingName:'諾曼地乳酪燒餅30片/箱68G',qty:3,unit:'箱',unitPrice:338,total:1014,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'f',date:'2026-04-10',supId:'S006',ingName:'統珍-珍珠腸20斤/箱(菜腸王)',qty:2,unit:'箱',unitPrice:435,total:870,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'g',date:'2026-04-10',supId:'S006',ingName:'府城黑胡椒豬排(10盒/箱)',qty:1,unit:'盒',unitPrice:230,total:230,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'h',date:'2026-04-10',supId:'S006',ingName:'黑麥園黃金抓餅(10包/箱)透膜',qty:1,unit:'包',unitPrice:80,total:80,docNo:'309618',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'i',date:'2026-04-01',supId:'S006',ingName:'禾家香鍋貼×12包/箱',qty:12,unit:'包',unitPrice:95,total:1140,docNo:'307845',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'j',date:'2026-04-01',supId:'S006',ingName:'酸菜(榨菜王)×4包',qty:1,unit:'箱',unitPrice:300,total:300,docNo:'307845',store:'嘉興店'},
+    {id:'BUY'+Date.now()+'k',date:'2026-04-17',supId:'S007',ingName:'美食家耐炸油18L',qty:1,unit:'桶',unitPrice:880,total:880,docNo:'150417003',store:'交大店'},
+    {id:'BUY'+Date.now()+'l',date:'2026-04-17',supId:'S007',ingName:'漂白水',qty:1,unit:'桶',unitPrice:50,total:50,docNo:'150417003',store:'交大店'},
+    {id:'BUY'+Date.now()+'m',date:'2026-04-17',supId:'S007',ingName:'3M菜瓜布(2入)',qty:1,unit:'包',unitPrice:40,total:40,docNo:'150417003',store:'交大店'},
+    {id:'BUY'+Date.now()+'n',date:'2026-04-17',supId:'S007',ingName:'可果美蕃茄醬(3.15kg塑膠桶)',qty:1,unit:'桶',unitPrice:195,total:195,docNo:'150417003',store:'交大店'},
+    {id:'BUY'+Date.now()+'o',date:'2026-04-17',supId:'S007',ingName:'薯條袋',qty:1,unit:'束',unitPrice:30,total:30,docNo:'150417003',store:'交大店'}
+  ];
+  imports.forEach(function(b){state.buyLog.push(b)});
+  
+  // Also create AP records
+  if(!state.apList)state.apList=[];
+  state.apList.push({id:'AP'+Date.now()+'x',date:'2026-04-10',supplier:'沁味(福聯)食品有限公司',itemName:'估價單309618 (8項)',amount:6745,dueDate:'',status:'未付款',paidDate:'',note:'發票 93758161 含稅'});
+  state.apList.push({id:'AP'+Date.now()+'y',date:'2026-04-01',supplier:'沁味(福聯)食品有限公司',itemName:'估價單307845 (2項去重後)',amount:1440,dueDate:'',status:'未付款',paidDate:'',note:'沖3月份發票 XY34107006'});
+  // 志祥企業社 交大店進貨僅記錄品項，不建立應付帳款
+})();
+
+
 
 let _saveTimer=null;
 function saveState(){pushUndo();clearTimeout(_saveTimer);_saveTimer=setTimeout(()=>{try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){alert('儲存失敗：空間不足')}},400)}
@@ -1727,7 +1711,7 @@ pg.appendChild(dv({cls:'page-title'},'☁️ 雲端同步設定'));
 
 pg.appendChild(dv({cls:'card',html:'<div class="card-title">連線狀態</div><div id="cloud-status" style="font-size:0.92rem;padding:8px 0">'+(cfg.enabled?'<span style="color:#0A5A46">🟢 已連線</span>':'<span style="color:#706E68">⭕ 未啟用</span>')+'</div>'}));
 
-pg.appendChild(dv({cls:'card',html:'<div class="card-title">📋 Supabase 設定步驟</div><div style="font-size:0.88rem;line-height:1.8;color:#555350"><b>第一步：建立 Supabase 帳號</b><br>前往 <a href="https://supabase.com" target="_blank" style="color:#1455A0">supabase.com</a> 註冊免費帳號（免費方案含 500MB 資料庫）<br><br><b>第二步：建立專案</b><br>登入後點「New Project」→ 取名如「haoming-erp」→ 設定資料庫密碼 → 選 Region: Northeast Asia (Tokyo)<br><br><b>第三步：建立資料表</b><br>進入專案 → 左側選「SQL Editor」→ 貼上以下 SQL 執行：</div><div style="background:#1E1E1C;color:#F3F1EB;border-radius:8px;padding:14px 16px;margin:12px 0;font-family:monospace;font-size:0.84rem;line-height:1.6;overflow-x:auto;white-space:pre">CREATE TABLE erp_data (\n  id TEXT PRIMARY KEY DEFAULT \'erp_main\',\n  data JSONB,\n  updated_at TIMESTAMPTZ DEFAULT NOW(),\n  device TEXT DEFAULT \'unknown\'\n);\n\nALTER TABLE erp_data ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY "Allow all" ON erp_data\n  FOR ALL USING (true) WITH CHECK (true);</div><div style="font-size:0.88rem;line-height:1.8;color:#555350"><b>第四步：取得連線資訊</b><br>進入專案 → Settings → API →<br>• <b>Project URL</b>：複製貼到下方「Supabase URL」<br>• <b>anon public key</b>：複製貼到下方「API Key」<br><br><b>第五步：在下方填入並測試連線</b></div>'}));
+pg.appendChild(dv({cls:'card',html:'<div class="card-title">📋 Supabase 設定步驟</div><div style="font-size:0.88rem;line-height:1.8;color:#555350"><b>第一步：建立 Supabase 帳號</b><br>前往 <a href="https://supabase.com" target="_blank" style="color:#1455A0">supabase.com</a> 註冊免費帳號（免費方案含 500MB 資料庫）<br><br><b>第二步：建立專案</b><br>登入後點「New Project」→ 取名如「haomin-system」→ 設定資料庫密碼 → 選 Region: Northeast Asia (Tokyo)<br><br><b>第三步：建立資料表</b><br>進入專案 → 左側選「SQL Editor」→ 貼上以下 SQL 執行：</div><div style="background:#1E1E1C;color:#F3F1EB;border-radius:8px;padding:14px 16px;margin:12px 0;font-family:monospace;font-size:0.84rem;line-height:1.6;overflow-x:auto;white-space:pre">CREATE TABLE erp_data (\n  id TEXT PRIMARY KEY DEFAULT \'erp_main\',\n  data JSONB,\n  updated_at TIMESTAMPTZ DEFAULT NOW(),\n  device TEXT DEFAULT \'unknown\'\n);\n\nALTER TABLE erp_data ENABLE ROW LEVEL SECURITY;\n\nCREATE POLICY "Allow all" ON erp_data\n  FOR ALL USING (true) WITH CHECK (true);</div><div style="font-size:0.88rem;line-height:1.8;color:#555350"><b>第四步：取得連線資訊</b><br>進入專案 → Settings → API →<br>• <b>Project URL</b>：複製貼到下方「Supabase URL」<br>• <b>anon public key</b>：複製貼到下方「API Key」<br><br><b>第五步：在下方填入並測試連線</b></div>'}));
 
 var providerHtml='<div class="card"><div class="card-title">選擇雲端服務</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">';
 ['supabase|Supabase|免費 500MB・即時同步・最推薦|#0A5A46','firebase|Firebase|Google 免費方案・設定簡單|#9A6210','jsonbin|JSONBin.io|最簡單・免費10000次/月|#1455A0'].forEach(function(p){p=p.split('|');var sel=(cfg.provider||'supabase')===p[0];providerHtml+='<div onclick="selectProvider(\''+p[0]+'\')" style="border:2px solid '+(sel?p[3]:'#D6D4CC')+';border-radius:10px;padding:12px;cursor:pointer;text-align:center;background:'+(sel?'#F3F1EB':'#fff')+';transition:.2s"><div style="font-weight:700;color:'+p[3]+';margin-bottom:4px">'+p[1]+'</div><div style="font-size:0.82rem;color:#706E68;line-height:1.5">'+p[2]+'</div>'+(sel?'<div style="margin-top:6px"><span class="badge badge-green">已選擇</span></div>':'')+'</div>'});
@@ -1736,7 +1720,7 @@ pg.appendChild(dv({html:providerHtml}));
 
 var provider=cfg.provider||'supabase';
 if(provider==='firebase'){
-pg.appendChild(dv({cls:'card',html:'<div class="card-title">🔧 Firebase SDK 設定</div><div style="font-size:0.88rem;color:#555350;line-height:1.8;margin-bottom:14px"><b>步驟：</b><br>1. 前往 <a href="https://console.firebase.google.com" target="_blank" style="color:#1455A0">Firebase Console</a> → 你的專案<br>2. 左側 Realtime Database 確認已建立<br>3. 點左上齒輪 → <b>專案設定</b> → 往下滑到「您的應用程式」<br>4. 如果沒有 Web app，點「<b>&lt;/&gt;</b>」圖示新增一個<br>5. 複製下方 firebaseConfig 的各項值填入</div><div class="form-row c2"><div class="fg"><label>API Key *</label><input id="cloud-fb-apikey" value="'+esc(cfg.fbApiKey||'')+'" placeholder="AIzaSy..."></div><div class="fg"><label>Project ID *</label><input id="cloud-fb-projid" value="'+esc(cfg.fbProjectId||'')+'" placeholder="haoming-erp"></div></div><div class="form-row c2"><div class="fg"><label>Database URL *</label><input id="cloud-fb-url" value="'+esc(cfg.fbUrl||'')+'" placeholder="https://xxx.firebasedatabase.app"></div><div class="fg"><label>Auth Domain</label><input id="cloud-fb-auth" value="'+esc(cfg.fbAuthDomain||'')+'" placeholder="xxx.firebaseapp.com"></div></div><div class="form-row c2"><div class="fg"><label>Storage Bucket</label><input id="cloud-fb-bucket" value="'+esc(cfg.fbStorageBucket||'')+'" placeholder="xxx.appspot.com"></div><div class="fg"><label>App ID</label><input id="cloud-fb-appid" value="'+esc(cfg.fbAppId||'')+'" placeholder="1:123:web:abc"></div></div><div class="form-row c2"><div class="fg"><label>裝置名稱</label><input id="cloud-device" value="'+esc(cfg.deviceName||'')+'" placeholder="例：辦公室電腦"></div><div class="fg"><label>自動同步</label><select id="cloud-auto"><option value="0"'+(!cfg.autoSync?' selected':'')+'>關閉</option><option value="1"'+(cfg.autoSync?' selected':'')+'>開啟</option></select></div></div><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn btn-primary" onclick="saveCloudConfigMulti()">💾 儲存</button><button class="btn btn-outline" onclick="testFirebase()">🔌 測試連線</button></div>'}))
+pg.appendChild(dv({cls:'card',html:'<div class="card-title">🔧 Firebase SDK 設定</div><div style="font-size:0.88rem;color:#555350;line-height:1.8;margin-bottom:14px"><b>步驟：</b><br>1. 前往 <a href="https://console.firebase.google.com" target="_blank" style="color:#1455A0">Firebase Console</a> → 你的專案<br>2. 左側 Realtime Database 確認已建立<br>3. 點左上齒輪 → <b>專案設定</b> → 往下滑到「您的應用程式」<br>4. 如果沒有 Web app，點「<b>&lt;/&gt;</b>」圖示新增一個<br>5. 複製下方 firebaseConfig 的各項值填入</div><div class="form-row c2"><div class="fg"><label>API Key *</label><input id="cloud-fb-apikey" value="'+esc(cfg.fbApiKey||'')+'" placeholder="AIzaSy..."></div><div class="fg"><label>Project ID *</label><input id="cloud-fb-projid" value="'+esc(cfg.fbProjectId||'')+'" placeholder="haomin-system"></div></div><div class="form-row c2"><div class="fg"><label>Database URL *</label><input id="cloud-fb-url" value="'+esc(cfg.fbUrl||'')+'" placeholder="https://xxx.firebasedatabase.app"></div><div class="fg"><label>Auth Domain</label><input id="cloud-fb-auth" value="'+esc(cfg.fbAuthDomain||'')+'" placeholder="xxx.firebaseapp.com"></div></div><div class="form-row c2"><div class="fg"><label>Storage Bucket</label><input id="cloud-fb-bucket" value="'+esc(cfg.fbStorageBucket||'')+'" placeholder="xxx.appspot.com"></div><div class="fg"><label>App ID</label><input id="cloud-fb-appid" value="'+esc(cfg.fbAppId||'')+'" placeholder="1:123:web:abc"></div></div><div class="form-row c2"><div class="fg"><label>裝置名稱</label><input id="cloud-device" value="'+esc(cfg.deviceName||'')+'" placeholder="例：辦公室電腦"></div><div class="fg"><label>自動同步</label><select id="cloud-auto"><option value="0"'+(!cfg.autoSync?' selected':'')+'>關閉</option><option value="1"'+(cfg.autoSync?' selected':'')+'>開啟</option></select></div></div><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn btn-primary" onclick="saveCloudConfigMulti()">💾 儲存</button><button class="btn btn-outline" onclick="testFirebase()">🔌 測試連線</button></div>'}))
 }else if(provider==='jsonbin'){
 pg.appendChild(dv({cls:'card',html:'<div class="card-title">🔧 JSONBin.io 設定</div><div style="font-size:0.88rem;color:#555350;line-height:1.8;margin-bottom:14px"><b>步驟：</b><br>1. 前往 <a href="https://jsonbin.io" target="_blank" style="color:#1455A0">jsonbin.io</a> → 免費註冊<br>2. 登入後點右上角大頭貼 → API Keys → 複製 Master Key</div><div class="form-row c2"><div class="fg"><label>Master Key</label><input id="cloud-jb-key" value="'+esc(cfg.jbKey||'')+'" placeholder="$2a$10$..." type="password"></div><div class="fg"><label>Bin ID（首次留空自動建立）</label><input id="cloud-jb-bin" value="'+esc(cfg.jbBinId||'')+'" placeholder="自動產生"></div></div><div class="form-row c2"><div class="fg"><label>裝置名稱</label><input id="cloud-device" value="'+esc(cfg.deviceName||'')+'" placeholder="例：辦公室電腦"></div><div class="fg"><label>自動同步</label><select id="cloud-auto"><option value="0"'+(!cfg.autoSync?' selected':'')+'>關閉</option><option value="1"'+(cfg.autoSync?' selected':'')+'>開啟</option></select></div></div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn btn-primary" onclick="saveCloudConfigMulti()">💾 儲存</button></div>'}))
 }else{
@@ -1859,7 +1843,7 @@ window.jsonbinSave=function(silent){
   var headers={'Content-Type':'application/json','X-Master-Key':cfg.jbKey};
   var url=cfg.jbBinId?'https://api.jsonbin.io/v3/b/'+cfg.jbBinId:'https://api.jsonbin.io/v3/b';
   var method=cfg.jbBinId?'PUT':'POST';
-  if(!cfg.jbBinId)headers['X-Bin-Name']='haoming-erp';
+  if(!cfg.jbBinId)headers['X-Bin-Name']='haomin-system';
   fetch(url,{method:method,headers:headers,body:JSON.stringify(payload)})
     .then(function(r){return r.json()}).then(function(res){
       if(res.metadata&&res.metadata.id&&!cfg.jbBinId){state.cloudConfig.jbBinId=res.metadata.id}
@@ -2157,9 +2141,32 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='1.0.0';
-var BUILD_NUMBER='20260414-001';
+var SYSTEM_VERSION='1.1.0';
+var BUILD_NUMBER='20260418-002';
 var VERSION_HISTORY=[
+  {ver:'1.1.0',build:'20260418-002',date:'2026-04-18',changes:[
+    '🎨 全面優化介面主題 — Warm Kitchen Theme',
+    '📝 字體升級 Noto Sans TC（Google Fonts CDN）',
+    '🎯 表格增加斑馬紋底色 + hover 高亮 + sticky 表頭',
+    '💎 卡片增加 hover 陰影效果',
+    '🔘 按鈕增加 active 縮放回饋 + 陰影層次',
+    '📱 表單 focus 狀態增加綠色外框光暈',
+    '🪟 Modal 增加開啟動畫 + 背景模糊',
+    '📊 指標卡片增加 hover 上浮效果',
+    '🎨 Badge 改為圓潤藥丸樣式',
+    '📜 全域自訂捲軸（6px 細捲軸）',
+    '🖨️ 列印模式隱藏導覽列和按鈕'
+  ]},
+  {ver:'1.0.1',build:'20260418-001',date:'2026-04-18',changes:[
+    '📦 新增供應商：沁味(福聯)食品有限公司、志祥企業社',
+    '🛍️ 匯入 15 筆進貨記錄（3 張單據辨識去重）',
+    '💳 自動建立 3 筆應付帳款（沁味福聯×2 + 志祥×1）',
+    '☁️ Firebase 改為 SDK 連接方式（與人資系統一致）',
+    '📌 新增版本管理系統（版本號 + 修改紀錄）',
+    '↩️ 新增 Undo/Redo 上一步下一步功能（30步 + Ctrl+Z/Y）',
+    '💾 備份管理中心（自動備份14天 + 還原 + 下載）',
+    '📱 門市APP 叫貨表改為完整231項 + Firebase SDK寫死'
+  ]},
   {ver:'1.0.0',build:'20260414-001',date:'2026-04-14',changes:[
     '🎉 系統初始化完成，共 25 個功能模組',
     '📊 儀表板：庫存警示、毛利率、進貨損耗統計、快速動作',
