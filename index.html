@@ -286,7 +286,7 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
 
 // 自動補齊新模組權限（舊版 localStorage 相容）
 (function fixPermissions(){
-  if(!state.permissions)return;
+  if(!state.permissions)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
   var allModules=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
   if(state.permissions['老闆']){
     allModules.forEach(function(m){
@@ -1560,7 +1560,7 @@ window.doLogout=function(){
 // 依角色套用權限 — 隱藏/顯示 nav 按鈕
 function applyPermissions(){
   var role=(state.currentUser||{}).role||'員工';
-  var allowed=(state.permissions||DEFAULT_PERMS)[role]||DEFAULT_PERMS['員工'];
+  var allowed=(state.permissions&&state.permissions[role])||DEFAULT_PERMS[role]||DEFAULT_PERMS['員工'];
   var navBtns=document.querySelectorAll('#nav-bar [data-cp]');
   navBtns.forEach(function(btn){
     var cp=btn.getAttribute('data-cp');
