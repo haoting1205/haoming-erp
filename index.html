@@ -271,6 +271,19 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
   Object.keys(FC).forEach(function(k){state.cloudConfig[k]=FC[k]});
 })();
 
+// 確保管理員帳號存在（不被舊資料覆蓋）
+(function ensureAdminUser(){
+  if(!state.users)state.users=[];
+  var admin=state.users.find(function(u){return u.username==='admin'});
+  if(!admin){
+    state.users.push({id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true});
+  } else {
+    // 確保帳號啟用
+    admin.active=true;
+    admin.role='老闆';
+  }
+})();
+
 // 自動補齊新模組權限（舊版 localStorage 相容）
 (function fixPermissions(){
   if(!state.permissions)return;
