@@ -1559,6 +1559,12 @@ window.doLogout=function(){
 
 // 依角色套用權限 — 隱藏/顯示 nav 按鈕
 function applyPermissions(){
+  // 每次套用前先確保權限完整
+  if(!state.permissions)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
+  if(state.permissions['老闆']){
+    var allMods=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
+    allMods.forEach(function(m){if(state.permissions['老闆'].indexOf(m)<0)state.permissions['老闆'].push(m)});
+  }
   var role=(state.currentUser||{}).role||'員工';
   var allowed=(state.permissions&&state.permissions[role])||DEFAULT_PERMS[role]||DEFAULT_PERMS['員工'];
   var navBtns=document.querySelectorAll('#nav-bar [data-cp]');
@@ -3867,6 +3873,16 @@ document.addEventListener('DOMContentLoaded',()=>{
     state.cloudConfig.lastSync=new Date().toISOString();
     try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){}
     console.log('✅ Loaded from Firestore');
+    // 雲端資料載入後重新修正權限和帳號（雲端可能是舊版資料）
+    (function(){
+      if(!state.permissions)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
+      var allMods=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
+      if(state.permissions['老闆']){allMods.forEach(function(m){if(state.permissions['老闆'].indexOf(m)<0)state.permissions['老闆'].push(m)})}
+      if(!state.users)state.users=[];
+      var admin=state.users.find(function(u){return u.username==='admin'});
+      if(!admin){state.users.push({id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true})}
+      else{admin.active=true;admin.role='老闆'}
+    })();
     renderPage();
   }).catch(function(e){console.log('Firestore load failed, using localStorage:',e)});
 })();
