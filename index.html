@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.1.0</title>
+<title>好洺生管系統 v2.1.0 ULTIMATE</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -284,17 +284,6 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
   }
 })();
 
-// 自動補齊新模組權限（舊版 localStorage 相容）
-(function fixPermissions(){
-  // 強制使用 DEFAULT_PERMS（不保留舊版權限，避免新模組被隱藏）
-  state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
-  var allModules=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
-  if(state.permissions['老闆']){
-    allModules.forEach(function(m){
-      if(state.permissions['老闆'].indexOf(m)<0)state.permissions['老闆'].push(m);
-    });
-  }
-})();
 
 // 修正供應商格式（舊版相容）
 (function fixSupFormat(){
@@ -437,7 +426,7 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const toDay=()=>new Date().toISOString().slice(0,10);
 const toMon=()=>new Date().toISOString().slice(0,7);
 const nxtId=(arr,p)=>p+String(Math.max(0,...arr.map(x=>parseInt((x.id||'').replace(p,''))||0))+1).padStart(3,'0');
-const $=id=>document.getElementById(id);
+const $=id=>document.getElementById(id);window.$=$;
 const $$=sel=>[...document.querySelectorAll(sel)];
 const CUR=()=>state.meta.currency||'NT$';
 const opts=(arr,sel)=>arr.map(v=>`<option value="${esc(v)}"${v===sel?' selected':''}>${esc(v)}</option>`).join('');
@@ -638,7 +627,8 @@ window.saveMetaSettings=function(){state.meta.company=$('mc-name')?.value||'';st
 function exportBackup(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='好洺ERP備份_'+toDay()+'.json';a.click();toast('✅ 備份已下載')}
 function importBackup(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.ings)throw new Error();if(!confirm('確定匯入？目前資料將被覆蓋'))return;Object.assign(state,d);saveState();renderPage();toast('✅ 備份已匯入')}catch{alert('❌ 無效的備份檔案')}};reader.readAsText(file);e.target.value=''}
 function clearAllData(){if(!confirm('⚠️ 確定清除所有資料？'))return;if(!confirm('再次確認？'))return;localStorage.removeItem(COST_KEY);location.reload()}
-
+</script>
+<script>
 // ════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════
@@ -1463,6 +1453,19 @@ var DEFAULT_PERMS={
   '店長':['dash','order','buy','batch','ing','store-inv','transfer','prod','label','waste','schedule','alert-center'],
   '員工':['dash','order','store-inv','prod','label','batch','schedule']
 };
+
+// === v2.1.0 fix: fixPermissions moved here ===
+// 自動補齊新模組權限（舊版 localStorage 相容）
+(function fixPermissions(){
+  // 強制使用 DEFAULT_PERMS（不保留舊版權限，避免新模組被隱藏）
+  state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
+  var allModules=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
+  if(state.permissions['老闆']){
+    allModules.forEach(function(m){
+      if(state.permissions['老闆'].indexOf(m)<0)state.permissions['老闆'].push(m);
+    });
+  }
+})();
 if(!state.recoveryCode)state.recoveryCode='haoming2026';
 if(!state.permissions||!Object.keys(state.permissions).length)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
 
@@ -3889,12 +3892,43 @@ pushUndo(); // 初始快照
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-app-compat.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js"></script>
 
+<script>
+console.log('%c🟢 [v2.1.0 ULTIMATE 修復版] 載入中...','background:#0A6847;color:#fff;padding:4px 8px;border-radius:4px;font-weight:700');
+window.__HAOMING_ULTIMATE = true;
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    try {
+      var logo = document.querySelector('.logo');
+      if(logo){
+        var b = document.createElement('span');
+        b.textContent = 'ULTIMATE FIX';
+        b.style.cssText = 'display:inline-block;margin-left:8px;padding:2px 8px;background:#D9534F;color:#fff;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:.5px;animation:pulse 2s infinite';
+        logo.appendChild(b);
+        var st = document.createElement('style');
+        st.textContent = '@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}';
+        document.head.appendChild(st);
+      }
+      // 把版本號改成醒目的紅色
+      var verSpan = document.querySelector('.logo span:nth-of-type(2)');
+      if(verSpan && verSpan.textContent.includes('v2.0')){
+        verSpan.textContent = 'v2.1.0-ultimate';
+        verSpan.style.color = '#FFD700';
+        verSpan.style.fontWeight = '700';
+      }
+    } catch(e){
+      console.warn('視覺標記失敗:', e.message);
+    }
+  }, 100);
+});
+</script>
+
 <!-- ═══════════════════════════════════════════════════════════
-     v2.1.0 稅務整合升級
-     - 已修復原 v2.0.0 跨 script 區塊變數依賴 bug
-       (Script #2 + Script #3 合併為單一區塊)
-     - 新增 window.HaomingTax 共用稅務模組
-     插入時間: 2026-04-25
+     v2.1.0 ULTIMATE 修復版
+     - 修復原 v2.0.0 的兩個跨 script 區塊變數依賴 bug:
+       1. fixPermissions IIFE 移到 DEFAULT_PERMS 定義後
+       2. const $ 額外暴露到 window.$
+     - 注入 window.HaomingTax 共用稅務模組 (含 30 食材稅別)
+     - 升級 renderTax 為 v2.1.0 廠商級+品項級稅務管理
      ═══════════════════════════════════════════════════════════ -->
 <script>
 /* ═══════════════════════════════════════════════════════════════
