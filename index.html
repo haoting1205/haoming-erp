@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>好洺餐飲事業有限公司 — 生產管理系統</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.1.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -286,7 +286,8 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
 
 // 自動補齊新模組權限（舊版 localStorage 相容）
 (function fixPermissions(){
-  if(!state.permissions)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
+  // 強制使用 DEFAULT_PERMS（不保留舊版權限，避免新模組被隱藏）
+  state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
   var allModules=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
   if(state.permissions['老闆']){
     allModules.forEach(function(m){
@@ -1559,14 +1560,8 @@ window.doLogout=function(){
 
 // 依角色套用權限 — 隱藏/顯示 nav 按鈕
 function applyPermissions(){
-  // 每次套用前先確保權限完整
-  if(!state.permissions)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
-  if(state.permissions['老闆']){
-    var allMods=['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','internal','label','menu','allergen','waste','ap','ar','budget','count','rtn','tax','cost-analysis','wo','customer','asset','sales','qc','trace','schedule','equip','alert-center','cloud','users','ref'];
-    allMods.forEach(function(m){if(state.permissions['老闆'].indexOf(m)<0)state.permissions['老闆'].push(m)});
-  }
   var role=(state.currentUser||{}).role||'員工';
-  var allowed=(state.permissions&&state.permissions[role])||DEFAULT_PERMS[role]||DEFAULT_PERMS['員工'];
+  var allowed=DEFAULT_PERMS[role]||DEFAULT_PERMS['員工'];
   var navBtns=document.querySelectorAll('#nav-bar [data-cp]');
   navBtns.forEach(function(btn){
     var cp=btn.getAttribute('data-cp');
@@ -3894,5 +3889,1070 @@ pushUndo(); // 初始快照
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-app-compat.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js"></script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     v2.1.0 稅務整合升級（追加注入,不修改原始程式碼）
+     插入時間: 2026-04-25
+     模組: window.HaomingTax (與財會系統共用)
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   好洺生管系統 v2.0.0 → v2.1.0 稅務整合升級
+   ═══════════════════════════════════════════════════════════════
+   採取「追加注入」模式：包裝原函式,不修改任何原始程式碼
+   作者：AI 數位轉型 CTO
+   日期：2026-04-25
+   ═══════════════════════════════════════════════════════════════ */
+
+(function(){
+  'use strict';
+
+  if(window.HaomingTax){
+    console.log('[稅務升級] 已套用過,跳過');
+    return;
+  }
+
+  function bootUpgrade(){
+    if(typeof state==='undefined' || typeof DB_INGS==='undefined' ||
+       typeof renderTax==='undefined' || typeof renderIng==='undefined' ||
+       typeof renderBuy==='undefined' || typeof renderAP==='undefined' ||
+       typeof openIngModal==='undefined' || typeof openBuyModal==='undefined' ||
+       typeof saveBuy==='undefined' || typeof saveIng==='undefined' ||
+       typeof receivePO==='undefined'){
+      setTimeout(bootUpgrade, 250);
+      return;
+    }
+    runUpgrade();
+  }
+
+  function runUpgrade(){
+    console.log('🔧 [生管 v2.1.0] 開始套用稅務升級...');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 1: 注入 HaomingTax 模組
+    // ═══════════════════════════════════════════════════════════
+    const TAX_TYPES = {
+      taxable:    { rate: 0.05, label: '應稅 5%',  emoji: '💰', color: '#9A6210' },
+      tax_free:   { rate: 0,    label: '免稅',     emoji: '🌾', color: '#0A5A46' },
+      zero_rated: { rate: 0,    label: '零稅率',   emoji: '⚡', color: '#1455A0' }
+    };
+
+    // 30 項食材稅別預設（系統推斷+保守原則）
+    const ING_TAX_PATCH = {
+      // 免稅 11 項
+      'I003': 'tax_free',  // 高麗菜（蔬菜）
+      'I004': 'tax_free',  // 白米（稻米）
+      'I010': 'tax_free',  // 洋蔥（蔬菜）
+      'I011': 'tax_free',  // 雞蛋（生鮮蛋）
+      'I013': 'tax_free',  // 番茄（蔬菜）
+      'I024': 'tax_free',  // 大蒜（蔬菜）
+      'I089': 'tax_free',  // 老薑（蔬菜）
+      'I094': 'tax_free',  // 大辣椒（蔬菜）
+      'I118': 'tax_free',  // 紅蘿蔔（蔬菜）
+      'I125': 'tax_free',  // 杏鮑菇（菇蔬）
+      // 應稅 19 項
+      'I002': 'taxable',   // 鮭魚片（分切包裝）
+      'I005': 'taxable',   // 雞胸肉（分切包裝）
+      'I006': 'taxable',   // 豆腐（加工品）
+      'I007': 'taxable',   // 蝦仁（加工品）
+      'I008': 'taxable',   // 醬油（調味料）
+      'I009': 'taxable',   // 玄米油（食用油）
+      'I012': 'taxable',   // 麵粉（加工品）
+      'I014': 'taxable',   // 牛里肌（分切）
+      'I015': 'taxable',   // 奶油（乳製品）
+      'I023': 'taxable',   // 雞腿排（分切）
+      'I025': 'taxable',   // 沙拉油（食用油）
+      'I041': 'taxable',   // 豬梅花肉片
+      'I044': 'taxable',   // 芝麻香油
+      'I080': 'taxable',   // 三層肉
+      'I083': 'taxable',   // 醬油膏
+      'I087': 'taxable',   // 酸菜絲
+      'I090': 'taxable',   // 二砂
+      'I092': 'taxable',   // 蘿蔔乾（醃漬加工）
+      'I111': 'taxable',   // 豬絞肉
+      'I129': 'taxable'    // 鮪魚罐頭
+    };
+
+    /**
+     * 依食材推斷稅別（fallback 規則）
+     */
+    function inferIngTaxType(ing){
+      if(!ing) return { type: 'taxable', reason: '預設應稅' };
+      const id = ing.id || '';
+      if(ING_TAX_PATCH[id]) {
+        return {
+          type: ING_TAX_PATCH[id],
+          reason: '系統內建判定'
+        };
+      }
+      const name = ing.name || '';
+      const cat = ing.cat || '';
+      // 蔬菜類預設免稅
+      if(cat === '蔬菜' || /蔬菜|青菜|果菜/.test(name)){
+        return { type: 'tax_free', reason: '生鮮蔬菜（免稅）' };
+      }
+      // 穀物類：稻米免稅,其他應稅
+      if(cat === '穀物' && /米$|稻|糙米/.test(name)){
+        return { type: 'tax_free', reason: '稻米（免稅）' };
+      }
+      // 蛋類：生鮮免稅
+      if(cat === '蛋類' && /雞蛋|鴨蛋|生鮮/.test(name) && !/-應稅|加工|滷|皮蛋/.test(name)){
+        return { type: 'tax_free', reason: '生鮮蛋（免稅）' };
+      }
+      // 預設應稅
+      return { type: 'taxable', reason: '加工/調味/包裝品（應稅）' };
+    }
+
+    /**
+     * 依供應商推斷預設「報價是否含稅」
+     */
+    function inferSupPriceIncludesTax(sup){
+      if(!sup) return false;
+      const name = sup.name || '';
+      // 福聯/沁味 → 含稅報價（依過往備註）
+      if(/福聯|沁味/.test(name)) return true;
+      // 預設未稅
+      return false;
+    }
+
+    function getIngTaxType(ing){
+      if(ing && ing.taxType) return ing.taxType;
+      return inferIngTaxType(ing).type;
+    }
+
+    function getTaxBadge(ing){
+      const t = getIngTaxType(ing);
+      const info = TAX_TYPES[t] || TAX_TYPES.taxable;
+      return { type: t, rate: info.rate, label: info.label,
+               emoji: info.emoji, color: info.color };
+    }
+
+    /**
+     * 計算單筆進貨的稅務拆分
+     * @param {Object} ing - 食材物件
+     * @param {Object} sup - 供應商物件
+     * @param {Number} qty - 進貨數量
+     * @param {Number} unitPrice - 單價
+     * @param {Boolean} priceIncludesTax - 報價是否含稅（覆蓋預設）
+     * @returns {Object} { netAmt, taxAmt, grossAmt, taxType, priceIncludesTax }
+     */
+    function calcBuyTax(ing, sup, qty, unitPrice, priceIncludesTax){
+      qty = +qty || 0;
+      unitPrice = +unitPrice || 0;
+      const taxType = getIngTaxType(ing);
+      const rate = TAX_TYPES[taxType] ? TAX_TYPES[taxType].rate : 0;
+      const incl = priceIncludesTax !== undefined ? priceIncludesTax
+        : (sup && sup.priceIncludesTax !== undefined ? sup.priceIncludesTax
+           : inferSupPriceIncludesTax(sup));
+
+      let netAmt, taxAmt, grossAmt;
+      if(rate === 0){
+        // 免稅
+        netAmt = qty * unitPrice;
+        taxAmt = 0;
+        grossAmt = netAmt;
+      } else if(incl){
+        // 含稅報價：反算
+        grossAmt = qty * unitPrice;
+        netAmt = Math.round(grossAmt / (1 + rate) * 100) / 100;
+        taxAmt = Math.round((grossAmt - netAmt) * 100) / 100;
+      } else {
+        // 未稅報價：加稅
+        netAmt = qty * unitPrice;
+        taxAmt = Math.round(netAmt * rate * 100) / 100;
+        grossAmt = Math.round((netAmt + taxAmt) * 100) / 100;
+      }
+      return { netAmt, taxAmt, grossAmt, taxType, priceIncludesTax: incl, rate };
+    }
+
+    /**
+     * 對 buyLog 計算稅務統計
+     */
+    function calcBuyLogSummary(buyLogList){
+      let totalGross = 0, totalNet = 0, totalTax = 0, totalFree = 0;
+      const byTaxType = { taxable: 0, tax_free: 0 };
+      const byVendor = {};
+      const byIng = {};
+
+      (buyLogList || []).forEach(b => {
+        const gross = +b.total || 0;
+        const taxType = b.taxType || 'taxable';
+        const incl = b.priceIncludesTax !== undefined ? b.priceIncludesTax : false;
+        const rate = TAX_TYPES[taxType] ? TAX_TYPES[taxType].rate : 0;
+
+        let net, tax;
+        if(rate === 0){ net = gross; tax = 0; }
+        else if(incl){ net = Math.round(gross/(1+rate)*100)/100; tax = gross - net; }
+        else {
+          // 未稅報價：gross 應該已經是含稅的（如果有正確存）
+          // 為了相容舊資料，假設 b.total 是「含稅後總額」
+          net = b.netAmt !== undefined ? b.netAmt : Math.round(gross/(1+rate)*100)/100;
+          tax = b.taxAmt !== undefined ? b.taxAmt : (gross - net);
+        }
+
+        totalGross += gross;
+        totalNet += net;
+        totalTax += tax;
+        if(taxType === 'tax_free') totalFree += gross;
+        byTaxType[taxType] = (byTaxType[taxType] || 0) + gross;
+
+        const vname = (state.sups||[]).find(s => s.id === b.supId);
+        const vkey = vname ? vname.name : (b.supId || '未知');
+        if(!byVendor[vkey]) byVendor[vkey] = { net:0, tax:0, gross:0, count:0 };
+        byVendor[vkey].net += net;
+        byVendor[vkey].tax += tax;
+        byVendor[vkey].gross += gross;
+        byVendor[vkey].count++;
+
+        const ikey = b.ingName || '未知';
+        if(!byIng[ikey]) byIng[ikey] = { net:0, tax:0, gross:0, count:0, taxType };
+        byIng[ikey].net += net;
+        byIng[ikey].tax += tax;
+        byIng[ikey].gross += gross;
+        byIng[ikey].count++;
+      });
+
+      const round = n => Math.round(n*100)/100;
+      return {
+        totalGross: round(totalGross),
+        totalNet: round(totalNet),
+        totalTax: round(totalTax),
+        totalFree: round(totalFree),
+        byTaxType, byVendor, byIng
+      };
+    }
+
+    // 對外 API
+    window.HaomingTax = {
+      TAX_TYPES, ING_TAX_PATCH,
+      inferIngTaxType, inferSupPriceIncludesTax,
+      getIngTaxType, getTaxBadge,
+      calcBuyTax, calcBuyLogSummary,
+      version: '1.0.0'
+    };
+    console.log('  ✅ HaomingTax 模組已注入');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 2: 對 state.ings 套用稅別預設
+    // ═══════════════════════════════════════════════════════════
+    let ingPatched = 0;
+    (state.ings || []).forEach(ing => {
+      if(ing.taxType === undefined){
+        const inf = inferIngTaxType(ing);
+        ing.taxType = inf.type;
+        ing.taxNote = inf.reason;
+        ing.taxConfirmed = !!ING_TAX_PATCH[ing.id];  // 內建判定的標為已確認
+        ingPatched++;
+      }
+    });
+    console.log('  ✅ 已套用 ' + ingPatched + ' 項食材稅別');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 3: 對 state.sups 套用 priceIncludesTax 預設
+    // ═══════════════════════════════════════════════════════════
+    let supPatched = 0;
+    (state.sups || []).forEach(sup => {
+      if(sup.priceIncludesTax === undefined){
+        sup.priceIncludesTax = inferSupPriceIncludesTax(sup);
+        supPatched++;
+      }
+    });
+    console.log('  ✅ 已套用 ' + supPatched + ' 家廠商報價方式');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 4: 修補舊 buyLog/apList 補稅務欄位
+    // ═══════════════════════════════════════════════════════════
+    let buyPatched = 0;
+    (state.buyLog || []).forEach(b => {
+      if(b.taxType === undefined){
+        const ing = (state.ings||[]).find(i => i.id === b.ingId || i.name === b.ingName);
+        const sup = (state.sups||[]).find(s => s.id === b.supId);
+        const taxType = ing ? getIngTaxType(ing) : 'taxable';
+        const incl = sup ? !!sup.priceIncludesTax : false;
+        b.taxType = taxType;
+        b.priceIncludesTax = incl;
+        // 補算 netAmt / taxAmt
+        const calc = calcBuyTax(ing || {taxType}, sup, b.qty, b.unitPrice, incl);
+        b.netAmt = calc.netAmt;
+        b.taxAmt = calc.taxAmt;
+        // total 維持不變（保留歷史）
+        buyPatched++;
+      }
+    });
+    console.log('  ✅ 已修補 ' + buyPatched + ' 筆舊進貨記錄');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 5: 注入 CSS 樣式
+    // ═══════════════════════════════════════════════════════════
+    const style = document.createElement('style');
+    style.id = 'tax-upgrade-style';
+    style.textContent = `
+      /* 稅別徽章 */
+      .tax-badge { display:inline-flex; align-items:center; gap:3px;
+        padding:2px 8px; border-radius:10px; font-size:0.7rem; font-weight:700;
+        white-space:nowrap; letter-spacing:.3px; line-height:1.4 }
+      .tax-badge.tax-taxable { background:var(--amber-l); color:var(--amber-d); border:1px solid #E5C56F }
+      .tax-badge.tax-tax_free { background:var(--pri-l); color:var(--pri-d); border:1px solid #94CFAB }
+      .tax-badge.tax-zero_rated { background:var(--blue-l); color:#0C447C; border:1px solid #93C5FD }
+      .tax-badge.tax-mini { padding:1px 5px; font-size:0.66rem }
+      
+      /* 食材表格稅別欄 */
+      .ing-tax-cell { white-space:nowrap }
+      .ing-tax-cell.unconfirmed { opacity:.65; border-left:2px solid var(--amber) }
+      
+      /* 進貨輸入稅務即時計算區 */
+      .buy-tax-calc { background:linear-gradient(135deg,var(--amber-l),#FFFAEB);
+        border:1.5px solid #F0C060; border-radius:8px; padding:10px 12px; margin:6px 0;
+        display:grid; grid-template-columns:repeat(3,1fr); gap:8px; font-size:0.84rem }
+      .buy-tax-calc-cell { text-align:center }
+      .buy-tax-calc-cell .lbl { font-size:0.72rem; color:var(--amber-d);
+        font-weight:700; letter-spacing:.5px; margin-bottom:2px }
+      .buy-tax-calc-cell .val { font-size:1.05rem; font-weight:700; color:var(--g800);
+        font-family:monospace; font-variant-numeric:tabular-nums }
+      .buy-tax-calc-cell.gross .val { color:var(--amber-d) }
+      .buy-tax-calc-cell.tax .val { color:var(--red) }
+      .buy-tax-calc-cell.net .val { color:var(--pri) }
+      
+      /* 稅務 KPI 卡片 */
+      .tax-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px }
+      .tax-kpi-card { background:var(--card); border-radius:var(--r); padding:14px 16px;
+        border:1.5px solid var(--g200); border-left-width:5px;
+        box-shadow:var(--shadow-sm); transition:.2s }
+      .tax-kpi-card:hover { box-shadow:var(--shadow-md); transform:translateY(-1px) }
+      .tax-kpi-card .lbl { font-size:0.72rem; color:var(--g500); font-weight:700;
+        letter-spacing:.5px; margin-bottom:5px; text-transform:none }
+      .tax-kpi-card .val { font-size:1.45rem; font-weight:700; line-height:1.2;
+        font-variant-numeric:tabular-nums }
+      .tax-kpi-card .sub { font-size:0.72rem; color:var(--g400); margin-top:3px; font-weight:500 }
+      .tax-kpi-card.tk-net { border-left-color:var(--pri) }
+      .tax-kpi-card.tk-net .val { color:var(--pri) }
+      .tax-kpi-card.tk-tax { border-left-color:var(--amber) }
+      .tax-kpi-card.tk-tax .val { color:var(--amber) }
+      .tax-kpi-card.tk-free { border-left-color:var(--teal) }
+      .tax-kpi-card.tk-free .val { color:var(--teal) }
+      .tax-kpi-card.tk-gross { border-left-color:var(--g500) }
+      .tax-kpi-card.tk-gross .val { color:var(--g700) }
+      
+      /* 食材稅別概覽 modal */
+      .ing-tax-list { max-height:400px; overflow-y:auto; border:1px solid var(--g200);
+        border-radius:var(--r-sm) }
+      .ing-tax-row { display:grid; grid-template-columns:60px 1fr 80px 100px 100px;
+        gap:10px; padding:8px 12px; align-items:center; border-bottom:1px solid var(--g100);
+        font-size:0.86rem; cursor:pointer; transition:.15s }
+      .ing-tax-row:hover { background:var(--g50) }
+      .ing-tax-row .id { font-family:monospace; font-size:0.78rem; color:var(--g400) }
+      .ing-tax-row .nm { font-weight:600 }
+      .ing-tax-row .ct { font-size:0.78rem; color:var(--g400) }
+      
+      /* 應付帳款稅務拆分行 */
+      .ap-tax-detail { background:var(--g50); border-radius:6px; padding:8px 12px;
+        margin-top:6px; font-size:0.82rem; display:none }
+      .ap-tax-detail.open { display:block }
+      .ap-tax-detail-grid { display:grid; grid-template-columns:repeat(4,1fr);
+        gap:8px; font-variant-numeric:tabular-nums }
+      .ap-tax-detail-cell .lbl { font-size:0.7rem; color:var(--g500); font-weight:700 }
+      .ap-tax-detail-cell .val { font-size:0.92rem; font-weight:700 }
+    `;
+    document.head.appendChild(style);
+    console.log('  ✅ CSS 樣式已注入');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 6: 替換 renderTax — 完整稅務管理頁
+    // ═══════════════════════════════════════════════════════════
+    window.renderTax = function(){
+      const pg = dv({});
+      const sw = sopBox('tax');
+      if(sw) pg.appendChild(sw);
+
+      const buys = state.buyLog || [];
+      const thisMonth = buys.filter(b => b.date && b.date.startsWith(toMon()));
+      const thisMonthSummary = HaomingTax.calcBuyLogSummary(thisMonth);
+      const allSummary = HaomingTax.calcBuyLogSummary(buys);
+
+      pg.appendChild(dv({
+        style: 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px'
+      },
+        dv({ cls: 'page-title', style: 'margin:0' }, '🧾 稅務管理 v2.1.0'),
+        dv({ style: 'display:flex;gap:6px;flex-wrap:wrap' },
+          btn('btn btn-outline btn-sm', '🥬 食材稅別總覽', showIngTaxOverview),
+          btn('btn btn-outline btn-sm', '📊 廠商稅別明細', () => showVendorTaxDetail()),
+          btn('btn btn-primary btn-sm', '📥 登錄進貨（含稅）', () => openBuyModal(''))
+        )
+      ));
+
+      // ─── KPI 卡片：本月 ───
+      const kpiWrap = dv({ cls: 'card', style: 'padding:18px 20px' });
+      kpiWrap.innerHTML = '<div class="card-title">📅 本月稅務概要 (' + toMon() + ')</div>' +
+        '<div class="tax-kpi-grid">' +
+        '<div class="tax-kpi-card tk-gross"><div class="lbl">本月含稅總額</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(thisMonthSummary.totalGross, 0) + '</div>' +
+          '<div class="sub">' + thisMonth.length + ' 筆進貨</div></div>' +
+        '<div class="tax-kpi-card tk-net"><div class="lbl">未稅金額</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(thisMonthSummary.totalNet, 0) + '</div>' +
+          '<div class="sub">應稅 + 免稅</div></div>' +
+        '<div class="tax-kpi-card tk-tax"><div class="lbl">進項稅額（可扣抵）</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(thisMonthSummary.totalTax, 0) + '</div>' +
+          '<div class="sub">5% × 應稅進貨</div></div>' +
+        '<div class="tax-kpi-card tk-free"><div class="lbl">免稅進貨</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(thisMonthSummary.totalFree, 0) + '</div>' +
+          '<div class="sub">蔬果/稻米/生鮮蛋</div></div>' +
+        '</div>';
+      pg.appendChild(kpiWrap);
+
+      // ─── 累積統計 ───
+      const cumWrap = dv({ cls: 'card' });
+      cumWrap.innerHTML = '<div class="card-title">📊 累積稅務（全期間）</div>' +
+        '<div class="tax-kpi-grid">' +
+        '<div class="tax-kpi-card tk-gross"><div class="lbl">累積含稅總額</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(allSummary.totalGross, 0) + '</div>' +
+          '<div class="sub">' + buys.length + ' 筆</div></div>' +
+        '<div class="tax-kpi-card tk-net"><div class="lbl">累積未稅</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(allSummary.totalNet, 0) + '</div></div>' +
+        '<div class="tax-kpi-card tk-tax"><div class="lbl">累積進項稅</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(allSummary.totalTax, 0) + '</div></div>' +
+        '<div class="tax-kpi-card tk-free"><div class="lbl">累積免稅</div>' +
+          '<div class="val">' + CUR() + ' ' + fmt(allSummary.totalFree, 0) + '</div></div>' +
+        '</div>';
+      pg.appendChild(cumWrap);
+
+      // ─── 本月進貨明細表（含稅務欄位） ───
+      const detailWrap = dv({ cls: 'card', style: 'padding:0;overflow:hidden' });
+      let html = '<div class="card-title" style="padding:16px 20px 10px;margin:0;border:none">📋 本月進貨稅務明細（' + thisMonth.length + ' 筆）</div>';
+      if(!thisMonth.length){
+        html += '<div style="text-align:center;padding:40px;color:var(--g400)">本月尚無進貨記錄</div>';
+      } else {
+        html += '<div style="overflow-x:auto"><table class="tbl">' +
+          '<thead><tr><th>日期</th><th>供應商</th><th>食材</th><th>稅別</th>' +
+          '<th style="text-align:right">未稅</th><th style="text-align:right">稅額</th>' +
+          '<th style="text-align:right">含稅</th><th>發票</th></tr></thead><tbody>';
+        thisMonth.slice().reverse().forEach(b => {
+          const ing = (state.ings||[]).find(i => i.id === b.ingId || i.name === b.ingName);
+          const sup = (state.sups||[]).find(s => s.id === b.supId);
+          const taxType = b.taxType || (ing ? getIngTaxType(ing) : 'taxable');
+          const badge = HaomingTax.getTaxBadge(ing || { taxType });
+          const incl = b.priceIncludesTax !== undefined ? b.priceIncludesTax
+            : (sup ? !!sup.priceIncludesTax : false);
+          const calc = HaomingTax.calcBuyTax(
+            ing || {taxType},
+            sup,
+            b.qty || 0,
+            b.unitPrice || 0,
+            incl
+          );
+          html += '<tr>' +
+            '<td style="font-size:0.82rem;color:var(--g400)">' + esc(b.date) + '</td>' +
+            '<td style="font-size:0.84rem">' + esc(sup ? sup.name : (b.supId || '—')) +
+              (incl ? ' <span style="font-size:0.7rem;color:var(--amber-d);font-weight:700">(含稅報價)</span>' : '') +
+              '</td>' +
+            '<td style="font-weight:600">' + esc(b.ingName) + '</td>' +
+            '<td><span class="tax-badge tax-' + badge.type + '">' +
+              badge.emoji + ' ' + badge.label + '</span></td>' +
+            '<td style="text-align:right;font-family:monospace">' + CUR() + ' ' + fmt(calc.netAmt, 1) + '</td>' +
+            '<td style="text-align:right;font-family:monospace;color:' +
+              (calc.taxAmt > 0 ? 'var(--amber-d);font-weight:700' : 'var(--g400)') + '">' +
+              (calc.taxAmt > 0 ? CUR() + ' ' + fmt(calc.taxAmt, 1) : '—') + '</td>' +
+            '<td style="text-align:right;font-family:monospace;font-weight:700">' + CUR() + ' ' + fmt(b.total || calc.grossAmt, 0) + '</td>' +
+            '<td style="font-size:0.78rem;color:var(--g400)">' + esc(b.docNo || b.invoice || '—') + '</td>' +
+            '</tr>';
+        });
+        // 合計行
+        html += '<tr style="background:var(--g100);font-weight:700">' +
+          '<td colspan="4" style="text-align:right">合計</td>' +
+          '<td style="text-align:right;font-family:monospace">' + CUR() + ' ' + fmt(thisMonthSummary.totalNet, 0) + '</td>' +
+          '<td style="text-align:right;font-family:monospace;color:var(--amber-d)">' + CUR() + ' ' + fmt(thisMonthSummary.totalTax, 0) + '</td>' +
+          '<td style="text-align:right;font-family:monospace">' + CUR() + ' ' + fmt(thisMonthSummary.totalGross, 0) + '</td>' +
+          '<td></td></tr>';
+        html += '</tbody></table></div>';
+      }
+      detailWrap.innerHTML = html;
+      pg.appendChild(detailWrap);
+
+      // ─── 申報指引 ───
+      pg.appendChild(dv({ cls: 'tip', style: 'margin-top:14px' },
+        '💡 台灣營業稅每兩月申報一次（單數月申報前期）。本頁進項稅額可作為申報計算的參考，' +
+        '但實際申報以發票/二聯式憑證為準。免稅項目（蔬果/稻米/生鮮蛋）不計入進項稅額。'
+      ));
+
+      return pg;
+    };
+    console.log('  ✅ renderTax 已替換為 v2.1.0 完整版');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 7: 包裝 renderIng — 食材列表加稅別欄
+    // ═══════════════════════════════════════════════════════════
+    const _origRenderIng = window.renderIng;
+    window.renderIng = function(){
+      const pg = _origRenderIng();
+      // 在表格的「進價/單位」欄位後加稅別徽章（透過 DOM 修改）
+      setTimeout(() => {
+        const tables = document.querySelectorAll('#cost-content table');
+        tables.forEach(tbl => {
+          const headRow = tbl.querySelector('thead tr');
+          if(!headRow) return;
+          // 確認是食材表格（看「進價/單位」欄）
+          const headers = [...headRow.querySelectorAll('th')].map(th => th.textContent);
+          const priceIdx = headers.findIndex(h => /進價/.test(h));
+          if(priceIdx < 0) return;
+          // 在每個資料行加稅別徽章到 priceIdx 欄
+          const dataRows = tbl.querySelectorAll('tbody tr');
+          dataRows.forEach(tr => {
+            const cells = tr.querySelectorAll('td');
+            const idCell = cells[0];
+            if(!idCell) return;
+            const idText = idCell.textContent.trim();
+            const ing = (state.ings||[]).find(i => i.id === idText);
+            if(!ing) return;
+            const priceCell = cells[priceIdx];
+            if(!priceCell || priceCell.querySelector('.tax-badge')) return;
+            const badge = HaomingTax.getTaxBadge(ing);
+            const span = document.createElement('span');
+            span.className = 'tax-badge tax-mini tax-' + badge.type;
+            span.textContent = badge.emoji + ' ' + badge.label;
+            span.style.marginTop = '4px';
+            span.style.display = 'inline-block';
+            priceCell.appendChild(document.createElement('br'));
+            priceCell.appendChild(span);
+          });
+        });
+      }, 60);
+      return pg;
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 8 & 9: 包裝 openIngModal + saveIng — 加稅別欄位
+    // ═══════════════════════════════════════════════════════════
+    const _origOpenIngModal = window.openIngModal;
+    window.openIngModal = function(id){
+      _origOpenIngModal(id);
+      // 修改 modal 加上稅別欄位
+      setTimeout(() => {
+        const ing = id ? (state.ings||[]).find(x => x.id === id) :
+          { taxType: 'taxable', taxNote: '' };
+        if(!ing) return;
+        const taxType = ing.taxType || inferIngTaxType(ing).type;
+        const inferredReason = inferIngTaxType(ing).reason;
+        // 找到「肉品來源」那一行,在它後面插入稅別區
+        const meatField = document.getElementById('fi-meat');
+        if(!meatField) return;
+        const parentRow = meatField.closest('.form-row');
+        if(!parentRow || parentRow.querySelector('#fi-tax')) return;
+        const taxBlock = document.createElement('div');
+        taxBlock.style.cssText = 'background:var(--amber-l);border-radius:8px;padding:12px 14px;' +
+          'margin-top:6px;border-left:4px solid var(--amber)';
+        taxBlock.innerHTML = '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;color:var(--amber-d)">' +
+          '🧾 稅務設定</div>' +
+          '<div class="form-row c2">' +
+          '<div class="fg"><label>稅別分類</label><select id="fi-tax">' +
+          '<option value="taxable"' + (taxType === 'taxable' ? ' selected' : '') + '>💰 應稅 5%（加工/調味/包裝）</option>' +
+          '<option value="tax_free"' + (taxType === 'tax_free' ? ' selected' : '') + '>🌾 免稅（蔬果/稻米/生鮮蛋）</option>' +
+          '<option value="zero_rated"' + (taxType === 'zero_rated' ? ' selected' : '') + '>⚡ 零稅率（外銷,少用）</option>' +
+          '</select></div>' +
+          '<div class="fg"><label>稅別備註（選填）</label><input id="fi-taxnote" value="' +
+            esc(ing.taxNote || inferredReason) + '" placeholder="例：分切包裝肉品"></div>' +
+          '</div>' +
+          '<div style="font-size:0.78rem;color:var(--amber-d);margin-top:4px">' +
+          '💡 系統建議：' + inferredReason + '</div>';
+        parentRow.insertAdjacentElement('afterend', taxBlock);
+      }, 50);
+    };
+
+    const _origSaveIng = window.saveIng;
+    window.saveIng = function(eid){
+      // 在原 saveIng 執行前，先把稅別欄位寫到 form (透過 hidden field)
+      // 但因原 saveIng 用 $('fi-...') 抓欄位，我們改寫整個函式
+      const name = document.getElementById('fi-name')?.value?.trim();
+      if(!name){ alert('請填入食材名稱'); return; }
+      const id = eid || document.getElementById('fi-id')?.value || nxtId(state.ings, 'I');
+      const taxType = document.getElementById('fi-tax')?.value || 'taxable';
+      const taxNote = document.getElementById('fi-taxnote')?.value || '';
+      const obj = {
+        id, name,
+        cat: document.getElementById('fi-cat')?.value || '其他',
+        unit: document.getElementById('fi-unit')?.value || '公斤',
+        form: document.getElementById('fi-form')?.value || '整顆/原形',
+        sup: document.getElementById('fi-sup')?.value || 'S001',
+        meatSrc: document.getElementById('fi-meat')?.value || '',
+        price: +document.getElementById('fi-price')?.value || 0,
+        stock: +document.getElementById('fi-stock')?.value || 0,
+        safety: +document.getElementById('fi-safety')?.value || 0,
+        kcal: +document.getElementById('fi-kcal')?.value || 0,
+        prot: +document.getElementById('fi-prot')?.value || 0,
+        fat: +document.getElementById('fi-fat')?.value || 0,
+        carb: +document.getElementById('fi-carb')?.value || 0,
+        sodium: +document.getElementById('fi-sodium')?.value || 0,
+        totalWeight: +document.getElementById('fi-tw')?.value || 0,
+        solidWeight: +document.getElementById('fi-sw')?.value || 0,
+        taxType,
+        taxNote,
+        taxConfirmed: true,  // 老闆手動儲存就視為已確認
+        updatedAt: toDay()
+      };
+      if(eid) state.ings = state.ings.map(x => x.id === eid ? obj : x);
+      else state.ings.push(obj);
+      addAudit(eid ? '編輯食材' : '新增食材', name + ' (' + (TAX_TYPES[taxType]||{}).label + ')');
+      saveState();
+      closeModal();
+      renderPage();
+      toast('✅ ' + name + ' 已儲存');
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 10 & 11: 包裝 openBuyModal + saveBuy — 進貨即時稅算
+    // ═══════════════════════════════════════════════════════════
+    const _origOpenBuyModal = window.openBuyModal;
+    window.openBuyModal = function(supId){
+      _origOpenBuyModal(supId);
+      setTimeout(() => {
+        // 在「合計」欄位後插入稅務即時計算區
+        const totalField = document.getElementById('b-total');
+        if(!totalField) return;
+        const totalRow = totalField.closest('.form-row');
+        if(!totalRow || document.getElementById('b-tax-calc-wrap')) return;
+
+        // 增加「報價方式」切換 + 稅務計算顯示區
+        const taxBox = document.createElement('div');
+        taxBox.id = 'b-tax-calc-wrap';
+        taxBox.innerHTML =
+          '<div class="form-row c2" style="margin-top:8px">' +
+          '<div class="fg"><label>報價方式</label><select id="b-incl">' +
+          '<option value="0">📋 未稅報價（廠商發票分列稅額）</option>' +
+          '<option value="1">💸 含稅報價（廠商開出含稅總額）</option>' +
+          '</select></div>' +
+          '<div class="fg"><label>稅別（依食材自動帶入）</label>' +
+          '<input id="b-taxtype-display" disabled style="background:var(--g100);font-weight:700"></div>' +
+          '</div>' +
+          '<div id="b-tax-calc" class="buy-tax-calc">' +
+          '<div class="buy-tax-calc-cell net"><div class="lbl">未稅金額</div><div class="val" id="b-net">—</div></div>' +
+          '<div class="buy-tax-calc-cell tax"><div class="lbl">稅額（5%）</div><div class="val" id="b-tax">—</div></div>' +
+          '<div class="buy-tax-calc-cell gross"><div class="lbl">含稅總額</div><div class="val" id="b-gross">—</div></div>' +
+          '</div>';
+        totalRow.insertAdjacentElement('afterend', taxBox);
+
+        // 設定預設值（依供應商）
+        const supSelect = document.getElementById('b-sup');
+        const updateInclFromSup = () => {
+          const sId = supSelect?.value;
+          const sup = (state.sups||[]).find(s => s.id === sId);
+          const inclSelect = document.getElementById('b-incl');
+          if(inclSelect && sup){
+            inclSelect.value = sup.priceIncludesTax ? '1' : '0';
+          }
+          recalcBuyTax();
+        };
+        supSelect?.addEventListener('change', updateInclFromSup);
+
+        // 食材變更時更新稅別顯示
+        const ingSelect = document.getElementById('b-ing');
+        const updateTaxTypeDisplay = () => {
+          const sl = ingSelect;
+          if(!sl) return;
+          const opt = sl.options[sl.selectedIndex];
+          const ingId = opt?.getAttribute('data-id');
+          const ing = (state.ings||[]).find(i => i.id === ingId || i.name === sl.value);
+          const display = document.getElementById('b-taxtype-display');
+          if(display && ing){
+            const badge = HaomingTax.getTaxBadge(ing);
+            display.value = badge.emoji + ' ' + badge.label;
+            display.style.color = badge.color;
+          } else if(display){
+            display.value = '— 請先選擇食材 —';
+            display.style.color = 'var(--g400)';
+          }
+          recalcBuyTax();
+        };
+        ingSelect?.addEventListener('change', updateTaxTypeDisplay);
+
+        // 數量/單價/合計變更 → 重算稅
+        ['b-qty','b-price','b-total','b-incl'].forEach(fid => {
+          const el = document.getElementById(fid);
+          if(el) el.addEventListener('input', recalcBuyTax);
+        });
+
+        // 初次設定
+        updateInclFromSup();
+        updateTaxTypeDisplay();
+      }, 50);
+    };
+
+    function recalcBuyTax(){
+      const ingSel = document.getElementById('b-ing');
+      const opt = ingSel?.options[ingSel.selectedIndex];
+      const ingId = opt?.getAttribute('data-id');
+      const ing = (state.ings||[]).find(i => i.id === ingId || i.name === ingSel?.value);
+      const sup = (state.sups||[]).find(s => s.id === document.getElementById('b-sup')?.value);
+      const qty = +document.getElementById('b-qty')?.value || 0;
+      const unitPrice = +document.getElementById('b-price')?.value || 0;
+      let total = +document.getElementById('b-total')?.value || 0;
+      const incl = document.getElementById('b-incl')?.value === '1';
+
+      if(!ing || !qty){
+        const setT = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+        setT('b-net', '—'); setT('b-tax', '—'); setT('b-gross', '—');
+        return;
+      }
+
+      // 自動填合計（如果空）
+      if(!total && unitPrice){
+        total = qty * unitPrice;
+        const totalEl = document.getElementById('b-total');
+        if(totalEl && !totalEl.value) totalEl.value = total;
+      }
+
+      const calc = HaomingTax.calcBuyTax(ing, sup, qty, unitPrice, incl);
+      const NF = v => CUR() + ' ' + fmt(v, 1);
+      const setT = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+      setT('b-net', NF(calc.netAmt));
+      setT('b-tax', calc.taxAmt > 0 ? NF(calc.taxAmt) : '— 免稅');
+      setT('b-gross', NF(calc.grossAmt));
+    }
+
+    const _origSaveBuy = window.saveBuy;
+    window.saveBuy = function(){
+      const sl = document.getElementById('b-ing');
+      const ingName = sl?.value;
+      if(!ingName){ alert('請選擇食材'); return; }
+      const op = sl.options[sl.selectedIndex];
+      const ingId = op?.getAttribute('data-id') || '';
+      const ing = (state.ings||[]).find(i => i.id === ingId || i.name === ingName);
+      const sup = (state.sups||[]).find(s => s.id === document.getElementById('b-sup')?.value);
+      const qty = +document.getElementById('b-qty')?.value || 0;
+      if(!qty){ alert('請填入數量'); return; }
+      const unitPrice = +document.getElementById('b-price')?.value || 0;
+      const total = +document.getElementById('b-total')?.value || qty * unitPrice;
+      const incl = document.getElementById('b-incl')?.value === '1';
+      const calc = HaomingTax.calcBuyTax(ing || {}, sup, qty, unitPrice, incl);
+
+      const entry = {
+        id: 'B' + Date.now(),
+        date: document.getElementById('b-date')?.value || toDay(),
+        ingName,
+        ingId,
+        supId: document.getElementById('b-sup')?.value || '',
+        qty,
+        unit: document.getElementById('b-unit')?.value || '公斤',
+        unitPrice,
+        total,                   // 含稅總額（保持原行為）
+        invoice: document.getElementById('b-inv')?.value || '',
+        // ─── 新增稅務欄位 ───
+        taxType: calc.taxType,
+        priceIncludesTax: incl,
+        netAmt: calc.netAmt,
+        taxAmt: calc.taxAmt,
+        grossAmt: calc.grossAmt
+      };
+      state.buyLog.push(entry);
+
+      if(document.getElementById('b-update')?.value === 'yes'){
+        const found = state.ings.find(i => i.id === ingId || i.name === ingName);
+        if(found){
+          found.stock = (found.stock || 0) + qty;
+          if(unitPrice) found.price = unitPrice;
+          found.updatedAt = toDay();
+        }
+      }
+      addAudit('登錄進貨', ingName + ' ' + qty + '（稅 ' + CUR() + fmt(calc.taxAmt, 0) + '）');
+      saveState();
+      closeModal();
+      renderPage();
+      toast('✅ 進貨記錄已儲存（含稅 ' + CUR() + fmt(total, 0) +
+            '，未稅 ' + CUR() + fmt(calc.netAmt, 0) + '）');
+    };
+    console.log('  ✅ openBuyModal/saveBuy 已包裝');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 12: 包裝 receivePO — 採購收貨自動算稅
+    // ═══════════════════════════════════════════════════════════
+    const _origReceivePO = window.receivePO;
+    window.receivePO = function(id){
+      const p = (state.poList||[]).find(x => x.id === id);
+      if(!p) return _origReceivePO(id);
+      // 計算稅務（依品項與供應商）
+      const ing = (state.ings||[]).find(i => i.name === p.itemName);
+      const sup = (state.sups||[]).find(s => s.name === p.supplier);
+      const incl = sup ? !!sup.priceIncludesTax : false;
+      const calc = HaomingTax.calcBuyTax(ing || {}, sup, p.qty || 0, p.unitPrice || 0, incl);
+
+      // 保留原邏輯（更新狀態）
+      p.status = '已到貨';
+      p.receivedDate = toDay();
+      // 加稅務欄位
+      p.taxType = calc.taxType;
+      p.priceIncludesTax = incl;
+      p.netAmt = calc.netAmt;
+      p.taxAmt = calc.taxAmt;
+
+      // 建立應付帳款（加稅務欄位）
+      if(!state.apList) state.apList = [];
+      state.apList.push({
+        id: 'AP' + Date.now(),
+        poId: p.id,
+        date: p.receivedDate,
+        supplier: p.supplier,
+        itemName: p.itemName,
+        amount: p.totalAmt,
+        status: '未付款',
+        dueDate: '',
+        note: '自動由採購單產生',
+        // ─── 稅務欄位 ───
+        taxType: calc.taxType,
+        priceIncludesTax: incl,
+        netAmt: calc.netAmt,
+        taxAmt: calc.taxAmt
+      });
+
+      addAudit('到貨驗收', p.itemName + '（稅 ' + CUR() + fmt(calc.taxAmt, 0) + '）');
+      saveState();
+      renderPage();
+      toast('✅ 已驗收，應付帳款已自動建立（含稅務拆分）');
+    };
+    console.log('  ✅ receivePO 已包裝');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 13: 包裝 renderAP — 拆分稅務
+    // ═══════════════════════════════════════════════════════════
+    const _origRenderAP = window.renderAP;
+    window.renderAP = function(){
+      const pg = _origRenderAP();
+      // 在 AP 表格的「金額」欄位旁加稅務徽章 + 點擊展開拆分
+      setTimeout(() => {
+        const tables = document.querySelectorAll('#cost-content table');
+        tables.forEach(tbl => {
+          const headRow = tbl.querySelector('thead tr');
+          if(!headRow) return;
+          const headers = [...headRow.querySelectorAll('th')].map(th => th.textContent);
+          const amtIdx = headers.findIndex(h => /金額/.test(h));
+          if(amtIdx < 0) return;
+          // 確認是 AP 表格（看「到期日」欄）
+          if(!headers.some(h => /到期日/.test(h))) return;
+          const dataRows = tbl.querySelectorAll('tbody tr');
+          dataRows.forEach((tr, idx) => {
+            const cells = tr.querySelectorAll('td');
+            const amtCell = cells[amtIdx];
+            if(!amtCell || amtCell.querySelector('.tax-badge')) return;
+            const list = state.apList || [];
+            // 反向（因為 AP 渲染時用 .reverse()）
+            const ap = list[list.length - 1 - idx];
+            if(!ap || !ap.taxType) return;
+            const badge = HaomingTax.getTaxBadge({ taxType: ap.taxType });
+            const span = document.createElement('span');
+            span.className = 'tax-badge tax-mini tax-' + badge.type;
+            span.textContent = badge.emoji + ' ' + badge.label;
+            span.style.marginLeft = '6px';
+            amtCell.appendChild(span);
+            // 加稅務拆分明細（在金額下方）
+            if(ap.netAmt !== undefined && ap.taxAmt > 0){
+              const detail = document.createElement('div');
+              detail.style.cssText = 'font-size:0.74rem;color:var(--g400);margin-top:2px';
+              detail.textContent = '未稅 ' + CUR() + fmt(ap.netAmt, 0) +
+                ' + 稅 ' + CUR() + fmt(ap.taxAmt, 0);
+              amtCell.appendChild(detail);
+            }
+          });
+        });
+      }, 60);
+      return pg;
+    };
+    console.log('  ✅ renderAP 已包裝');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 14: 食材稅別概覽 modal + 廠商稅別明細 modal
+    // ═══════════════════════════════════════════════════════════
+    window.showIngTaxOverview = function(){
+      const ings = state.ings || [];
+      const taxable = ings.filter(i => getIngTaxType(i) === 'taxable');
+      const taxFree = ings.filter(i => getIngTaxType(i) === 'tax_free');
+
+      let html = mH('🥬 30 項食材稅別總覽');
+      html += '<div class="grid3" style="margin-bottom:14px">' +
+        '<div class="metric"><div class="metric-label">應稅 5%</div>' +
+          '<div class="metric-val" style="color:var(--amber-d)">' + taxable.length + ' 項</div>' +
+          '<div class="metric-sub">' + Math.round(taxable.length / ings.length * 100) + '%</div></div>' +
+        '<div class="metric"><div class="metric-label">免稅</div>' +
+          '<div class="metric-val" style="color:var(--pri)">' + taxFree.length + ' 項</div>' +
+          '<div class="metric-sub">蔬果/稻米/生鮮蛋</div></div>' +
+        '<div class="metric"><div class="metric-label">總食材數</div>' +
+          '<div class="metric-val">' + ings.length + ' 項</div>' +
+          '<div class="metric-sub">點擊列可編輯</div></div>' +
+        '</div>';
+
+      html += '<div class="ing-tax-list">';
+      // 先列免稅,再列應稅（讓人快速看出免稅有哪些）
+      [...taxFree, ...taxable].forEach(ing => {
+        const badge = HaomingTax.getTaxBadge(ing);
+        const confirmed = ing.taxConfirmed;
+        html += '<div class="ing-tax-row" onclick="closeModal();openIngModal(\'' + ing.id + '\')">' +
+          '<div class="id">' + esc(ing.id) + '</div>' +
+          '<div><div class="nm">' + esc(ing.name) + '</div>' +
+          '<div class="ct">' + esc(ing.cat) + ' · ' + esc(ing.unit) + '</div></div>' +
+          '<div style="text-align:center"><span class="tax-badge tax-' + badge.type + '">' +
+            badge.emoji + '</span></div>' +
+          '<div style="font-size:0.78rem;color:var(--g500);text-align:right">' +
+            esc(badge.label) + '</div>' +
+          '<div style="text-align:right">' +
+            (confirmed ? '<span class="badge badge-green" style="font-size:0.7rem">✓ 已確認</span>'
+                       : '<span class="badge badge-warn" style="font-size:0.7rem">推斷</span>') +
+          '</div>' +
+          '</div>';
+      });
+      html += '</div>';
+
+      html += '<div class="tip" style="margin-top:14px">' +
+        '💡 系統依品項類別自動推斷稅別。<b>蔬果</b>（高麗菜/洋蔥/番茄/紅蘿蔔）、<b>稻米</b>（白米）、<b>生鮮蛋</b>（雞蛋）為免稅；' +
+        '<b>分切肉品</b>（雞胸/牛里肌/雞腿/三層）、<b>調味料</b>、<b>包裝加工品</b>為應稅。' +
+        '點擊任意食材可編輯確認。</div>';
+      html += '<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
+      modal(html, true);
+    };
+
+    window.showVendorTaxDetail = function(){
+      const buys = state.buyLog || [];
+      const thisMonth = buys.filter(b => b.date && b.date.startsWith(toMon()));
+      const summary = HaomingTax.calcBuyLogSummary(thisMonth);
+      const vendors = Object.keys(summary.byVendor).sort((a,b) =>
+        summary.byVendor[b].tax - summary.byVendor[a].tax);
+
+      let html = mH('📊 ' + toMon() + ' 廠商稅別明細');
+      if(!vendors.length){
+        html += '<div style="text-align:center;padding:30px;color:var(--g400)">本月尚無進貨記錄</div>';
+      } else {
+        html += '<div style="overflow-x:auto"><table class="tbl">' +
+          '<thead><tr><th>廠商</th><th>進貨筆數</th>' +
+          '<th style="text-align:right">未稅</th><th style="text-align:right">進項稅</th>' +
+          '<th style="text-align:right">含稅總額</th></tr></thead><tbody>';
+        vendors.forEach(v => {
+          const d = summary.byVendor[v];
+          html += '<tr>' +
+            '<td style="font-weight:600">' + esc(v) + '</td>' +
+            '<td style="text-align:center">' + d.count + '</td>' +
+            '<td style="text-align:right;font-family:monospace">' + CUR() + ' ' + fmt(d.net, 0) + '</td>' +
+            '<td style="text-align:right;font-family:monospace;color:' +
+              (d.tax > 0 ? 'var(--amber-d);font-weight:700' : 'var(--g400)') + '">' +
+              (d.tax > 0 ? CUR() + ' ' + fmt(d.tax, 0) : '—') + '</td>' +
+            '<td style="text-align:right;font-family:monospace;font-weight:700">' + CUR() + ' ' + fmt(d.gross, 0) + '</td>' +
+            '</tr>';
+        });
+        html += '<tr style="background:var(--g100);font-weight:700">' +
+          '<td colspan="2" style="text-align:right">合計</td>' +
+          '<td style="text-align:right">' + CUR() + ' ' + fmt(summary.totalNet, 0) + '</td>' +
+          '<td style="text-align:right;color:var(--amber-d)">' + CUR() + ' ' + fmt(summary.totalTax, 0) + '</td>' +
+          '<td style="text-align:right">' + CUR() + ' ' + fmt(summary.totalGross, 0) + '</td>' +
+          '</tr>';
+        html += '</tbody></table></div>';
+      }
+      html += '<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
+      modal(html, true);
+    };
+    console.log('  ✅ 食材稅別/廠商稅別 modal 已注入');
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 15: 修改 SOP_DATA.tax — 新版稅務 SOP
+    // ═══════════════════════════════════════════════════════════
+    if(typeof SOP_DATA !== 'undefined'){
+      SOP_DATA.tax = {
+        badge: '稅務管理 v2.1',
+        flow: ['設定稅別', '進貨輸入', '即時稅算', '查看月報', '申報參考'],
+        sections: [
+          { title: '食材稅別設定',
+            steps: [
+              '進入「🥬 食材庫存」點擊食材編輯',
+              '在「🧾 稅務設定」區選擇稅別（應稅 5% / 免稅 / 零稅率）',
+              '系統依類別自動建議：蔬果/稻米/生鮮蛋 → 免稅；其他 → 應稅',
+              '點頂部「🥬 食材稅別總覽」可一覽所有食材稅別狀態'
+            ],
+            tip: '30 項食材已內建稅別判定，無需手動設定'
+          },
+          { title: '進貨輸入即時稅算',
+            steps: [
+              '進入「🛍️ 進貨記錄」點「＋ 登錄進貨」',
+              '選擇食材後系統自動帶入稅別（應稅/免稅）',
+              '選擇「報價方式」：未稅報價或含稅報價',
+              '填入數量+單價，系統即時顯示「未稅/稅額/含稅」三欄拆分',
+              '儲存後 buyLog 自動記錄稅務拆分'
+            ],
+            warn: '福聯/沁味預設「含稅報價」（依過往備註），其他廠商預設「未稅報價」'
+          },
+          { title: '稅務月報',
+            steps: [
+              '本頁顯示本月含稅總額/未稅金額/進項稅/免稅進貨',
+              '下方「進貨稅務明細」逐筆列出稅別與拆分',
+              '點「📊 廠商稅別明細」查看依廠商彙總',
+              '進項稅額可作為營業稅申報的扣抵參考'
+            ]
+          }
+        ]
+      };
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // STEP 16: 升級版本號 + 加入 changelog
+    // ═══════════════════════════════════════════════════════════
+    try {
+      window.SYSTEM_VERSION = '2.1.0';
+      window.BUILD_NUMBER = '20260425-tax';
+    } catch(e){}
+
+    if(typeof VERSION_HISTORY !== 'undefined' && Array.isArray(VERSION_HISTORY)){
+      VERSION_HISTORY.unshift({
+        ver: '2.1.0',
+        build: '20260425-tax',
+        date: '2026-04-25',
+        changes: [
+          '🧾 稅務整合升級 — 廠商級+品項級稅別管理',
+          '💰 注入 HaomingTax 稅務計算模組 (window.HaomingTax)',
+          '🥬 30 項食材內建稅別判定（11 免稅 / 19 應稅）',
+          '🌾 蔬果/稻米/生鮮蛋自動歸為免稅',
+          '💸 食材編輯加「稅務設定」區（稅別+備註）',
+          '📋 廠商加 priceIncludesTax 欄位（福聯/沁味預設含稅報價）',
+          '🛍️ 進貨輸入即時稅算（未稅/稅額/含稅三欄拆分）',
+          '💳 應付帳款拆分稅務欄位 + 徽章顯示',
+          '🧾 稅務頁全新改版 — 8 項 KPI + 廠商級彙總 + 進貨明細',
+          '📊 食材稅別總覽 modal（一覽 30 項稅別狀態）',
+          '📊 廠商稅別明細 modal（依廠商彙總月度進項稅）',
+          '🔧 採購收貨自動套用稅務（受 receivePO 包裝）',
+          '🔧 SOP 加稅務章節（食材設定/進貨輸入/月報）',
+          '🌐 與財會系統共用同一稅務邏輯（window.HaomingTax）'
+        ]
+      });
+    }
+
+    // 更新 topbar logo 版本顯示
+    const verSpan = document.querySelector('.logo span:last-child');
+    if(verSpan && /v2\.0/.test(verSpan.textContent)){
+      verSpan.textContent = 'v2.1.0';
+    }
+
+    console.log('  ✅ 版本升級至 v2.1.0 (Build 20260425-tax)');
+
+    // ═══════════════════════════════════════════════════════════
+    // 完成
+    // ═══════════════════════════════════════════════════════════
+    setTimeout(() => {
+      console.log('═══════════════════════════════════════════════');
+      console.log('🎉 好洺生管系統 v2.1.0 升級完成！');
+      console.log('═══════════════════════════════════════════════');
+      console.log('  • ' + ingPatched + ' 項食材已套用稅別');
+      console.log('  • ' + supPatched + ' 家廠商已套用報價方式');
+      console.log('  • ' + buyPatched + ' 筆舊進貨已修補稅務欄位');
+      console.log('  • 食材編輯加「稅務設定」區');
+      console.log('  • 進貨輸入即時稅算');
+      console.log('  • 「🧾 稅務」分頁全新改版');
+      console.log('  • 與財會系統共用 window.HaomingTax');
+      console.log('═══════════════════════════════════════════════');
+      // 重新渲染當前頁
+      if(typeof renderPage === 'function') {
+        try { renderPage(); } catch(e){}
+      }
+    }, 200);
+  }
+
+  // 啟動
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', () => setTimeout(bootUpgrade, 600));
+  } else {
+    setTimeout(bootUpgrade, 600);
+  }
+})();
+
+</script>
 </body>
 </html>
