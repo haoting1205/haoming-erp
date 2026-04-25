@@ -638,8 +638,7 @@ window.saveMetaSettings=function(){state.meta.company=$('mc-name')?.value||'';st
 function exportBackup(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='好洺ERP備份_'+toDay()+'.json';a.click();toast('✅ 備份已下載')}
 function importBackup(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.ings)throw new Error();if(!confirm('確定匯入？目前資料將被覆蓋'))return;Object.assign(state,d);saveState();renderPage();toast('✅ 備份已匯入')}catch{alert('❌ 無效的備份檔案')}};reader.readAsText(file);e.target.value=''}
 function clearAllData(){if(!confirm('⚠️ 確定清除所有資料？'))return;if(!confirm('再次確認？'))return;localStorage.removeItem(COST_KEY);location.reload()}
-</script>
-<script>
+
 // ════════════════════════════════════════════════════════════
 
 // ══════════════════════════════════════════════════════
@@ -3891,9 +3890,11 @@ pushUndo(); // 初始快照
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js"></script>
 
 <!-- ═══════════════════════════════════════════════════════════
-     v2.1.0 稅務整合升級（追加注入,不修改原始程式碼）
+     v2.1.0 稅務整合升級
+     - 已修復原 v2.0.0 跨 script 區塊變數依賴 bug
+       (Script #2 + Script #3 合併為單一區塊)
+     - 新增 window.HaomingTax 共用稅務模組
      插入時間: 2026-04-25
-     模組: window.HaomingTax (與財會系統共用)
      ═══════════════════════════════════════════════════════════ -->
 <script>
 /* ═══════════════════════════════════════════════════════════════
