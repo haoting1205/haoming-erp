@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>好洺生管系統 v2.1.0 ULTIMATE</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.1.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -3892,43 +3892,14 @@ pushUndo(); // 初始快照
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-app-compat.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js"></script>
 
-<script>
-console.log('%c🟢 [v2.1.0 ULTIMATE 修復版] 載入中...','background:#0A6847;color:#fff;padding:4px 8px;border-radius:4px;font-weight:700');
-window.__HAOMING_ULTIMATE = true;
-window.addEventListener('load', function(){
-  setTimeout(function(){
-    try {
-      var logo = document.querySelector('.logo');
-      if(logo){
-        var b = document.createElement('span');
-        b.textContent = 'ULTIMATE FIX';
-        b.style.cssText = 'display:inline-block;margin-left:8px;padding:2px 8px;background:#D9534F;color:#fff;border-radius:4px;font-size:0.65rem;font-weight:700;letter-spacing:.5px;animation:pulse 2s infinite';
-        logo.appendChild(b);
-        var st = document.createElement('style');
-        st.textContent = '@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}';
-        document.head.appendChild(st);
-      }
-      // 把版本號改成醒目的紅色
-      var verSpan = document.querySelector('.logo span:nth-of-type(2)');
-      if(verSpan && verSpan.textContent.includes('v2.0')){
-        verSpan.textContent = 'v2.1.0-ultimate';
-        verSpan.style.color = '#FFD700';
-        verSpan.style.fontWeight = '700';
-      }
-    } catch(e){
-      console.warn('視覺標記失敗:', e.message);
-    }
-  }, 100);
-});
-</script>
 
 <!-- ═══════════════════════════════════════════════════════════
-     v2.1.0 ULTIMATE 修復版
-     - 修復原 v2.0.0 的兩個跨 script 區塊變數依賴 bug:
+     v2.1.0 稅務整合升級
+     - 修復原 v2.0.0 跨 script 區塊變數依賴 bug:
        1. fixPermissions IIFE 移到 DEFAULT_PERMS 定義後
        2. const $ 額外暴露到 window.$
      - 注入 window.HaomingTax 共用稅務模組 (含 30 食材稅別)
-     - 升級 renderTax 為 v2.1.0 廠商級+品項級稅務管理
+     - 升級 renderTax 為廠商級+品項級稅務管理
      ═══════════════════════════════════════════════════════════ -->
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -4294,7 +4265,9 @@ window.addEventListener('load', function(){
     // ═══════════════════════════════════════════════════════════
     // STEP 6: 替換 renderTax — 完整稅務管理頁
     // ═══════════════════════════════════════════════════════════
+    const _origRenderTax = window.renderTax;  // 保留原函式作為降級用
     window.renderTax = function(){
+     try {
       const pg = dv({});
       const sw = sopBox('tax');
       if(sw) pg.appendChild(sw);
@@ -4409,8 +4382,16 @@ window.addEventListener('load', function(){
       ));
 
       return pg;
+     } catch(e){
+      console.warn('[v2.1.0] renderTax 新版錯誤,降級舊版:', e.message);
+      if(typeof _origRenderTax === 'function') return _origRenderTax();
+      // 連舊版都沒有,顯示錯誤訊息
+      const errPg = dv({});
+      errPg.innerHTML = '<div class="card" style="padding:30px;text-align:center;color:#9A6210"><h3>⚠️ 稅務管理頁載入失敗</h3><p>錯誤訊息: ' + (e.message||'unknown') + '</p><p>請重新整理頁面或回報此問題</p></div>';
+      return errPg;
+     }
     };
-    console.log('  ✅ renderTax 已替換為 v2.1.0 完整版');
+    console.log('  ✅ renderTax 已替換為 v2.1.0 完整版（含降級保護）');
 
     // ═══════════════════════════════════════════════════════════
     // STEP 7: 包裝 renderIng — 食材列表加稅別欄
@@ -4951,9 +4932,11 @@ window.addEventListener('load', function(){
     }
 
     // 更新 topbar logo 版本顯示
-    const verSpan = document.querySelector('.logo span:last-child');
-    if(verSpan && /v2\.0/.test(verSpan.textContent)){
+    const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
+    if(verSpan && /v2\.[01]/.test(verSpan.textContent)){
       verSpan.textContent = 'v2.1.0';
+      verSpan.style.color = 'rgba(212,149,15,.85)';
+      verSpan.style.fontWeight = '600';
     }
 
     console.log('  ✅ 版本升級至 v2.1.0 (Build 20260425-tax)');
