@@ -2829,19 +2829,23 @@ window.importExcelFile=function(input){
       var validKeys=['sups','ings','storeInv','buyLog','recipes','menu','waste','poList','apList','batchList','contracts','qcRecords','equipment','transfers','prodLog','prodSchedule','users','haccpLogs','internalProducts','internalOrders','arList','countList','returnList','workOrders','customers','custOrders','assets','salesData'];
       var imported=[];var skipped=[];
       
-      wb.SheetNames.forEach(function(name){
-        var mappedKey=SHEET_EN[name]||name;if(validKeys.indexOf(mappedKey)<0){skipped.push(name);return};name=mappedKey
-        var ws=wb.Sheets[name];
+      wb.SheetNames.forEach(function(origName){
+        // origName = Excel 工作表名稱(中文或英文皆可),用於拿 wb.Sheets[]
+        // stateKey = 對應到 state 內部欄位的英文 key,用於 state[stateKey]=data
+        var stateKey=SHEET_EN[origName]||origName;
+        if(validKeys.indexOf(stateKey)<0){skipped.push(origName);return}
+        var ws=wb.Sheets[origName];
+        if(!ws){skipped.push(origName+' (找不到工作表)');return}
         var rawData=XLSX.utils.sheet_to_json(ws,{header:1});
-        if(rawData.length<3){skipped.push(name+' (不足3行)');return}
-        
+        if(rawData.length<3){skipped.push(origName+' (不足3行)');return}
+
         // Row 0 = Chinese headers, Row 1 = English keys, Row 2+ = data
         var cnHeaders=rawData[0];
         var enKeys=rawData[1];
-        
+
         // Validate: check if row 2 looks like English keys
         var isNewFormat=enKeys&&enKeys.some&&enKeys.some(function(k){return typeof k==='string'&&/^[a-zA-Z]/.test(k)});
-        
+
         var data;
         if(isNewFormat){
           // New format: row 1=cn, row 2=en keys, row 3+=data
@@ -2860,9 +2864,9 @@ window.importExcelFile=function(input){
           // Legacy format: row 1=keys, row 2+=data (fallback)
           data=XLSX.utils.sheet_to_json(ws);
         }
-        
-        if(!data.length){skipped.push(name+' (空)');return}
-        
+
+        if(!data.length){skipped.push(origName+' (空)');return}
+
         // Parse JSON strings, auto-generate IDs
         data=data.map(function(row){
           Object.keys(row).forEach(function(k){
@@ -2874,15 +2878,15 @@ window.importExcelFile=function(input){
             if(row[k]==='false')row[k]=false;
           });
           if(!row.id||String(row.id).trim()===''){
-            var prefix=name==='sups'?'S':name==='ings'?'I':name==='users'?'U':'';
+            var prefix=stateKey==='sups'?'S':stateKey==='ings'?'I':stateKey==='users'?'U':'';
             if(prefix){row.id=nxtId(data.filter(function(r){return r.id}),prefix)}
-            else{row.id=name.slice(0,2).toUpperCase()+Date.now()+Math.random().toString(36).slice(2,5)}
+            else{row.id=stateKey.slice(0,2).toUpperCase()+Date.now()+Math.random().toString(36).slice(2,5)}
           }
           return row;
         });
-        
-        state[name]=data;
-        imported.push(name+' ('+data.length+'筆)');
+
+        state[stateKey]=data;
+        imported.push((SHEET_CN[stateKey]||stateKey)+' ('+data.length+'筆)');
       });
       
       if(imported.length){
