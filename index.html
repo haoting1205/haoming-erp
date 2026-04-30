@@ -188,6 +188,18 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
   .nav-btn{padding:3px 6px;font-size:0.74rem}
   .metric-val{font-size:1.1rem}
 }
+/* 捲動條樣式 - 更明顯易辨識 */
+::-webkit-scrollbar{width:14px;height:14px}
+::-webkit-scrollbar-track{background:#E8E5DA;border-radius:7px;border:1px solid #D5D1C3}
+::-webkit-scrollbar-thumb{background:#0A5A46;border-radius:7px;border:2px solid #E8E5DA;min-height:40px}
+::-webkit-scrollbar-thumb:hover{background:#0E7558;border:2px solid #DDD6C2}
+::-webkit-scrollbar-thumb:active{background:#16876D}
+::-webkit-scrollbar-corner{background:#E8E5DA}
+* {scrollbar-width:auto;scrollbar-color:#0A5A46 #E8E5DA} /* Firefox */
+/* Modal 內捲動條較細,但仍清楚 */
+#modal-ov::-webkit-scrollbar{width:12px}
+#modal-ov::-webkit-scrollbar-thumb{background:#BA7517;border:2px solid rgba(0,0,0,.1)}
+#modal-ov::-webkit-scrollbar-thumb:hover{background:#D49B30}
 </style>
 </head>
 <body>
@@ -345,6 +357,8 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
 let _saveTimer=null;
 var _fbSaveTimer=null;
 function saveState(){
+  // 儲存當下視為已存,清空 modal snapshot 避免 closeModal 誤判 dirty
+  window._modalSnapshot=null;
   pushUndo();
   // 1. localStorage 快取（即時）
   clearTimeout(_saveTimer);
@@ -441,8 +455,234 @@ const sbadge=(s,sf)=>s<=0?'<span class="badge badge-red">❌ 缺貨</span>':s<=s
 const mbadge=m=>{const t=state.meta.targetMargin||0.65;return m==null?'<span class="badge badge-gray">未設定</span>':m>=t?'<span class="badge badge-green">✅ 達標</span>':m>=(t-0.1)?'<span class="badge badge-warn">⚠️ 尚可</span>':'<span class="badge badge-red">❌ 偏低</span>'};
 
 // Modal system
-function modal(html,wide){let ov=$('modal-ov');if(!ov){ov=dv({id:'modal-ov',style:'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto'});ov.addEventListener('click',e=>{if(e.target===ov)closeModal()});document.body.appendChild(ov)}ov.innerHTML=`<div style="background:#fff;border-radius:14px;padding:24px 28px;width:100%;max-width:${wide?960:660}px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.25)">${html}</div>`;ov.style.display='flex';ov.scrollTop=0}
-function closeModal(){const o=$('modal-ov');if(o)o.style.display='none'}
+function _snapshotModalForm(){
+  // 快照 modal 內所有可編輯欄位的當前值,作為「未改動」的基準
+  var ov=$('modal-ov');if(!ov)return null;
+  var snap={};
+  ov.querySelectorAll('input,select,textarea').forEach(function(el,idx){
+    var key=el.id||('_idx_'+idx);
+    if(el.type==='checkbox'||el.type==='radio'){snap[key]=el.checked}
+    else{snap[key]=el.value||''}
+  });
+  return snap;
+}
+function _isModalDirty(){
+  // 判斷 modal 內容是否有改動
+  if(!window._modalSnapshot)return false;
+  var ov=$('modal-ov');if(!ov)return false;
+  var dirty=false;
+  ov.querySelectorAll('input,select,textarea').forEach(function(el,idx){
+    if(dirty)return;
+    var key=el.id||('_idx_'+idx);
+    var cur=(el.type==='checkbox'||el.type==='radio')?el.checked:(el.value||'');
+    if(window._modalSnapshot[key]!==undefined&&window._modalSnapshot[key]!==cur)dirty=true;
+  });
+  return dirty;
+}
+function modal(html,wide){let ov=$('modal-ov');if(!ov){ov=dv({id:'modal-ov',style:'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto'});ov.addEventListener('click',e=>{if(e.target===ov)closeModal()});document.body.appendChild(ov)}ov.innerHTML=`<div style="background:#fff;border-radius:14px;padding:24px 28px;width:100%;max-width:${wide?960:660}px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.25)">${html}</div>`;ov.style.display='flex';ov.scrollTop=0;
+  // 等 DOM 穩定後:1) 升級 select 為智慧搜尋 2) 快照初始值
+  setTimeout(function(){
+    try{autoUpgradeSelects()}catch(e){console.warn('SmartSelect 升級失敗',e)}
+    window._modalSnapshot=_snapshotModalForm();
+  },50);
+}
+function closeModal(force){const o=$('modal-ov');if(!o||o.style.display==='none')return;
+  if(force!==true&&_isModalDirty()){
+    if(!confirm('⚠️ 您有未儲存的變更\n\n關閉後將遺失目前修改。\n\n按「確定」放棄變更並關閉\n按「取消」回到表單繼續編輯')){return}
+  }
+  window._modalSnapshot=null;
+  o.style.display='none';
+}
+// 給儲存後關閉用 — 跳過 dirty 檢查
+function closeModalForce(){window._modalSnapshot=null;const o=$('modal-ov');if(o)o.style.display='none'}
+window.closeModal=closeModal;window.closeModalForce=closeModalForce;
+
+// ═══ SmartSelect 智慧搜尋下拉系統 ═══
+// 把指定的 <select> 升級為可搜尋下拉,使用者可打關鍵字過濾
+// 升級後 select 仍存在(隱藏),value 同步,saveXxx 邏輯不用改
+function _smartSelectExtractData(opt,id){
+  // 從原 option 抽出搜尋資料(name/code/cat/sup)
+  var data={value:opt.value,label:opt.text,id:'',cat:'',sup:'',extra:''};
+  // 食材選單 (b-ing/mu-ing1/w-name/lb-ing/tr-rec) 通常 value=name, 從 state.ings 比對找
+  if(state&&state.ings&&['b-ing','mu-ing1','w-name','tr-rec','lb-ing','sc-rec'].indexOf(id)>=0){
+    var ing=state.ings.find(function(x){return x.name===opt.value||x.id===opt.value});
+    if(ing){data.id=ing.id;data.cat=ing.cat||'';data.sup=ing.sup||''}
+  }
+  // 供應商選單(b-sup/po-sup/qc-sup/fi-sup) 通常 value=id, 從 state.sups 比對
+  if(state&&state.sups&&['b-sup','po-sup','qc-sup','fi-sup'].indexOf(id)>=0){
+    var sup=state.sups.find(function(x){return x.id===opt.value});
+    if(sup){data.id=sup.id;data.cat=sup.type||'';data.extra=sup.contact||''}
+  }
+  // 配方選單(pd-rec/lb-rec/wo-recipe/tr-rec/sc-rec)
+  if(state&&state.recipes&&['pd-rec','lb-rec','wo-recipe','sc-rec'].indexOf(id)>=0){
+    var rec=state.recipes.find(function(x){return x.id===opt.value||x.name===opt.value});
+    if(rec){data.id=rec.id;data.cat=rec.cat||'';data.extra=rec.code||''}
+  }
+  return data;
+}
+
+function enhanceSelect(sel){
+  if(!sel||sel._smartSelectAttached)return;
+  if(sel.tagName!=='SELECT')return;
+  if(sel.multiple)return;  // 多選不支援
+  var optionCount=sel.options.length;
+  if(optionCount<6)return;  // 選項少不需要搜尋
+  if(sel.dataset.noSmart==='1')return;  // 明確標記不要升級
+  sel._smartSelectAttached=true;
+  
+  // 建立 wrapper
+  var wrap=document.createElement('div');
+  wrap.style.cssText='position:relative;width:100%';
+  sel.parentNode.insertBefore(wrap,sel);
+  wrap.appendChild(sel);
+  sel.style.display='none';
+  sel.setAttribute('data-smart-hidden','1');
+  
+  // 抽出所有選項資料
+  var optsData=[];
+  for(var i=0;i<sel.options.length;i++){
+    optsData.push(_smartSelectExtractData(sel.options[i],sel.id));
+  }
+  
+  // 建立 input 顯示框
+  var input=document.createElement('input');
+  input.type='text';
+  input.autocomplete='off';
+  input.placeholder='🔍 點此搜尋或選擇...';
+  input.style.cssText='width:100%;padding:8px 12px;border:1px solid #C9C5BA;border-radius:6px;background:#fff;cursor:pointer;font-family:inherit;font-size:0.92rem';
+  // 設定當前選中值的顯示
+  var curOpt=optsData.find(function(o){return o.value===sel.value});
+  if(curOpt&&curOpt.value){input.value=curOpt.label}
+  wrap.appendChild(input);
+  
+  // 建立 dropdown
+  var drop=document.createElement('div');
+  drop.style.cssText='position:absolute;top:100%;left:0;right:0;z-index:3000;background:#fff;border:1px solid #C9C5BA;border-top:none;border-radius:0 0 6px 6px;max-height:280px;overflow-y:auto;box-shadow:0 6px 18px rgba(0,0,0,.12);display:none';
+  wrap.appendChild(drop);
+  
+  var hilite=-1;  // 鍵盤上下方向高亮位置
+  var visList=[];
+  
+  function renderList(query){
+    query=(query||'').trim().toLowerCase();
+    visList=optsData.filter(function(o){
+      // 「— 請選擇 —」這類空 value 選項:無搜尋字時顯示,有搜尋字時隱藏
+      if(!o.value){return !query}
+      if(!query)return true;
+      var hay=(o.label+' '+o.id+' '+o.cat+' '+o.sup+' '+o.extra+' '+o.value).toLowerCase();
+      return hay.indexOf(query)>=0;
+    });
+    if(!visList.length){
+      drop.innerHTML='<div style="padding:14px 12px;color:#999;text-align:center;font-size:0.88rem">📭 找不到符合條件的項目</div>';
+      return;
+    }
+    var html='';
+    visList.forEach(function(o,idx){
+      var isSel=o.value===sel.value;
+      var bg=idx===hilite?'#FFF8ED':(isSel?'#DFF5EC':'#fff');
+      var labelHtml=o.label||'<i style="color:#999">— 請選擇 —</i>';
+      // 標籤(類別/供應商)
+      var tags='';
+      if(o.cat)tags+='<span style="display:inline-block;background:#F3F1EB;color:#555;padding:1px 7px;border-radius:10px;font-size:0.72rem;margin-left:4px">'+o.cat+'</span>';
+      if(o.id&&o.id!==o.value)tags+='<span style="color:#999;font-size:0.74rem;margin-left:4px;font-family:monospace">'+o.id+'</span>';
+      html+='<div data-idx="'+idx+'" style="padding:7px 12px;cursor:pointer;border-bottom:1px solid #F3F1EB;background:'+bg+';font-size:0.9rem" onmouseover="this.style.background=\'#FFF8ED\'" onmouseout="this.style.background=\''+bg+'\'">'+
+        (isSel?'<span style="color:#0A5A46;margin-right:5px">✓</span>':'')+labelHtml+tags+'</div>';
+    });
+    drop.innerHTML=html;
+    // 綁定點擊 (用 mousedown 確保比 input.blur 先觸發)
+    drop.querySelectorAll('[data-idx]').forEach(function(row){
+      row.addEventListener('mousedown',function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        var idx=+row.getAttribute('data-idx');
+        var pick=visList[idx];
+        if(pick){
+          sel.value=pick.value;
+          input.value=pick.label||'';
+          drop.style.display='none';
+          // 觸發原 select 的 change 事件,讓既有 onchange 處理器運作
+          var ev2=new Event('change',{bubbles:true});
+          sel.dispatchEvent(ev2);
+        }
+      });
+    });
+  }
+  
+  function showDrop(){
+    renderList(input.value===_lastDisplayValue()?'':input.value);
+    drop.style.display='block';
+  }
+  function _lastDisplayValue(){
+    var c=optsData.find(function(o){return o.value===sel.value});
+    return c?c.label:'';
+  }
+  
+  input.addEventListener('focus',function(){
+    // 點擊後清空顯示讓使用者打字搜尋,但記住原值
+    input._origLabel=_lastDisplayValue();
+    input.value='';
+    hilite=-1;
+    showDrop();
+    input.select();
+  });
+  input.addEventListener('blur',function(){
+    // 失焦時:如果沒選到任何 (input.value 不對應任何選項),恢復原值
+    setTimeout(function(){
+      drop.style.display='none';
+      var matched=optsData.find(function(o){return o.label===input.value});
+      if(!matched){
+        // 還原顯示
+        var cur=optsData.find(function(o){return o.value===sel.value});
+        input.value=cur?cur.label:'';
+      }
+    },150);
+  });
+  input.addEventListener('input',function(){
+    hilite=visList.length>0?0:-1;
+    renderList(input.value);
+  });
+  input.addEventListener('keydown',function(e){
+    if(e.key==='ArrowDown'){
+      e.preventDefault();
+      if(drop.style.display==='none')showDrop();
+      hilite=Math.min(visList.length-1,hilite+1);
+      renderList(input.value);
+      // 自動滾到可見位置
+      var cur=drop.querySelector('[data-idx="'+hilite+'"]');
+      if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest'});
+    }else if(e.key==='ArrowUp'){
+      e.preventDefault();
+      hilite=Math.max(0,hilite-1);
+      renderList(input.value);
+      var cur=drop.querySelector('[data-idx="'+hilite+'"]');
+      if(cur&&cur.scrollIntoView)cur.scrollIntoView({block:'nearest'});
+    }else if(e.key==='Enter'){
+      e.preventDefault();
+      if(hilite>=0&&visList[hilite]){
+        var pick=visList[hilite];
+        sel.value=pick.value;
+        input.value=pick.label||'';
+        drop.style.display='none';
+        var ev2=new Event('change',{bubbles:true});
+        sel.dispatchEvent(ev2);
+        input.blur();
+      }
+    }else if(e.key==='Escape'){
+      drop.style.display='none';
+      input.blur();
+    }
+  });
+}
+
+function autoUpgradeSelects(){
+  // Modal 開啟後掃描所有 select 自動升級
+  var ov=$('modal-ov');if(!ov)return;
+  ov.querySelectorAll('select').forEach(function(sel){
+    enhanceSelect(sel);
+  });
+}
+window.enhanceSelect=enhanceSelect;
+window.autoUpgradeSelects=autoUpgradeSelects;
 const mH=t=>`<div class="modal-title"><b style="font-size:1.05rem">${t}</b><button class="btn btn-sm btn-outline" onclick="closeModal()">✕</button></div>`;
 const mF=fn=>`<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="${fn}">✔ 儲存</button></div>`;
 
@@ -520,7 +760,7 @@ function openRecipeModal(id){const def={id:nxtId(state.recipes,'R'),code:'M'+Str
 window._editR=JSON.parse(JSON.stringify(rec));
 const bld=()=>(window._editR.ings||[]).map((ing,i)=>'<div class="recipe-ing-row" id="ring-'+i+'"><select onchange="updRI('+i+',\'name\',this.value)"><option value="">— 食材 —</option>'+state.ings.map(iv=>'<option value="'+esc(iv.name)+'"'+(iv.name===ing.name?' selected':'')+'>'+esc(iv.name)+'</option>').join('')+'</select><input type="number" min="0" step="0.1" value="'+(ing.qty||0)+'" onchange="updRI('+i+',\'qty\',+this.value)" placeholder="用量"><select onchange="updRI('+i+',\'unit\',this.value)">'+['g','ml','公斤','公升','顆','個','張','盒','份'].map(u=>'<option'+(u===ing.unit?' selected':'')+'>'+u+'</option>').join('')+'</select><select onchange="updRI('+i+',\'form\',this.value)">'+opts(state.refs.forms||['整顆/原形'],ing.form||'整顆/原形')+'</select><button class="btn btn-sm btn-danger" onclick="delRI('+i+')">✕</button></div>').join('');
 modal(mH(id?'編輯配方卡':'新增配方卡')+'<div class="form-row c5"><div class="fg"><label>配方ID</label><input id="rf-id" value="'+esc(rec.id)+'" disabled></div><div class="fg"><label>代碼</label><input id="rf-code" value="'+esc(rec.code)+'"></div><div class="fg" style="grid-column:span 2"><label>配方名稱 *</label><input id="rf-name" value="'+esc(rec.name)+'"></div><div class="fg"><label>分類</label><select id="rf-cat">'+opts(['醬料','主食','配料','湯品','甜點','飲品','其他'],rec.cat||'醬料')+'</select></div></div><div class="form-row c3"><div class="fg"><label>成品單位</label><select id="rf-unit">'+opts(state.refs.units||[],rec.unit)+'</select></div><div class="fg"><label>批次倍數</label><input id="rf-mult" type="number" min="0.1" step="0.5" value="'+rec.multiplier+'"></div><div class="fg"><label>每批產出</label><input id="rf-batch" type="number" min="1" value="'+rec.perBatch+'"></div></div><div style="display:flex;justify-content:space-between;align-items:center;border-top:.5px solid #eee;padding-top:10px;margin:4px 0 8px"><span style="font-size:0.92rem;font-weight:600">食材明細</span><button class="btn btn-sm btn-success" onclick="addRI()">＋ 新增食材</button></div><div id="ings-c" style="max-height:280px;overflow-y:auto">'+bld()+'</div>'+mF("saveRecipe('"+id+"')"),true);
-window._rebuildRI=()=>{const c=$('ings-c');if(c)c.innerHTML=bld()}}
+window._rebuildRI=()=>{const c=$('ings-c');if(c){c.innerHTML=bld();setTimeout(function(){if(typeof autoUpgradeSelects==='function')autoUpgradeSelects()},30)}}}
 window.updRI=(i,k,v)=>{if(window._editR)window._editR.ings[i][k]=v};
 window.delRI=function(i){if(!window._editR)return;window._editR.ings.splice(i,1);if(window._rebuildRI)window._rebuildRI()};
 window.addRI=function(){if(!window._editR)return;window._editR.ings.push({name:'',qty:0,unit:'g',form:'整顆/原形'});if(window._rebuildRI)window._rebuildRI()};
