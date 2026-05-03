@@ -942,9 +942,102 @@ det.innerHTML+='<div class="card"><div class="card-title">🏷️ 每100g 營養
 
 function openRecipeModal(id){const def={id:nxtId(state.recipes,'R'),code:'M'+String(Math.max(0,...state.recipes.map(x=>parseInt(x.code.replace('M',''))||0))+1).padStart(3,'0'),name:'',cat:'醬料',multiplier:1,perBatch:1,unit:'包',ings:[]};const rec=id?state.recipes.find(x=>x.id===id):def;if(!rec)return;
 window._editR=JSON.parse(JSON.stringify(rec));
-const bld=()=>(window._editR.ings||[]).map((ing,i)=>'<div class="recipe-ing-row" id="ring-'+i+'"><select onchange="updRI('+i+',\'name\',this.value)"><option value="">— 食材 —</option>'+state.ings.map(iv=>'<option value="'+esc(iv.name)+'"'+(iv.name===ing.name?' selected':'')+'>'+esc(iv.name)+'</option>').join('')+'</select><input type="number" min="0" step="0.1" value="'+(ing.qty||0)+'" onchange="updRI('+i+',\'qty\',+this.value)" placeholder="用量"><select onchange="updRI('+i+',\'unit\',this.value)">'+['g','ml','公斤','台斤','公升','顆','個','張','盒','份'].map(u=>'<option'+(u===ing.unit?' selected':'')+'>'+u+'</option>').join('')+'</select><select onchange="updRI('+i+',\'form\',this.value)">'+opts(state.refs.forms||['整顆/原形'],ing.form||'整顆/原形')+'</select><button class="btn btn-sm btn-danger" onclick="delRI('+i+')">✕</button></div>').join('');
+// 🆕 智慧搜尋食材選擇器 (取代下拉選單)
+const bld=()=>(window._editR.ings||[]).map((ing,i)=>{
+  // 檢查食材是否在食材庫存在
+  const foundIng=state.ings.find(function(x){return x.name===ing.name});
+  const notFound=ing.name&&!foundIng;
+  const wrapStyle=notFound?'background:#FCE8E8;border:1px solid #B82525;':'';
+  const inputStyle=notFound?'border:1px solid #B82525;background:#fff;color:#B82525;font-weight:700':'';
+  const warningIcon=notFound?' <span style="color:#B82525;font-weight:700" title="食材庫無此項">❌</span>':'';
+  // 已選食材的顯示資訊 (規格/單價/可食率)
+  const ingHint=foundIng?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">'+CUR()+(foundIng.price||0)+'/'+esc(foundIng.unit)+(foundIng.yieldRate&&foundIng.yieldRate<1?' (可食率 '+Math.round(foundIng.yieldRate*100)+'%)':'')+'</div>':'';
+  return '<div class="recipe-ing-row" id="ring-'+i+'" style="'+wrapStyle+'padding:6px;border-radius:6px;margin-bottom:4px"><div style="position:relative"><input type="text" id="ri-search-'+i+'" value="'+esc(ing.name||'')+'" placeholder="🔍 輸入食材名稱..." style="'+inputStyle+'" oninput="riSearch('+i+',this.value)" onfocus="riSearch('+i+',this.value)" onblur="setTimeout(function(){var d=document.getElementById(\'ri-drop-'+i+'\');if(d)d.style.display=\'none\'},200)" autocomplete="off">'+warningIcon+ingHint+'<div id="ri-drop-'+i+'" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-radius:6px;max-height:240px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.1)"></div></div><input type="number" min="0" step="0.1" value="'+(ing.qty||0)+'" onchange="updRI('+i+',\'qty\',+this.value)" placeholder="用量"><select onchange="updRI('+i+',\'unit\',this.value)">'+['g','ml','公斤','台斤','公升','顆','個','張','盒','份'].map(u=>'<option'+(u===ing.unit?' selected':'')+'>'+u+'</option>').join('')+'</select><select onchange="updRI('+i+',\'form\',this.value)">'+opts(state.refs.forms||['整顆/原形'],ing.form||'整顆/原形')+'</select><button class="btn btn-sm btn-danger" onclick="delRI('+i+')">✕</button></div>';
+}).join('');
+
+// 智慧搜尋過濾 (已移到 openRecipeModal 外面)
+// riSearch / riPick / riQuickAdd 函式定義在後面
+
+
 modal(mH(id?'編輯配方卡':'新增配方卡')+'<div class="form-row c5"><div class="fg"><label>配方ID</label><input id="rf-id" value="'+esc(rec.id)+'" disabled></div><div class="fg"><label>代碼</label><input id="rf-code" value="'+esc(rec.code)+'"></div><div class="fg" style="grid-column:span 2"><label>配方名稱 *</label><input id="rf-name" value="'+esc(rec.name)+'"></div><div class="fg"><label>分類</label><select id="rf-cat">'+opts(['醬料','主食','配料','湯品','甜點','飲品','其他'],rec.cat||'醬料')+'</select></div></div><div class="form-row c3"><div class="fg"><label>成品單位</label><select id="rf-unit">'+opts(state.refs.units||[],rec.unit)+'</select></div><div class="fg"><label>批次倍數</label><input id="rf-mult" type="number" min="0.1" step="0.5" value="'+rec.multiplier+'"></div><div class="fg"><label>每批產出</label><input id="rf-batch" type="number" min="1" value="'+rec.perBatch+'"></div></div><div style="display:flex;justify-content:space-between;align-items:center;border-top:.5px solid #eee;padding-top:10px;margin:4px 0 8px"><span style="font-size:0.92rem;font-weight:600">食材明細</span><button class="btn btn-sm btn-success" onclick="addRI()">＋ 新增食材</button></div><div id="ings-c" style="max-height:280px;overflow-y:auto">'+bld()+'</div>'+mF("saveRecipe('"+id+"')"),true);
 window._rebuildRI=()=>{const c=$('ings-c');if(c){c.innerHTML=bld();setTimeout(function(){if(typeof autoUpgradeSelects==='function')autoUpgradeSelects()},30)}}}
+
+// 🆕 智慧搜尋 - 移到 openRecipeModal 外面 (確保第一次載入即可用)
+// 全域可用,搜尋食材庫提供建議
+window._riSearchInner=function(idx,query){
+  var drop=document.getElementById('ri-drop-'+idx);
+  if(!drop)return;
+  query=(query||'').toLowerCase().trim();
+  var matches=state.ings.filter(function(iv){
+    if(!query)return true;
+    return iv.name.toLowerCase().indexOf(query)>=0||(iv.cat||'').toLowerCase().indexOf(query)>=0;
+  }).slice(0,30);
+  
+  var html='';
+  if(matches.length===0){
+    if(query){
+      html='<div style="padding:14px;text-align:center;color:#B82525"><div style="font-size:0.86rem;font-weight:700;margin-bottom:8px">⚠️ 食材庫無「'+esc(query)+'」</div><button class="btn btn-sm" style="background:#0A5A46;color:#fff" onclick="riQuickAdd('+idx+',\''+esc(query).replace(/'/g,"\\'")+'\')">➕ 快速新增「'+esc(query)+'」到食材庫</button></div>';
+    }else{
+      html='<div style="padding:10px;color:#999;font-size:0.82rem">食材庫尚無資料,請先到「🥬 食材庫存」新增</div>';
+    }
+  }else{
+    html=matches.map(function(iv){
+      var hint='<span style="font-size:0.74rem;color:#706E68">'+esc(iv.cat||'')+' · '+CUR()+(iv.price||0)+'/'+esc(iv.unit)+'</span>';
+      return '<div onmousedown="riPick('+idx+',\''+esc(iv.name).replace(/'/g,"\\'")+'\',\''+esc(iv.unit)+'\')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #f0f0f0" onmouseover="this.style.background=\'#f5f9f7\'" onmouseout="this.style.background=\'#fff\'"><div style="font-weight:600">'+esc(iv.name)+'</div>'+hint+'</div>';
+    }).join('');
+    var exactMatch=matches.find(function(iv){return iv.name===query});
+    if(query&&!exactMatch){
+      html+='<div style="padding:10px;border-top:2px solid #f0f0f0;background:#fffaf0"><button class="btn btn-sm" style="background:#0A5A46;color:#fff;width:100%" onclick="riQuickAdd('+idx+',\''+esc(query).replace(/'/g,"\\'")+'\')">➕ 找不到? 新增「'+esc(query)+'」到食材庫</button></div>';
+    }
+  }
+  drop.innerHTML=html;
+  drop.style.display='block';
+};
+window.riSearch=window._riSearchInner;
+
+window.riPick=function(idx,name,unit){
+  if(!window._editR)return;
+  window._editR.ings[idx].name=name;
+  if(!window._editR.ings[idx].unit||window._editR.ings[idx].unit==='g'){
+    var ing=state.ings.find(function(x){return x.name===name});
+    if(ing&&['公斤','台斤','顆','個','張','盒','份','包','瓶'].indexOf(ing.unit)>=0){
+      window._editR.ings[idx].unit=ing.unit;
+    }
+  }
+  var drop=document.getElementById('ri-drop-'+idx);
+  if(drop)drop.style.display='none';
+  if(window._rebuildRI)window._rebuildRI();
+};
+
+window.riQuickAdd=function(idx,name){
+  if(!name||!name.trim())return;
+  name=name.trim();
+  if(state.ings.find(function(x){return x.name===name})){
+    alert('「'+name+'」已存在於食材庫');
+    return;
+  }
+  if(!confirm('要新增食材「'+name+'」到食材庫嗎?\n\n進價會先設 0,記得稍後到食材庫補進價'))return;
+  var newIng={
+    id:nxtId(state.ings,'I'),
+    name:name,
+    cat:'其他',
+    unit:'公斤',
+    form:'整顆/原形',
+    sup:state.sups&&state.sups.length?state.sups[0].id:'S001',
+    meatSrc:'',
+    price:0,stock:0,safety:0,
+    kcal:0,prot:0,fat:0,carb:0,sodium:0,
+    totalWeight:0,solidWeight:0,
+    yieldRate:1,
+    customerSell:false,sellPrice:0,
+    updatedAt:toDay()
+  };
+  state.ings.push(newIng);
+  saveState();
+  addAudit('配方編輯時快速新增食材',name);
+  window.riPick(idx,name,'公斤');
+  toast('✅ 「'+name+'」已新增到食材庫');
+};
 window.updRI=(i,k,v)=>{if(window._editR)window._editR.ings[i][k]=v};
 window.delRI=function(i){if(!window._editR)return;window._editR.ings.splice(i,1);if(window._rebuildRI)window._rebuildRI()};
 window.addRI=function(){if(!window._editR)return;window._editR.ings.push({name:'',qty:0,unit:'g',form:'整顆/原形'});if(window._rebuildRI)window._rebuildRI()};
@@ -1026,6 +1119,200 @@ window.exportMissingCSV=function(){
   a.click();
   URL.revokeObjectURL(url);
   toast('✅ 缺料報告已匯出 CSV');
+};
+
+// ══════════════════════════════════════════════════════
+// 資料清理工具
+// ══════════════════════════════════════════════════════
+
+// 找出未被使用的食材
+window.findUnusedIngs=function(){
+  var usedNames=new Set();
+  // 配方使用的食材
+  (state.recipes||[]).forEach(function(r){
+    (r.ings||[]).forEach(function(ing){usedNames.add(ing.name)});
+  });
+  // 菜單使用的食材
+  (state.menu||[]).forEach(function(m){if(m.ing1)usedNames.add(m.ing1)});
+  // 還在庫存有量的食材也保留
+  return state.ings.filter(function(i){
+    return !usedNames.has(i.name)&&(+i.stock||0)===0;
+  });
+};
+
+// 找出停用且無交易的客戶
+window.findUnusedCustomers=function(){
+  return (state.customers||[]).filter(function(c){
+    if(c.status==='active')return false;
+    var hasOrders=(state.custOrders||[]).some(function(o){return o.custId===c.id});
+    return !hasOrders;
+  });
+};
+
+// 找出已完成超過 N 天的訂單 (預設 90 天)
+window.findOldOrders=function(days){
+  days=days||90;
+  var threshold=new Date();
+  threshold.setDate(threshold.getDate()-days);
+  return (state.custOrders||[]).filter(function(o){
+    if(['completed','cancelled','refunded'].indexOf(o.status)<0)return false;
+    var d=new Date(o.orderDate||o.createdAt||'');
+    return d<threshold;
+  });
+};
+
+// 找出已完成超過 6 個月的採購單
+window.findOldPOs=function(){
+  var threshold=new Date();
+  threshold.setMonth(threshold.getMonth()-6);
+  return (state.poList||[]).filter(function(p){
+    if(p.status!=='已收貨'&&p.status!=='已驗收')return false;
+    var d=new Date(p.date||'');
+    return d<threshold;
+  });
+};
+
+// 找出已用完/過期超過 30 天的批次
+window.findOldBatches=function(){
+  var threshold=new Date();
+  threshold.setDate(threshold.getDate()-30);
+  return (state.batchList||[]).filter(function(b){
+    if(b.status!=='已用完')return false;
+    var d=new Date(b.disposalDate||b.expiryDate||'');
+    return d<threshold;
+  });
+};
+
+window.showDataCleaning=function(){
+  // 各項分析
+  var unusedIngs=window.findUnusedIngs();
+  var unusedCusts=window.findUnusedCustomers();
+  var oldOrders=window.findOldOrders(90);
+  var oldPOs=window.findOldPOs();
+  var oldBatches=window.findOldBatches();
+  
+  // 統計卡
+  var stats=[
+    {key:'ings',label:'🥬 未使用食材',count:unusedIngs.length,desc:'未被任何配方/菜單使用、且庫存為 0',color:'#0A5A46'},
+    {key:'custs',label:'👥 停用客戶',count:unusedCusts.length,desc:'已停用且無交易紀錄',color:'#1455A0'},
+    {key:'orders',label:'📋 過期訂單',count:oldOrders.length,desc:'已完成/已取消超過 90 天',color:'#9A6210'},
+    {key:'pos',label:'🛍️ 過期採購',count:oldPOs.length,desc:'已收貨超過 6 個月',color:'#7c3aed'},
+    {key:'batches',label:'📅 過期批次',count:oldBatches.length,desc:'已用完超過 30 天',color:'#B82525'}
+  ];
+  
+  var statsHtml=stats.map(function(s){
+    var btnClass=s.count>0?'btn btn-sm btn-outline':'btn btn-sm';
+    var btnStyle=s.count>0?'border:1px solid '+s.color+';color:'+s.color:'background:#f0f0f0;color:#999;cursor:not-allowed';
+    return '<div style="background:#fff;border-radius:8px;padding:14px;border:1px solid #e0e0e0"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><div style="font-size:0.92rem;font-weight:700;color:'+s.color+'">'+s.label+'</div><div style="font-size:1.6rem;font-weight:700;color:'+(s.count>0?s.color:'#ccc')+'">'+s.count+'</div></div><div style="font-size:0.78rem;color:#706E68;margin-bottom:10px;min-height:32px">'+s.desc+'</div>'+(s.count>0?'<button class="'+btnClass+'" style="'+btnStyle+';width:100%" onclick="showCleanDetail(\''+s.key+'\')">📋 查看明細並清理</button>':'<div style="padding:6px;text-align:center;font-size:0.78rem;color:#999">✅ 無需清理</div>')+'</div>';
+  }).join('');
+  
+  modal(mH('🗑️ 資料清理工具')+
+    '<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:0.86rem;color:#9A6210;line-height:1.6">💡 <b>使用建議</b><br>1. 清理前先 ⚙️ 設定 → 雲端 → 匯出 JSON 備份<br>2. 從食材庫開始(影響最小),逐項確認後再清理<br>3. 批次刪除前會列出明細,可逐筆勾選</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px">'+statsHtml+'</div>'+
+    '<div style="font-size:0.78rem;color:#706E68;border-top:1px dashed #ccc;padding-top:10px">⚠️ 已刪除資料無法復原(除非有備份)。請務必先備份再清理。</div>',
+  true);
+};
+
+// 查看清理明細
+window.showCleanDetail=function(key){
+  closeModal();
+  var data,title,renderRow,deleteFn;
+  if(key==='ings'){
+    data=window.findUnusedIngs();
+    title='未使用食材';
+    renderRow=function(i,idx){return '<tr><td><input type="checkbox" class="dc-chk" value="'+i.id+'" checked></td><td style="text-align:center;color:#706E68">'+(idx+1)+'</td><td style="font-weight:600">'+esc(i.name)+'</td><td>'+esc(i.cat||'')+'</td><td>'+esc(i.unit)+'</td><td style="text-align:right">'+CUR()+(i.price||0)+'</td><td style="text-align:right">'+(i.stock||0)+'</td></tr>'};
+    deleteFn=function(ids){state.ings=state.ings.filter(function(x){return ids.indexOf(x.id)<0});addAudit('清理未使用食材',ids.length+' 筆')};
+  }else if(key==='custs'){
+    data=window.findUnusedCustomers();
+    title='停用客戶 (無交易)';
+    renderRow=function(c,idx){return '<tr><td><input type="checkbox" class="dc-chk" value="'+c.id+'" checked></td><td style="text-align:center;color:#706E68">'+(idx+1)+'</td><td style="font-weight:600">'+esc(c.name)+'</td><td>'+esc(c.code||'')+'</td><td>'+esc(c.contact||'')+'</td><td>'+esc(c.phone||'')+'</td></tr>'};
+    deleteFn=function(ids){state.customers=state.customers.filter(function(x){return ids.indexOf(x.id)<0});addAudit('清理停用客戶',ids.length+' 筆')};
+  }else if(key==='orders'){
+    data=window.findOldOrders(90);
+    title='過期訂單 (>90 天)';
+    renderRow=function(o,idx){return '<tr><td><input type="checkbox" class="dc-chk" value="'+o.id+'" checked></td><td style="text-align:center;color:#706E68">'+(idx+1)+'</td><td style="font-family:monospace;font-size:0.78rem">'+esc(o.id)+'</td><td>'+esc(o.custName||'')+'</td><td>'+esc(o.orderDate||'').substring(0,10)+'</td><td><span class="badge badge-gray">'+esc(o.status||'')+'</span></td><td style="text-align:right">'+CUR()+fmt(o.total||0,0)+'</td></tr>'};
+    deleteFn=function(ids){state.custOrders=state.custOrders.filter(function(x){return ids.indexOf(x.id)<0});addAudit('清理過期訂單',ids.length+' 筆')};
+  }else if(key==='pos'){
+    data=window.findOldPOs();
+    title='過期採購單 (>6 個月)';
+    renderRow=function(p,idx){return '<tr><td><input type="checkbox" class="dc-chk" value="'+p.id+'" checked></td><td style="text-align:center;color:#706E68">'+(idx+1)+'</td><td>'+esc(p.date||'')+'</td><td>'+esc(p.itemName||'')+'</td><td>'+(p.qty||0)+' '+esc(p.unit||'')+'</td><td style="text-align:right">'+CUR()+fmt(p.totalAmt||0,0)+'</td></tr>'};
+    deleteFn=function(ids){state.poList=state.poList.filter(function(x){return ids.indexOf(x.id)<0});addAudit('清理過期採購單',ids.length+' 筆')};
+  }else if(key==='batches'){
+    data=window.findOldBatches();
+    title='過期批次 (已用完 >30 天)';
+    renderRow=function(b,idx){return '<tr><td><input type="checkbox" class="dc-chk" value="'+b.id+'" checked></td><td style="text-align:center;color:#706E68">'+(idx+1)+'</td><td>'+esc(b.batchNo||'')+'</td><td>'+esc(b.itemName||'')+'</td><td>'+esc(b.expiryDate||'')+'</td><td>'+esc(b.status||'')+'</td></tr>'};
+    deleteFn=function(ids){state.batchList=state.batchList.filter(function(x){return ids.indexOf(x.id)<0});addAudit('清理過期批次',ids.length+' 筆')};
+  }
+  
+  if(!data||data.length===0){toast('沒有可清理的項目');return}
+  
+  var headers=key==='ings'?'<th></th><th>序</th><th>名稱</th><th>類別</th><th>單位</th><th>進價</th><th>庫存</th>':
+              key==='custs'?'<th></th><th>序</th><th>客戶名稱</th><th>代碼</th><th>聯絡人</th><th>電話</th>':
+              key==='orders'?'<th></th><th>序</th><th>訂單號</th><th>客戶</th><th>下單日</th><th>狀態</th><th>金額</th>':
+              key==='pos'?'<th></th><th>序</th><th>日期</th><th>品項</th><th>數量</th><th>金額</th>':
+              '<th></th><th>序</th><th>批次號</th><th>品項</th><th>到期日</th><th>狀態</th>';
+  
+  var rows=data.map(renderRow).join('');
+  
+  modal(mH('🗑️ 清理:'+title+' ('+data.length+' 筆)')+
+    '<div style="background:#FCE8E8;border:1px solid #B82525;border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:0.86rem;color:#B82525">⚠️ 已勾選的項目將被永久刪除,無法復原。請仔細檢查再執行。</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:10px">'+
+      '<button class="btn btn-sm btn-outline" onclick="document.querySelectorAll(\'.dc-chk\').forEach(function(c){c.checked=true})">全選</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="document.querySelectorAll(\'.dc-chk\').forEach(function(c){c.checked=false})">取消全選</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="dcExportCSV(\''+key+'\')">📤 匯出 CSV(備份)</button>'+
+    '</div>'+
+    '<div style="overflow-x:auto;max-height:50vh;overflow-y:auto;border:1px solid #e0e0e0;border-radius:6px"><table class="tbl"><thead><tr>'+headers+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">'+
+      '<button class="btn btn-outline" onclick="closeModal();showDataCleaning()">← 返回</button>'+
+      '<button class="btn" style="background:#B82525;color:#fff" onclick="dcExecute(\''+key+'\')">🗑️ 確認刪除已勾選</button>'+
+    '</div>',
+  true);
+  
+  // 暫存 deleteFn 讓 dcExecute 能用
+  window._dcDeleteFn=deleteFn;
+  window._dcKey=key;
+};
+
+window.dcExecute=function(key){
+  var ids=Array.from(document.querySelectorAll('.dc-chk:checked')).map(function(c){return c.value});
+  if(ids.length===0){alert('請先勾選要刪除的項目');return}
+  if(!confirm('⚠️ 確定要刪除 '+ids.length+' 筆嗎?\n\n此操作無法復原!\n\n建議先匯出 CSV 備份'))return;
+  if(!window._dcDeleteFn)return;
+  window._dcDeleteFn(ids);
+  saveState();
+  closeModal();
+  toast('✅ 已刪除 '+ids.length+' 筆,記得備份雲端');
+  setTimeout(function(){showDataCleaning()},500);
+};
+
+window.dcExportCSV=function(key){
+  var data;
+  if(key==='ings')data=window.findUnusedIngs().map(function(i){return [i.id,i.name,i.cat,i.unit,i.price,i.stock]});
+  else if(key==='custs')data=window.findUnusedCustomers().map(function(c){return [c.id,c.code,c.name,c.contact,c.phone,c.status]});
+  else if(key==='orders')data=window.findOldOrders(90).map(function(o){return [o.id,o.custName,(o.orderDate||'').substring(0,10),o.status,o.total]});
+  else if(key==='pos')data=window.findOldPOs().map(function(p){return [p.id,p.date,p.itemName,p.qty,p.unit,p.totalAmt]});
+  else if(key==='batches')data=window.findOldBatches().map(function(b){return [b.id,b.batchNo,b.itemName,b.expiryDate,b.status]});
+  if(!data||data.length===0)return;
+  
+  var headers=key==='ings'?['ID','名稱','類別','單位','進價','庫存']:
+              key==='custs'?['ID','代碼','名稱','聯絡人','電話','狀態']:
+              key==='orders'?['訂單號','客戶','下單日','狀態','金額']:
+              key==='pos'?['採購單號','日期','品項','數量','單位','金額']:
+              ['批次ID','批次號','品項','到期日','狀態'];
+  
+  var csv='\uFEFF'+headers.join(',')+'\n';
+  data.forEach(function(row){
+    csv+=row.map(function(v){return '"'+(v||'').toString().replace(/"/g,'""')+'"'}).join(',')+'\n';
+  });
+  
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='清理備份_'+key+'_'+toDay()+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ 備份已匯出');
 };
 
 // ── DASHBOARD ───
@@ -1398,6 +1685,10 @@ window.delBuy=function(id){if(!confirm('確定刪除？'))return;state.buyLog=st
 
 // ── SETTINGS ───
 function renderRef(){const pg=dv({});const sw=sopBox('ref');if(sw)pg.appendChild(sw);pg.appendChild(dv({cls:'page-title'},'⚙️ 系統設定'));
+// 🆕 資料清理入口
+var dcCard=dv({cls:'card',style:'background:linear-gradient(135deg,#fff4e6,#fff8ed);border:1px solid #f5c98a'});
+dcCard.innerHTML='<div class="card-title" style="color:#9A6210">🗑️ 資料清理工具</div><div style="font-size:0.86rem;color:#9A6210;margin-bottom:10px;line-height:1.6">系統使用一段時間後可能累積無用資料 (未使用食材、過期訂單、停用客戶等),建議定期清理以提升效能與資料整潔度。</div><button class="btn btn-primary" onclick="showDataCleaning()" style="background:#9A6210">🗑️ 開啟資料清理</button>';
+pg.appendChild(dcCard);
 const mc=dv({cls:'card'});mc.appendChild(dv({cls:'card-title'},'🏢 公司基本資訊'));mc.innerHTML+=`<div class="form-row c2"><div class="fg"><label>公司名稱</label><input id="mc-name" value="${esc(state.meta.company||'')}"></div><div class="fg"><label>統一編號</label><input id="mc-taxid" value="${esc(state.meta.taxId||'')}"></div></div><div class="form-row c2"><div class="fg"><label>電話</label><input id="mc-phone" value="${esc(state.meta.phone||'')}"></div><div class="fg"><label>地址</label><input id="mc-addr" value="${esc(state.meta.address||'')}"></div></div><div class="fg" style="margin-bottom:10px"><label>門市列表（逗號分隔）</label><input id="mc-stores" value="${esc((state.meta.stores||[]).join(', '))}"></div><div class="form-row c2"><div class="fg"><label>目標毛利率 (%)</label><input id="mc-margin" type="number" min="1" max="99" value="${Math.round((state.meta.targetMargin||0.65)*100)}"></div><div class="fg"><label>貨幣符號</label><input id="mc-cur" value="${esc(state.meta.currency||'NT$')}"></div></div><div><button class="btn btn-primary" onclick="saveMetaSettings()">💾 儲存公司設定</button></div>`;pg.appendChild(mc);
 var verCard=dv({cls:'card'});verCard.appendChild(dv({cls:'card-title'},'📌 系統版本'));
 verCard.innerHTML+='<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:1.1rem;font-weight:700;color:#0A5A46">v'+SYSTEM_VERSION+'</span><span style="font-size:0.82rem;color:#706E68;margin-left:8px">Build '+BUILD_NUMBER+'</span></div><button class="btn btn-sm btn-outline" onclick="showVersionInfo()">查看修改紀錄</button></div>';
