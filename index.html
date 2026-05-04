@@ -121,6 +121,27 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 
 /* ── SOP ── */
 .sop-toggle{background:var(--pri-l);border:1.5px solid rgba(10,104,71,.15);border-radius:var(--r-sm);padding:10px 16px;cursor:pointer;font-size:0.86rem;color:var(--pri);font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+/* 🆕 SOP 區塊收合控制 */
+.sop-box{background:var(--pri-l);border:1.5px solid rgba(10,104,71,.15);border-radius:var(--r-sm);margin-bottom:14px;overflow:hidden;transition:all .2s}
+.sop-header{padding:10px 16px;cursor:pointer;font-size:0.86rem;color:var(--pri);font-weight:600;display:flex;justify-content:space-between;align-items:center;transition:background .15s}
+.sop-header:hover{background:rgba(10,104,71,.08)}
+.sop-header-left{display:flex;align-items:center;gap:8px}
+.sop-badge{background:rgba(10,104,71,.15);color:var(--pri);padding:2px 10px;border-radius:12px;font-size:0.74rem;font-weight:700}
+.sop-toggle{transition:transform .2s;font-size:0.78rem;background:transparent;border:none;padding:0;margin:0;color:var(--pri)}
+.sop-toggle.open{transform:rotate(180deg)}
+.sop-body{display:none;padding:0 16px 14px}
+.sop-body.open{display:block}
+.sop-flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0 14px;font-size:0.82rem}
+.sop-flow-step{background:#fff;border:1px solid rgba(10,104,71,.2);border-radius:6px;padding:5px 10px;font-weight:600;color:var(--pri)}
+.sop-flow-arrow{color:var(--pri);font-weight:700}
+.sop-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:8px}
+.sop-section{background:#fff;border-radius:6px;padding:12px 14px;border:1px solid rgba(10,104,71,.1)}
+.sop-section-title{font-weight:700;color:var(--pri);font-size:0.92rem;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(10,104,71,.1)}
+.sop-steps{list-style:none;padding:0;margin:0}
+.sop-steps li{display:flex;gap:8px;padding:5px 0;font-size:0.82rem;line-height:1.5}
+.sop-num{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--pri);color:#fff;border-radius:50%;font-size:0.7rem;font-weight:700;flex-shrink:0;margin-top:2px}
+.sop-warn{background:#FCE8E8;border-left:3px solid #B82525;border-radius:4px;padding:6px 10px;margin-top:8px;font-size:0.8rem;color:#B82525}
+.sop-tip{background:#FFF8ED;border-left:3px solid #f5c98a;border-radius:4px;padding:6px 10px;margin-top:6px;font-size:0.8rem;color:#9A6210}
 .sop-toggle:hover{background:var(--pri-bg);border-color:rgba(10,104,71,.25)}
 .sop-content{background:var(--card);border:var(--brd-l);border-radius:0 0 var(--r-sm) var(--r-sm);padding:16px 20px;margin-top:-14px;margin-bottom:14px;font-size:0.86rem;line-height:1.7}
 .sop-flow{display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-wrap:wrap}
@@ -281,6 +302,21 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
     state.waste.forEach(function(w){
       if(!w.type)w.type='normal';
     });
+  }
+  // 🆕 refs.units 自動補新單位 (台灣餐飲業)
+  if(state.refs&&state.refs.units){
+    var newUnits=['台兩','磅','盎司','加侖','瓶','隻','粒','把','束','袋','串','捲','尾'];
+    var changed=false;
+    newUnits.forEach(function(u){
+      if(state.refs.units.indexOf(u)<0){
+        state.refs.units.push(u);
+        changed=true;
+      }
+    });
+    if(changed){
+      console.log('[Migrate] refs.units 已補入 '+newUnits.length+' 個新單位');
+      try{saveState&&saveState()}catch(e){}
+    }
   }
 })();
 
