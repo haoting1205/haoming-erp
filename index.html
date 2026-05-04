@@ -232,7 +232,7 @@ const DB_MENU=[{"id": "M001", "code": "M001", "name": "紅燒豬里肌", "price"
 const DB_SUPS=[{"id": "S001", "name": "鮮蔬農場", "contact": "陳大明", "phone": "02-1234-5678", "addr": "台北市信義區農業路1號", "type": "蔬菜/水果", "pay": "月結30天", "days": 2, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S002", "name": "海鮮直送", "contact": "林小美", "phone": "02-8765-4321", "addr": "基隆市海港路88號", "type": "海鮮/魚類", "pay": "月結15天", "days": 1, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S003", "name": "肉品供應商", "contact": "王志明", "phone": "03-9876-5432", "addr": "桃園市中山路200號", "type": "豬/牛/雞肉", "pay": "月結30天", "days": 2, "score": 7, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S004", "name": "南北乾貨", "contact": "張麗華", "phone": "04-5555-1234", "addr": "台中市民生路45號", "type": "乾貨/調味料", "pay": "月結60天", "days": 3, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S005", "name": "頂級食用油", "contact": "黃建國", "phone": "07-3333-8888", "addr": "高雄市工業區三路10號", "type": "食用油/醬料", "pay": "月結30天", "days": 5, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""},
   {"id":"S006","name":"沁味(福聯)食品有限公司","contact":"業務","phone":"03-656-3850","addr":"新竹縣竹北市新工三路80號","type":"乾貨/調味料","pay":"月結30天","days":3,"score":4,"accountName":"","bankName":"","bankCode":"","branchName":"","branchCode":"","accountNo":""},
   {"id":"S007","name":"志祥企業社","contact":"廖文祥","phone":"03-5971723","addr":"新竹縣湖口鄉勝利村安宅九街43號","type":"包材","pay":"月結30天","days":3,"score":4,"accountName":"","bankName":"","bankCode":"","branchName":"","branchCode":"","accountNo":""}];
-const DB_REFS={"cats": ["肉類", "海鮮", "蔬菜", "穀物", "乳製品", "蛋類", "調味料", "香料", "食用油", "豆製品", "飲品材料", "包材", "半成品", "其他"], "units": ["公斤", "台斤", "公克", "公升", "毫升", "顆", "塊", "包", "箱", "條", "個", "張", "盒", "份", "罐"], "forms": ["整顆/原形", "切片", "切丁", "切碎", "切絲", "切塊", "切段", "泥狀", "醃漬", "醬狀", "乾燥/粉", "水煮", "去殼/去皮", "整瓣", "整束", "其他"], "supTypes": ["乳製品", "乾貨/調味料", "包材", "其他", "海鮮/魚類", "蔬菜/水果", "豬/牛/雞肉", "食用油/醬料"], "payTerms": ["現金", "貨到付款", "預付", "月結15天", "月結30天", "月結45天", "月結60天"], "lossReasons": ["備料損耗", "其他", "受潮", "撞傷", "溢出", "烹調損耗", "發芽", "碎裂", "腐爛", "過期"], "lossHandles": ["丟棄", "其他", "員工餐", "捐贈", "調整食譜", "退貨"], "meatSrc": ["其他", "國產CAS", "國產有機認證", "溯源牛肉", "溯源豬肉", "溯源雞肉", "產銷履歷", "進口加拿大", "進口巴西", "進口澳洲", "進口紐西蘭", "進口美國"]};
+const DB_REFS={"cats": ["肉類", "海鮮", "蔬菜", "穀物", "乳製品", "蛋類", "調味料", "香料", "食用油", "豆製品", "飲品材料", "包材", "半成品", "其他"], "units": ["公斤", "公克", "公升", "毫升", "台斤", "台兩", "磅", "盎司", "加侖", "顆", "塊", "包", "箱", "條", "個", "張", "盒", "份", "罐", "瓶", "隻", "粒", "把", "束", "袋", "串", "捲", "尾"], "forms": ["整顆/原形", "切片", "切丁", "切碎", "切絲", "切塊", "切段", "泥狀", "醃漬", "醬狀", "乾燥/粉", "水煮", "去殼/去皮", "整瓣", "整束", "其他"], "supTypes": ["乳製品", "乾貨/調味料", "包材", "其他", "海鮮/魚類", "蔬菜/水果", "豬/牛/雞肉", "食用油/醬料"], "payTerms": ["現金", "貨到付款", "預付", "月結15天", "月結30天", "月結45天", "月結60天"], "lossReasons": ["備料損耗", "其他", "受潮", "撞傷", "溢出", "烹調損耗", "發芽", "碎裂", "腐爛", "過期"], "lossHandles": ["丟棄", "其他", "員工餐", "捐贈", "調整食譜", "退貨"], "meatSrc": ["其他", "國產CAS", "國產有機認證", "溯源牛肉", "溯源豬肉", "溯源雞肉", "產銷履歷", "進口加拿大", "進口巴西", "進口澳洲", "進口紐西蘭", "進口美國"]};
 const SHEETS=[{"id": "yi_food_order", "title": "義早食材叫貨", "formNo": "表格編號：1140401", "items": [{"seq": 1, "name": "紐澳良雞腿排(4支/包)", "unit": "包", "price": 200}, {"seq": 2, "name": "蒜香雞肉(1kg/包)", "unit": "包", "price": 210}, {"seq": 3, "name": "綜合鮮菇(1kg/包)", "unit": "包", "price": 180}, {"seq": 4, "name": "炭香燒肉(1kg/包)", "unit": "包", "price": 260}, {"seq": 5, "name": "鮪魚醬(1kg/包)", "unit": "包", "price": 290}, {"seq": 6, "name": "凱撒醬(1kg/包)", "unit": "包", "price": 275}, {"seq": 7, "name": "蜂蜜芥末醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 8, "name": "塔塔醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 9, "name": "藍莓優格醬(1kg/包)", "unit": "包", "price": 270}, {"seq": 10, "name": "大蒜醬(500g/盒)", "unit": "盒", "price": 230}, {"seq": 11, "name": "杏仁奶酥醬(500g/盒)", "unit": "盒", "price": 245}, {"seq": 12, "name": "紅醬(1kg/包)", "unit": "包", "price": 160}, {"seq": 13, "name": "白醬(1kg/包)", "unit": "包", "price": 160}, {"seq": 14, "name": "青醬(1kg/包)", "unit": "包", "price": 210}, {"seq": 15, "name": "肉醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 16, "name": "泰式打拋豬(1kg/包)", "unit": "包", "price": 195}, {"seq": 17, "name": "麻辣醬(1kg/包)", "unit": "包", "price": 270}, {"seq": 18, "name": "辣椒醬(500g/包)", "unit": "包", "price": 140}, {"seq": 19, "name": "醬油膏(1kg/包)", "unit": "包", "price": 95}, {"seq": 20, "name": "料理調味粉(1kg/包)", "unit": "包", "price": 130}, {"seq": 21, "name": "義大利直麵(熟)(200g/包)", "unit": "包", "price": 10}, {"seq": 22, "name": "蜜汁鴨胸(500g/23包/箱)", "unit": "包", "price": 315}, {"seq": 23, "name": "青花菜(1kg/10包/箱)", "unit": "包", "price": 70}, {"seq": 24, "name": "玉米筍(1kg/10包/箱)", "unit": "包", "price": 126}, {"seq": 25, "name": "紅蘿蔔片(1kg/10包/箱)", "unit": "包", "price": 58}, {"seq": 26, "name": "大魚排(60片/箱)(5片為單位)", "unit": "包", "price": 75}, {"seq": 27, "name": "日式雪花豬排(130g/45片/6kg箱)(5片為單位)", "unit": "包", "price": 175}, {"seq": 28, "name": "鯰魚排(5片/10包/箱)", "unit": "包", "price": 179}, {"seq": 29, "name": "鯰魚排(3片/10包/箱)", "unit": "包", "price": 95}, {"seq": 30, "name": "韓式泡菜(3kg/桶)", "unit": "包", "price": 480}, {"seq": 31, "name": "優質雞塊(1kg/12包)", "unit": "包", "price": 142}, {"seq": 32, "name": "紅皮熟栗地瓜(1kg/12包/箱)", "unit": "包", "price": 116}, {"seq": 33, "name": "玉米粒易開罐(285g/24罐/箱)", "unit": "罐", "price": 22}, {"seq": 34, "name": "義大利直麵(生)(500g/20包/箱)", "unit": "包", "price": 26}, {"seq": 35, "name": "鮮奶油23.3%(12罐/箱)", "unit": "罐", "price": 105}, {"seq": 36, "name": "原味乳酪醬(500g/盒)", "unit": "盒", "price": 194}, {"seq": 37, "name": "藍莓乳酪醬(500g/盒)", "unit": "盒", "price": 200}, {"seq": 38, "name": "青蘋果餡(2.7g/6罐/箱)", "unit": "罐", "price": 683}, {"seq": 39, "name": "美乃滋(600g/包)", "unit": "包", "price": 76}, {"seq": 40, "name": "美式鬆餅(2片/50包/箱)", "unit": "包", "price": 12}, {"seq": 41, "name": "乳酪燒餅(10片/3盒/箱)", "unit": "箱", "price": 320}, {"seq": 42, "name": "光頭堡(30顆/籃)", "unit": "顆", "price": 7}, {"seq": 43, "name": "帕尼尼(30顆/籃)", "unit": "顆", "price": 13}, {"seq": 44, "name": "帕瑪森熱狗堡(12入/包)", "unit": "包", "price": 164}, {"seq": 45, "name": "泰式紅茶葉(600g*/30包/箱)", "unit": "包", "price": 157}, {"seq": 46, "name": "奶香金萱(600g/30包/箱)", "unit": "包", "price": 224}, {"seq": 47, "name": "白葡萄風味烏龍茶包(6.5g*50入/20包/箱)", "unit": "包", "price": 242}, {"seq": 48, "name": "南非國寶茶(7g*50入/20包/箱)", "unit": "包", "price": 453}, {"seq": 49, "name": "南非綠國寶茶(3.5g*50入/20包/箱)", "unit": "包", "price": 389}, {"seq": 50, "name": "南非紫蘇綠國寶茶(4.5g*50入/20包/箱)", "unit": "包", "price": 389}, {"seq": 51, "name": "專用奶精粉(1kg/20包/箱)", "unit": "包", "price": 173}, {"seq": 52, "name": "什穀芝麻飲粉(500g/40包/箱)", "unit": "包", "price": 168}, {"seq": 53, "name": "比利時風味巧克力粉(1kg/20包/箱)", "unit": "包", "price": 420}]}, {"id": "yi_pack_order", "title": "義早包材叫貨", "formNo": "表格編號：1150325", "items": [{"seq": 1, "name": "PET8OZ透明沙拉碗(25個/20包/箱)", "unit": "包", "price": 44}, {"seq": 2, "name": "PET8OZ透明沙拉蓋(50個/10包/箱)", "unit": "包", "price": 53}, {"seq": 3, "name": "PET24OZ花型沙拉碗、蓋(50個/3組/箱)", "unit": "組", "price": 273}, {"seq": 4, "name": "500空白紙杯(50個/20包/箱)", "unit": "包", "price": 60}, {"seq": 5, "name": "400空白紙杯(50個/20包/箱)", "unit": "包", "price": 55}, {"seq": 6, "name": "360空白紙杯(50個/20包/箱)", "unit": "包", "price": 53}, {"seq": 7, "name": "8OZ空白紙杯(50個/20包/箱)", "unit": "包", "price": 54}, {"seq": 8, "name": "凸杯蓋 90mm(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 9, "name": "凸杯蓋 78mm(50個/20包/箱)", "unit": "包", "price": 57}, {"seq": 10, "name": "90熱杯套(25個/40包/箱)", "unit": "串", "price": 20}, {"seq": 11, "name": "1.5OZ PET塑膠杯蓋(100個/25包/箱)", "unit": "包", "price": 92}, {"seq": 12, "name": "902塑膠內襯(50個/12包/箱)", "unit": "包", "price": 63}, {"seq": 13, "name": "902空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 81}, {"seq": 14, "name": "902凸蓋(50個/12包/箱)", "unit": "包", "price": 66}, {"seq": 15, "name": "850透明塑膠湯碗(50個/12包/箱)", "unit": "包", "price": 103}, {"seq": 16, "name": "850空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 60}, {"seq": 17, "name": "850平蓋(50個/12包/箱)", "unit": "包", "price": 29}, {"seq": 18, "name": "L300(50個/10包/箱)", "unit": "包", "price": 276}, {"seq": 19, "name": "L500(50個/10包/箱)", "unit": "包", "price": 171}, {"seq": 20, "name": "9吋披薩盒(50個/箱)", "unit": "箱", "price": 630}, {"seq": 21, "name": "3號內折牛皮方形餐盒(50個/4包/箱)", "unit": "包", "price": 315}, {"seq": 22, "name": "空白一體小(60個/10包/箱)", "unit": "包", "price": 83}, {"seq": 23, "name": "空白點心盒(100個/10包/箱)", "unit": "包", "price": 95}, {"seq": 24, "name": "20*20CM防油牛皮L袋(100個/40包/箱)", "unit": "包", "price": 88}, {"seq": 25, "name": "#70平口金色三角袋(100只/包)", "unit": "包", "price": 91}, {"seq": 26, "name": "鐵炮竹竹籤9cm(250支/80包)", "unit": "包", "price": 58}, {"seq": 27, "name": "黑色西餐匙(100支/40包/箱)", "unit": "包", "price": 46}, {"seq": 28, "name": "黑色西餐叉(100支/30包/2箱)", "unit": "包", "price": 45}, {"seq": 29, "name": "單支膠裝斜口6*18透明吸管(200支/20包/箱)", "unit": "包", "price": 26}, {"seq": 30, "name": "單支膠裝斜口12*21透明吸管(50支/40包/箱)", "unit": "包", "price": 14}, {"seq": 31, "name": "單支紙包斜口6*21透明吸管(100支/40包/箱)", "unit": "包", "price": 40}, {"seq": 32, "name": "單支紙包斜口6*21透明吸管(100支/50包/箱)", "unit": "包", "price": 46}, {"seq": 33, "name": "單支紙包斜口12*21透明吸管(50支/40包/箱)", "unit": "包", "price": 47}, {"seq": 34, "name": "免洗筷(80雙/30包/袋)", "unit": "包", "price": 21}, {"seq": 35, "name": "環保餐巾紙23cm單層(100張/60包/箱)", "unit": "包", "price": 22}, {"seq": 36, "name": "平邊牛皮色-四折扇形紙(100張/100包/箱)", "unit": "包", "price": 16}, {"seq": 37, "name": "空白封口膜(350m/6捲/箱)", "unit": "捲", "price": 352}, {"seq": 38, "name": "感熱紙80*80mm(60捲/箱)", "unit": "捲", "price": 22}, {"seq": 39, "name": "標籤貼紙40*30mm(5捲/20包/箱)", "unit": "包", "price": 139}, {"seq": 40, "name": "保鮮膜30公分 X 500公尺", "unit": "盒", "price": 399}, {"seq": 41, "name": "透明1號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 42, "name": "透明2號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 43, "name": "透明3號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 44, "name": "透明1號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 45, "name": "透明2號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 46, "name": "透明3號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 47, "name": "PS黑色雙杯座(100個/20包/箱)", "unit": "包", "price": 56}, {"seq": 48, "name": "PS黑色四杯座(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 49, "name": "煎板清潔劑", "unit": "瓶", "price": 303}, {"seq": 50, "name": "塑膠垃圾袋66*80(10包/箱)", "unit": "包", "price": 97}, {"seq": 51, "name": "義早logo圓貼(5000張)(約1~4天)", "unit": "包", "price": 1380}, {"seq": 52, "name": "收入傳票", "unit": "本", "price": 25}, {"seq": 53, "name": "支出傳票", "unit": "本", "price": 25}, {"seq": 54, "name": "二聯收據(50組/本)", "unit": "本", "price": 35}, {"seq": 55, "name": "透明膠帶18mm(8入/捆)", "unit": "捆", "price": 95}, {"seq": 56, "name": "BUNN12.75*5.25濾紙(500pcs/箱)", "unit": "箱", "price": 1102.5}, {"seq": 57, "name": "NBR無粉手套紫S號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 58, "name": "NBR無粉手套紫M號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 59, "name": "NBR無粉手套紫L號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 60, "name": "NBR無粉手套紫XL號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 61, "name": "立領長袖反摺-淺灰襯衫(M) 義早", "unit": "件", "price": 700}, {"seq": 62, "name": "立領長袖反摺-淺灰襯衫(L) 義早", "unit": "件", "price": 700}, {"seq": 63, "name": "立領長袖反摺-淺灰襯衫(XL) 義早", "unit": "件", "price": 700}, {"seq": 64, "name": "立領長袖反摺-淺灰襯衫(2L) 義早", "unit": "件", "price": 700}, {"seq": 65, "name": "立領長袖反摺-淺灰襯衫(3L) 義早", "unit": "件", "price": 700}, {"seq": 66, "name": "雙肩銅鈎耐磨咖啡色背心圍裙", "unit": "件", "price": 600}, {"seq": 67, "name": "深麻灰打鳥帽 義早", "unit": "件", "price": 200}]}, {"id": "gu_food_order", "title": "咕咕食材叫貨", "formNo": "表格編號：1140622", "items": [{"seq": 1, "name": "蒜香雞肉(1kg/包)", "unit": "包", "price": 210}, {"seq": 2, "name": "綜合鮮菇(1kg/包)", "unit": "包", "price": 180}, {"seq": 3, "name": "炭香燒肉(1kg/包)", "unit": "包", "price": 260}, {"seq": 4, "name": "鮪魚醬(1kg/包)", "unit": "包", "price": 290}, {"seq": 5, "name": "肉醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 6, "name": "泰式打拋豬(1kg/包)", "unit": "包", "price": 195}, {"seq": 7, "name": "辣椒醬(500g/包)", "unit": "包", "price": 140}, {"seq": 8, "name": "醬油膏(1kg/包)", "unit": "包", "price": 95}, {"seq": 9, "name": "酸菜(1kg/包)", "unit": "包", "price": 110}, {"seq": 10, "name": "菜脯(1kg/包)", "unit": "包", "price": 90}, {"seq": 11, "name": "焢肉(1kg/包)", "unit": "包", "price": 185}, {"seq": 12, "name": "料理調味粉(1kg/包)", "unit": "包", "price": 130}, {"seq": 13, "name": "小熱狗(50支/20包/箱)", "unit": "包", "price": 120}, {"seq": 14, "name": "起司片(90片/12包)", "unit": "包", "price": 265}, {"seq": 15, "name": "乳酪絲(1kg/10包/箱)", "unit": "包", "price": 245}, {"seq": 16, "name": "薯餅(20片/12包/箱)", "unit": "包", "price": 150}, {"seq": 17, "name": "脆皮薯條(2kg/6包/箱)", "unit": "包", "price": 210}, {"seq": 18, "name": "鮮奶油23.3%(12罐/箱)", "unit": "罐", "price": 105}, {"seq": 19, "name": "美乃滋(600g/包)", "unit": "包", "price": 76}, {"seq": 20, "name": "老麵饅頭(6入/包)", "unit": "包", "price": 78}, {"seq": 21, "name": "黑糖饅頭(6入/包)", "unit": "包", "price": 92}, {"seq": 22, "name": "蔥捲(6入/包)", "unit": "包", "price": 135}, {"seq": 23, "name": "芋頭捲(6入/包)", "unit": "包", "price": 143}, {"seq": 24, "name": "雜糧堅果饅頭(6入/包)", "unit": "包", "price": 168}, {"seq": 25, "name": "鮮蔥黑豚包(6入/包)", "unit": "包", "price": 152}, {"seq": 26, "name": "金沙包(6入/包)", "unit": "包", "price": 152}, {"seq": 27, "name": "芝麻包(6入/包)", "unit": "包", "price": 143}, {"seq": 28, "name": "刈包(20入/8包/箱)", "unit": "包", "price": 150}, {"seq": 29, "name": "蛋餅皮(30片/12包/箱)", "unit": "包", "price": 65}, {"seq": 30, "name": "厚切蔥抓餅(10片/10包/箱)", "unit": "包", "price": 90}, {"seq": 31, "name": "河粉皮(10片/10包/箱)", "unit": "包", "price": 50}, {"seq": 32, "name": "乳酪燒餅(10片/3盒/箱)", "unit": "箱", "price": 320}, {"seq": 33, "name": "蘿蔔糕(10片/10包/箱)", "unit": "包", "price": 60}, {"seq": 34, "name": "鍋貼(50入/12包/箱)", "unit": "包", "price": 100}, {"seq": 35, "name": "生煎包(50入/12包/箱)", "unit": "包", "price": 100}, {"seq": 36, "name": "肉粽(10入/12包/箱)", "unit": "包", "price": 250}, {"seq": 37, "name": "老油條(300入/3kg/箱)", "unit": "箱", "price": 650}, {"seq": 38, "name": "肉鬆(3kg/桶)", "unit": "包", "price": 400}, {"seq": 39, "name": "優質雞塊(1kg/12包/箱)", "unit": "包", "price": 142}, {"seq": 40, "name": "黃金脆皮雞排(30片/箱)(5片/包)", "unit": "包", "price": 105}, {"seq": 41, "name": "玉米粒易開罐(285g/24罐/箱)", "unit": "罐", "price": 22}, {"seq": 42, "name": "滷蛋(30粒/8包/箱)", "unit": "包", "price": 240}, {"seq": 43, "name": "豆皮菜鬆(600g/包)", "unit": "包", "price": 110}, {"seq": 44, "name": "豆棗(3kg/包)", "unit": "包", "price": 320}, {"seq": 45, "name": "牛蒡絲(3kg/包)", "unit": "包", "price": 425}, {"seq": 46, "name": "飯糰米(5kg/1包)", "unit": "包", "price": 260}, {"seq": 47, "name": "紅藜麥(1kg/1包)", "unit": "包", "price": 165}, {"seq": 48, "name": "花生粉(600g/包)", "unit": "包", "price": 100}, {"seq": 49, "name": "低筋麵粉(3kg/包)", "unit": "包", "price": 110}, {"seq": 50, "name": "鹽(1kg/1包)", "unit": "包", "price": 20}, {"seq": 51, "name": "二砂(1kg/1包)", "unit": "包", "price": 40}, {"seq": 52, "name": "胡椒鹽(600g/包)", "unit": "包", "price": 120}, {"seq": 53, "name": "番茄醬(3.15kg/桶)", "unit": "桶", "price": 200}, {"seq": 54, "name": "醬油膏(6kg/桶)", "unit": "桶", "price": 235}, {"seq": 55, "name": "沙拉油(18L/桶)", "unit": "桶", "price": 865}, {"seq": 56, "name": "耐炸油(18L/桶)", "unit": "桶", "price": 875}, {"seq": 57, "name": "泰式紅茶葉(600g*/30包/箱)", "unit": "包", "price": 157}, {"seq": 58, "name": "蔗糖液(3kg/8包/箱)", "unit": "包", "price": 125}, {"seq": 59, "name": "專用奶精粉(1kg/20包/箱)", "unit": "包", "price": 173}]}, {"id": "gu_pack_order", "title": "咕咕包材叫貨", "formNo": "表格編號：1140401", "items": [{"seq": 1, "name": "400空白紙杯(50個/20包/箱)", "unit": "包", "price": 53}, {"seq": 2, "name": "凸杯蓋 90mm(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 3, "name": "90熱杯套(25個/40包/箱)", "unit": "串", "price": 20}, {"seq": 4, "name": "1.5OZ PET塑膠杯蓋(100個/25包/箱)", "unit": "包", "price": 92}, {"seq": 5, "name": "850空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 60}, {"seq": 6, "name": "850平蓋(50個/12包/箱)", "unit": "包", "price": 29}, {"seq": 7, "name": "260空白紙湯碗(50個/40包/箱)", "unit": "包", "price": 30}, {"seq": 8, "name": "空白一體小(60個/10包/箱)", "unit": "包", "price": 83}, {"seq": 9, "name": "空白點心盒(100個/10包/箱)", "unit": "包", "price": 95}, {"seq": 10, "name": "20*20CM防油牛皮L袋(100張/40包/箱)", "unit": "包", "price": 88}, {"seq": 11, "name": "20*20CM防油牛皮L袋(200張/25包/箱)", "unit": "包", "price": 172}, {"seq": 12, "name": "30*30CM空白淋膜紙(1000張/4包/箱)", "unit": "包", "price": 900}, {"seq": 13, "name": "4兩防油紙袋(100入/束)", "unit": "束", "price": 40}, {"seq": 14, "name": "薯條袋", "unit": "束", "price": 35}, {"seq": 15, "name": "橡皮筋小", "unit": "包", "price": 50}, {"seq": 16, "name": "0號夾鏈袋", "unit": "包", "price": 15}, {"seq": 17, "name": "擦手紙(120抽/20包/箱)", "unit": "箱", "price": 410}, {"seq": 18, "name": "黑色西餐匙(100支/40包/箱)", "unit": "包", "price": 46}, {"seq": 19, "name": "黑色西餐叉(100支/30包/2箱)", "unit": "包", "price": 45}, {"seq": 20, "name": "單支膠裝斜口6*18透明吸管(200支/20包/箱)", "unit": "包", "price": 26}, {"seq": 21, "name": "單支紙包斜口6*21透明吸管(100支/50包/箱)", "unit": "包", "price": 46}, {"seq": 22, "name": "免洗筷(80雙/30包/袋)", "unit": "包", "price": 21}, {"seq": 23, "name": "環保餐巾紙23cm單層(100張/60包/箱)", "unit": "包", "price": 22}, {"seq": 24, "name": "空白封口膜(350m/6捲/箱)", "unit": "捲", "price": 352}, {"seq": 25, "name": "感熱紙80*80mm(60捲/箱)", "unit": "捲", "price": 22}, {"seq": 26, "name": "標籤貼紙40*30mm(5捲/20包/箱)", "unit": "包", "price": 139}, {"seq": 27, "name": "保鮮膜30公分 X 500公尺", "unit": "盒", "price": 399}, {"seq": 28, "name": "4兩耐熱袋", "unit": "包", "price": 40}, {"seq": 29, "name": "6兩耐熱袋", "unit": "包", "price": 40}, {"seq": 30, "name": "6兩耐熱袋(捲)", "unit": "捲", "price": 180}, {"seq": 31, "name": "1斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 32, "name": "3斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 33, "name": "10斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 34, "name": "煎板清潔劑", "unit": "瓶", "price": 303}, {"seq": 35, "name": "水槽濾網(50入/包)", "unit": "包", "price": 35}, {"seq": 36, "name": "沙拉脫", "unit": "桶", "price": 50}, {"seq": 37, "name": "漂白水", "unit": "桶", "price": 50}, {"seq": 38, "name": "除油劑", "unit": "桶", "price": 210}, {"seq": 39, "name": "酒精", "unit": "桶", "price": 505}, {"seq": 40, "name": "3M菜瓜布(2入/包)", "unit": "包", "price": 45}, {"seq": 41, "name": "3M綠菜瓜布(2入/包)", "unit": "包", "price": 45}, {"seq": 42, "name": "好神拖布盤", "unit": "個", "price": 230}, {"seq": 43, "name": "塑膠垃圾袋66*80(10包/箱)", "unit": "包", "price": 97}, {"seq": 44, "name": "咕咕logo圓貼(5000張)(約1~4天)", "unit": "包", "price": 1380}, {"seq": 45, "name": "收入傳票", "unit": "本", "price": 25}, {"seq": 46, "name": "支出傳票", "unit": "本", "price": 25}, {"seq": 47, "name": "二聯收據(50組/本)", "unit": "本", "price": 35}, {"seq": 48, "name": "透明膠帶18mm(8入/捆)", "unit": "捆", "price": 95}, {"seq": 49, "name": "NBR無粉手套紫S號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 50, "name": "NBR無粉手套紫M號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 51, "name": "NBR無粉手套紫L號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 52, "name": "NBR無粉手套紫XL號(100入/盒)", "unit": "盒", "price": 185}]}];
 </script>
 <script>
@@ -712,13 +712,13 @@ document.addEventListener('keydown',e=>{const ov=$('modal-ov');if(!ov||ov.style.
 const _sopOpen={};
 const SOP_DATA={
   dash:{badge:'每日 / 每週作業',flow:['登入系統','查庫存警示','確認補貨','登錄進貨','更新記錄'],sections:[{title:'每日作業',steps:['開店前查看儀表板「庫存警示」','有缺貨品項立即至「叫/出貨表」安排補貨','新進食材至「進貨記錄」登錄','查看「本月損耗」是否異常偏高']},{title:'每週 / 每月',steps:['每週盤點一次實際庫存','每月底至「設定」匯出備份','每月檢視菜單毛利率','每季對供應商評分'],tip:'建議每月 1 日執行匯出備份'}]},
-  ing:{badge:'食材庫存作業',flow:['收貨驗收','登錄進貨','更新庫存','定期盤點','補貨叫貨'],sections:[{title:'新增食材',steps:['點選「＋ 新增食材」填入資料','設定進價與安全庫存量','填入營養標示','儲存後確認出現在清單中'],warn:'同一食材勿重複新增'},{title:'庫存盤點',steps:['點擊 📦 調整庫存鈕','選擇「設為指定數量」','備註欄填入盤點日期','安全庫存量不足時系統自動標示 ⚠️'],tip:'每週一定期盤點'},{title:'🍽️ 可食率/備料良率設定 (重要!)',steps:['每個食材可設「可食率 (%)」表示備料後可食用的比例','預設 100%(全部可食),需要時改成實際比例','範例:鳳梨整顆 1kg → 去皮去芯後剩 600g → 設 60%','範例:豬肉帶骨 1kg → 去骨後剩 700g → 設 70%','範例:整顆高麗菜 → 去外葉/菜心後剩 85% → 設 85%','設定後系統「真實單位成本 = 進價 ÷ 可食率」自動算給你看','這個成本會自動套用到所有配方/菜單/損耗計算'],warn:'可食率影響毛利率計算!不設或設錯都會讓成本失真',tip:'計件類食材(顆/包/盒)通常維持 100%,除非容易壞掉'},{title:'🆕 🛒 對外可賣設定 (B2B)',steps:['編輯食材時勾選「🛒 對外可賣 (B2B 客戶可訂購)」','勾選後出現「對外售價」欄位 + 即時毛利率提示','售價會顯示在客戶下單頁;客戶若有專屬折扣,會自動套用'],warn:'食材的 price 是進價,sellPrice 才是對外賣價'},{title:'🆕 📥 匯入缺料 (一鍵建食材)',steps:['點右上「📥 匯入缺料」按鈕 (紅底)','系統列出 78 種「配方有用但食材庫沒登錄」的食材','智慧推測類別 (依名稱關鍵字)','可全選/取消/只選🔥高重要性','確認匯入後一次建立,進價先設 0 事後補'],tip:'第一次部署後立刻執行,可解決配方成本被低估問題'},{title:'🆕 📦 匯入包材 (從叫貨單)',steps:['點右上「📦 匯入包材」按鈕','系統列出 67 種包材 (從叫貨單偵測)','類別自動歸「包材」','可勾選需要的進行匯入'],tip:'包材建好後配方詳情會顯示「食材成本/包材成本」拆解'},{title:'🆕 📊 包材報表 + ABC 分析',steps:['點右上「📊 包材報表」按鈕','系統依「使用價值」分析:A 級(前 80% 金額) 是關鍵包材','B 級(80~95%) 次要;C 級(95~100%) 影響小','顯示每個包材被哪些配方用、總用量、總價值','閒置包材自動標示 (考慮停採或找用途)','可匯出 CSV 給採購'],tip:'A 級包材缺貨會立刻影響營運,要嚴格管控'}]},
+  ing:{badge:'食材庫存作業',flow:['收貨驗收','登錄進貨','更新庫存','定期盤點','補貨叫貨'],sections:[{title:'新增食材',steps:['點選「＋ 新增食材」填入資料','設定進價與安全庫存量','填入營養標示','儲存後確認出現在清單中'],warn:'同一食材勿重複新增'},{title:'庫存盤點',steps:['點擊 📦 調整庫存鈕','選擇「設為指定數量」','備註欄填入盤點日期','安全庫存量不足時系統自動標示 ⚠️'],tip:'每週一定期盤點'},{title:'🍽️ 可食率/備料良率設定 (重要!)',steps:['每個食材可設「可食率 (%)」表示備料後可食用的比例','預設 100%(全部可食),需要時改成實際比例','範例:鳳梨整顆 1kg → 去皮去芯後剩 600g → 設 60%','範例:豬肉帶骨 1kg → 去骨後剩 700g → 設 70%','範例:整顆高麗菜 → 去外葉/菜心後剩 85% → 設 85%','設定後系統「真實單位成本 = 進價 ÷ 可食率」自動算給你看','這個成本會自動套用到所有配方/菜單/損耗計算'],warn:'可食率影響毛利率計算!不設或設錯都會讓成本失真',tip:'計件類食材(顆/包/盒)通常維持 100%,除非容易壞掉'},{title:'🆕 🛒 對外可賣設定 (B2B)',steps:['編輯食材時勾選「🛒 對外可賣 (B2B 客戶可訂購)」','勾選後出現「對外售價」欄位 + 即時毛利率提示','售價會顯示在客戶下單頁;客戶若有專屬折扣,會自動套用'],warn:'食材的 price 是進價,sellPrice 才是對外賣價'},{title:'🆕 📥 匯入缺料 (一鍵建食材)',steps:['點右上「📥 匯入缺料」按鈕 (紅底)','系統列出 78 種「配方有用但食材庫沒登錄」的食材','智慧推測類別 (依名稱關鍵字)','可全選/取消/只選🔥高重要性','確認匯入後一次建立,進價先設 0 事後補'],tip:'第一次部署後立刻執行,可解決配方成本被低估問題'},{title:'🆕 📦 匯入包材 (從叫貨單)',steps:['點右上「📦 匯入包材」按鈕','系統列出 67 種包材 (從叫貨單偵測)','類別自動歸「包材」','可勾選需要的進行匯入'],tip:'包材建好後配方詳情會顯示「食材成本/包材成本」拆解'},{title:'🆕 📊 包材報表 + ABC 分析',steps:['點右上「📊 包材報表」按鈕','系統依「使用價值」分析:A 級(前 80% 金額) 是關鍵包材','B 級(80~95%) 次要;C 級(95~100%) 影響小','顯示每個包材被哪些配方用、總用量、總價值','閒置包材自動標示 (考慮停採或找用途)','可匯出 CSV 給採購'],tip:'A 級包材缺貨會立刻影響營運,要嚴格管控'},{title:'🆕 📏 多單位支援 (台灣餐飲業)',steps:['系統支援台灣餐飲業常用單位:','▸ 重量類:公斤、公克、台斤、台兩、磅、盎司','▸ 容量類:公升、毫升、加侖','▸ 計件類:顆、塊、包、隻、粒、把、束、串、捲、尾...','編輯食材時選不同單位,系統會「自動換算成公克儲存」(內部一致性)','你輸入「3 台斤豬肉 NT$200/台斤」 → 系統自動算 NT$0.333/g','顯示時會自動換算回你習慣的單位'],warn:'單位選錯會導致成本計算錯誤(如把公斤填成公克 = 1000 倍差異)',tip:'進口肉品用「磅」、傳統市場用「台斤」、海鮮用「公斤」'}]},
   sup:{badge:'供應商管理作業',flow:['建立資料','設付款條件','登錄進貨','評分管理','定期審核'],sections:[{title:'新增供應商',steps:['填入名稱、聯絡人、電話','付款條件選擇月結天數','填入銀行帳戶資訊','評分預設 8 分'],tip:'每個類別至少備 2 家供應商'},{title:'供應商評核',steps:['9-10 分：主力供應商','7-8 分：一般往來','5-6 分：列為觀察名單','1-4 分：考慮停止合作']}]},
   order:{badge:'叫貨出貨作業',flow:['查看叫貨表','門市填寫','出貨確認','記錄追蹤'],sections:[{title:'操作說明',steps:['系統預設 4 張叫貨表（231 項品項）','門市 APP 可直接填寫叫貨數量','中央廚房確認後出貨','出貨記錄可匯出 Excel']}]},
   'store-inv':{badge:'門市庫存管理',flow:['查看庫存','調整數量','調撥申請','盤點核對'],sections:[{title:'操作說明',steps:['查看各門市的食材和包材庫存','可手動調整庫存數量','需要調撥時建立調撥單','定期盤點核對帳面與實際']}]},
   'alert-center':{badge:'系統警示',flow:['自動掃描','分類顯示','處理問題','確認完成'],sections:[{title:'警示類型',steps:['低庫存警示（低於安全庫存）','效期警示（3天內到期）','設備保養逾期警示','應付帳款逾期警示']}]},
   buy:{badge:'進貨登錄作業',flow:['收貨驗收','核對數量','登錄進貨','更新庫存','保存憑證','自動推送財會'],sections:[{title:'進貨登錄步驟',steps:['收貨完成後立即登錄','選擇供應商與食材','填入數量與單價','選「✅ 自動加入庫存」'],warn:'進貨單位與庫存單位不同時需手動換算'},{title:'月結對帳流程',steps:['每月底核對進貨記錄','確認品項、數量、金額一致','有差異時確認退貨記錄','對帳完成後依匯款資料付款'],tip:'發票號碼完整填入'},{title:'🆕 🔄 自動推送到財會 (生管→財會橋接)',steps:['每筆進貨儲存後系統自動推送到財會「流水帳」','透過 Firebase 跨系統同步 (prod_finance/ledger)','財會系統會看到:日期/門市/類別/品項/金額','支出金額自動為負數','本機暫存備份 (上限 500 筆)','避免重複:用 sourceId 識別,網路中斷重試也不會重複'],tip:'不用再手動開兩個系統登錄,生管登一次自動同步'}]},
-  waste:{badge:'損耗管理作業 v2 (含類型分類+自動扣庫存)',flow:['收貨驗收','記錄損耗','自動扣庫存','類型分類成本','分析改善'],sections:[
+  waste:{badge:'損耗管理作業 v2 (含類型分類+自動扣庫存+財會推送)',flow:['收貨驗收','記錄損耗','自動扣庫存','類型分類成本','分析改善'],sections:[
     {title:'1️⃣ 損耗記錄步驟',steps:[
       '從 ♻️ 損耗管理 → ＋ 新增損耗',
       '選擇食材 → 系統顯示現有庫存',
@@ -758,8 +758,8 @@ const SOP_DATA={
     ],warn:'若供應商沒有未付 AP,只會記損耗不會抵扣'}
   ]},
   menu:{badge:'菜單成本作業',flow:['設定售價','確認毛利','分類管理','達標監控','定期調整'],sections:[{title:'設定售價',steps:['選擇主食材，系統帶入成本','售價 = 食材成本 ÷ (1-目標毛利率)','確認毛利率顯示✅達標後儲存']},{title:'毛利率管理',steps:['定期查看⚠️/❌項目','❌偏低：考慮提高售價','橘色待填入：盡快設定','每季重新計算一次'],warn:'售價調整需同步更新 POS'}]},
-  ref:{badge:'系統設定作業',flow:['建立公司資訊','設目標毛利','維護下拉選單','定期備份'],sections:[{title:'初始化設定',steps:['填入公司基本資訊','門市列表填入分店名稱','設定目標毛利率','確認貨幣符號']},{title:'資料備份規範',steps:['每月1日點選「匯出備份」','備份命名：好洺ERP備份_YYYYMM.json','存放公司雲端硬碟','需還原時點選「匯入備份」'],warn:'匯入備份會覆蓋所有現有資料'}]},
-  recipe:{badge:'配方卡管理作業',flow:['建立配方','填入食材','計算成本','設定售價','檢視營養'],sections:[{title:'新增配方卡',steps:['點選「＋ 新增配方」填入名稱與代碼','設定分類、成品單位、批次倍數','逐一新增食材明細（品名、用量、單位）','儲存後左側列表可查看成本'],tip:'食材用量以最小批次為基準填入'},{title:'成本與售價',steps:['系統自動計算每單位成本（依食材進價單位智慧換算）','若食材有設可食率 < 100%,系統用「真實成本」算','右側詳情顯示 55%/60%/65% 毛利建議售價','底部顯示每 100g 營養標示','定期檢查食材進價變動影響'],warn:'食材進價或可食率變動時成本會自動更新'},{title:'🍽️ 帳面成本 vs 真實成本',steps:['配方詳情會顯示兩個成本:','📦 帳面成本:純按進貨價算 (不含損耗)','🍽️ 真實成本:含可食率 (備料損耗) — 這才是真實使用成本','差異越大代表食材損耗越多 (鳳梨/帶骨肉品最明顯)','毛利率建議用「真實成本」計算才不會虧錢'],tip:'真實成本通常比帳面成本高 5~40%,看食材種類'},{title:'⚠️ 單位匹配重要說明',steps:['食材庫存的「單位」決定進價的計算基準（如：豬肉 100元/公斤、醬油 60元/公升）','配方填入用量時務必確認單位 → 重量(g/公斤/台斤) 系統自動換算','✅ 自動換算情境:食材公斤 → 配方填 g/台斤/公斤 都OK','✅ 自動換算情境:食材公升 → 配方填 ml/公升 都OK','⚠️ 計件類食材(包/盒/瓶/顆/張) 配方務必用相同單位','❌ 例如 醬油是「包」(每包 500ml,30元) 但配方填 100ml → 計算錯誤！應改成食材改用「公升」單位再設進價'],warn:'若食材單位是計件類(包/盒/瓶) 而配方用重量(g/ml),系統無法精確換算,會在 Console 顯示警告'},{title:'🆕 跨類別換算 (公升↔公克) 內建密度表',steps:['🆕 系統內建 50+ 常見食材密度表,「容量↔重量」可自動換算','油類(橄欖油/沙拉油/麻油):密度 0.91~0.92','水/高湯/茶/咖啡:密度 1.00','酒類(米酒/料酒/紹興):密度 0.97~0.98','醬油:密度 1.10','蠔油/醬油膏/番茄醬:密度 1.15~1.20','蜂蜜:密度 1.42','牛奶/鮮奶/豆漿:密度 1.03~1.04','範例:橄欖油 NT$150/公升 + 配方 100g → 系統算 NT$16.5 (套用密度 0.91)','食材命名含關鍵字即匹配:「初榨橄欖油」→ 套用「橄欖油」的 0.91','找不到密度的食材會以 1.0 計算且 Console 顯示警告'],tip:'此功能讓「食材記公升、配方填公克」也能正確算成本,不需強制統一單位'},{title:'🥚 雞蛋的處理方式 (三選一)',steps:['🥚 方法 1 - 散裝雞蛋(按顆):食材單位「顆」/進價 8元 /可食率 85% (扣蛋殼)','  → 配方一定要用「顆」','🥚 方法 2 - 整箱雞蛋(按重量) 推薦:食材單位「公斤」/進價 160元/kg /可食率 90%','  → 配方可用 g、公斤、台斤,系統自動換算','  → 例:配方填 150g → 系統算 160 ÷ 0.9 × 0.150 = NT$26.67','🥚 方法 3 - 蛋液/全蛋液(中央廚房):食材單位「公升」/進價 120元/L /可食率 100%','  → 配方可用 g、ml、公升 (蛋液密度 1.04 內建)','  → 例:配方填 100g 蛋液 → 系統算 NT$11.54','配方常用 g 的話建議用方法 2 (整箱) 或方法 3 (蛋液)'],tip:'雞蛋可食率參考:整顆雞蛋 85% (扣蛋殼+滴落) ｜ 整箱按重量 90% (主要扣蛋殼) ｜ 蛋液 100%'},{title:'🆕 📦 包裝規格 + 包材成本',steps:['每個配方可設「包裝規格」(每包淨重 X g/ml)','例:藍莓優格醬 1000g/包｜紐澳良雞腿排 600g/包(4支)｜辣椒醬 500g/包','配方詳情會自動顯示「成本拆解」:🍽️ 食材成本 + 📦 包材成本','食材庫類別「包材」會自動歸類到包材成本 (其他類別歸食材成本)','📦 食材庫頁面有「📦 匯入包材」按鈕可從叫貨單一次匯入','包材成本占比 > 10% 表示包材偏貴,可考慮換包裝/找新供應商','若配方總成本中「包材成本」是 0 → 提示未計入包材'],warn:'配方未計包材會虛報毛利!記得每個配方都加包材食材',tip:'包裝規格影響:標籤淨重自動帶入、營養標示「每份」計算'},{title:'🆕 ⚠️ 缺料報告 (右上紅色按鈕)',steps:['配方頁右上若出現「⚠️ 缺料報告 (X)」紅色按鈕','點開列出所有「配方有用但食材庫沒登錄」的食材','重要性分級:🔥 高 (≥10 個配方用)、⚠️ 中、• 低','點「快速新增」直接建食材','建議從🔥高重要性開始補,可大幅修正成本'],warn:'缺料食材會被靜默跳過,讓配方成本被低估!'},{title:'🆕 ⚠️ 異常偵測 + 💸 成本拆解',steps:['配方詳情頂部會顯示異常警示卡 (用量/單位錯誤/比例異常)','例:用量 12000 公斤 → 警示「單位可能選錯應為 g」','某食材佔總成本 > 95% → 警示「比例異常」','點任一食材列展開「成本拆解」:單價 × 用量 × 倍數 = 小計','配方詳情顯示「💸 成本拆解」(食材成本 vs 包材成本占比)'],tip:'異常偵測會在儀表板顯示警示卡 + 配方列表 ⚠️ badge'},{title:'🆕 📦 包材組合 (配方編輯)',steps:['編輯配方時,「包裝規格」下方會顯示「📦 包材組合」區塊','自動列食材庫所有「包材」類別食材 (來自匯入包材功能)','勾選需要的包材 + 設數量 (例:真空袋 1 包/標籤 1 張)','編輯舊配方時系統自動勾起已有的包材','儲存時自動合併到「食材明細」,計算成本時識別為包材'],warn:'若食材庫沒包材分類,先去「🥬 食材庫存」匯入包材',tip:'比逐一加食材快 5 倍'},{title:'🆕 🍳 餐點靈感工坊 (右上綠色按鈕)',steps:['配方頁右上點「🍳 餐點靈感工坊」開啟 3 個分頁','🎲 智能推薦:勾選食材 → 系統推薦現有相似配方 (Jaccard 演算法)','🔍 反向搜尋:選食材 → 列出哪些配方在用、毛利排序','💡 組合分析:常一起用的食材對 + 閒置食材清單','閒置食材 = 沒被任何配方用到 → 可開新菜或停採購'],tip:'從食材庫設計新菜的最佳工具!研發新品時必用'}]},
+  ref:{badge:'系統設定作業',flow:['建立公司資訊','設目標毛利','顯示單位偏好','維護下拉選單','定期備份'],sections:[{title:'初始化設定',steps:['填入公司基本資訊','門市列表填入分店名稱','設定目標毛利率','確認貨幣符號']},{title:'🆕 📏 顯示單位偏好 (依類別)',steps:['依台灣餐飲業習慣設定每類食材顯示單位','例:肉類顯示「台斤」、海鮮顯示「公斤」、食用油顯示「公升」','系統內部統一公克儲存,顯示時自動換算','選 auto = 用食材原始單位顯示','選具體單位 (公斤/台斤/磅/公升等) = 強制換算顯示'],tip:'設定後食材列表會看到 📏 圖示,代表該欄位是換算後的數值'},{title:'資料備份規範',steps:['每月1日點選「匯出備份」','備份命名：好洺ERP備份_YYYYMM.json','存放公司雲端硬碟','需還原時點選「匯入備份」'],warn:'匯入備份會覆蓋所有現有資料'}]},
+  recipe:{badge:'配方卡管理作業',flow:['建立配方','填入食材','計算成本','設定售價','檢視營養'],sections:[{title:'新增配方卡',steps:['點選「＋ 新增配方」填入名稱與代碼','設定分類、成品單位、批次倍數','逐一新增食材明細（品名、用量、單位）','儲存後左側列表可查看成本'],tip:'食材用量以最小批次為基準填入'},{title:'成本與售價',steps:['系統自動計算每單位成本（依食材進價單位智慧換算）','若食材有設可食率 < 100%,系統用「真實成本」算','右側詳情顯示 55%/60%/65% 毛利建議售價','底部顯示每 100g 營養標示','定期檢查食材進價變動影響'],warn:'食材進價或可食率變動時成本會自動更新'},{title:'🍽️ 帳面成本 vs 真實成本',steps:['配方詳情會顯示兩個成本:','📦 帳面成本:純按進貨價算 (不含損耗)','🍽️ 真實成本:含可食率 (備料損耗) — 這才是真實使用成本','差異越大代表食材損耗越多 (鳳梨/帶骨肉品最明顯)','毛利率建議用「真實成本」計算才不會虧錢'],tip:'真實成本通常比帳面成本高 5~40%,看食材種類'},{title:'⚠️ 單位匹配重要說明',steps:['食材庫存的「單位」決定進價的計算基準（如：豬肉 100元/公斤、醬油 60元/公升）','配方填入用量時務必確認單位 → 重量(g/公斤/台斤) 系統自動換算','✅ 自動換算情境:食材公斤 → 配方填 g/台斤/公斤 都OK','✅ 自動換算情境:食材公升 → 配方填 ml/公升 都OK','⚠️ 計件類食材(包/盒/瓶/顆/張) 配方務必用相同單位','❌ 例如 醬油是「包」(每包 500ml,30元) 但配方填 100ml → 計算錯誤！應改成食材改用「公升」單位再設進價'],warn:'若食材單位是計件類(包/盒/瓶) 而配方用重量(g/ml),系統無法精確換算,會在 Console 顯示警告'},{title:'🆕 跨類別換算 (公升↔公克) 內建密度表',steps:['🆕 系統內建 50+ 常見食材密度表,「容量↔重量」可自動換算','油類(橄欖油/沙拉油/麻油):密度 0.91~0.92','水/高湯/茶/咖啡:密度 1.00','酒類(米酒/料酒/紹興):密度 0.97~0.98','醬油:密度 1.10','蠔油/醬油膏/番茄醬:密度 1.15~1.20','蜂蜜:密度 1.42','牛奶/鮮奶/豆漿:密度 1.03~1.04','範例:橄欖油 NT$150/公升 + 配方 100g → 系統算 NT$16.5 (套用密度 0.91)','食材命名含關鍵字即匹配:「初榨橄欖油」→ 套用「橄欖油」的 0.91','找不到密度的食材會以 1.0 計算且 Console 顯示警告'],tip:'此功能讓「食材記公升、配方填公克」也能正確算成本,不需強制統一單位'},{title:'🥚 雞蛋的處理方式 (三選一)',steps:['🥚 方法 1 - 散裝雞蛋(按顆):食材單位「顆」/進價 8元 /可食率 85% (扣蛋殼)','  → 配方一定要用「顆」','🥚 方法 2 - 整箱雞蛋(按重量) 推薦:食材單位「公斤」/進價 160元/kg /可食率 90%','  → 配方可用 g、公斤、台斤,系統自動換算','  → 例:配方填 150g → 系統算 160 ÷ 0.9 × 0.150 = NT$26.67','🥚 方法 3 - 蛋液/全蛋液(中央廚房):食材單位「公升」/進價 120元/L /可食率 100%','  → 配方可用 g、ml、公升 (蛋液密度 1.04 內建)','  → 例:配方填 100g 蛋液 → 系統算 NT$11.54','配方常用 g 的話建議用方法 2 (整箱) 或方法 3 (蛋液)'],tip:'雞蛋可食率參考:整顆雞蛋 85% (扣蛋殼+滴落) ｜ 整箱按重量 90% (主要扣蛋殼) ｜ 蛋液 100%'},{title:'🆕 📦 包裝規格 + 包材成本',steps:['每個配方可設「包裝規格」(每包淨重 X g/ml)','例:藍莓優格醬 1000g/包｜紐澳良雞腿排 600g/包(4支)｜辣椒醬 500g/包','配方詳情會自動顯示「成本拆解」:🍽️ 食材成本 + 📦 包材成本','食材庫類別「包材」會自動歸類到包材成本 (其他類別歸食材成本)','📦 食材庫頁面有「📦 匯入包材」按鈕可從叫貨單一次匯入','包材成本占比 > 10% 表示包材偏貴,可考慮換包裝/找新供應商','若配方總成本中「包材成本」是 0 → 提示未計入包材'],warn:'配方未計包材會虛報毛利!記得每個配方都加包材食材',tip:'包裝規格影響:標籤淨重自動帶入、營養標示「每份」計算'},{title:'🆕 ⚠️ 缺料報告 (右上紅色按鈕)',steps:['配方頁右上若出現「⚠️ 缺料報告 (X)」紅色按鈕','點開列出所有「配方有用但食材庫沒登錄」的食材','重要性分級:🔥 高 (≥10 個配方用)、⚠️ 中、• 低','點「快速新增」直接建食材','建議從🔥高重要性開始補,可大幅修正成本'],warn:'缺料食材會被靜默跳過,讓配方成本被低估!'},{title:'🆕 ⚠️ 異常偵測 + 💸 成本拆解',steps:['配方詳情頂部會顯示異常警示卡 (用量/單位錯誤/比例異常)','例:用量 12000 公斤 → 警示「單位可能選錯應為 g」','某食材佔總成本 > 95% → 警示「比例異常」','點任一食材列展開「成本拆解」:單價 × 用量 × 倍數 = 小計','配方詳情顯示「💸 成本拆解」(食材成本 vs 包材成本占比)'],tip:'異常偵測會在儀表板顯示警示卡 + 配方列表 ⚠️ badge'},{title:'🆕 📦 包材組合 (配方編輯)',steps:['編輯配方時,「包裝規格」下方會顯示「📦 包材組合」區塊','自動列食材庫所有「包材」類別食材 (來自匯入包材功能)','勾選需要的包材 + 設數量 (例:真空袋 1 包/標籤 1 張)','編輯舊配方時系統自動勾起已有的包材','儲存時自動合併到「食材明細」,計算成本時識別為包材'],warn:'若食材庫沒包材分類,先去「🥬 食材庫存」匯入包材',tip:'比逐一加食材快 5 倍'},{title:'🆕 🍳 餐點靈感工坊 (右上綠色按鈕)',steps:['配方頁右上點「🍳 餐點靈感工坊」開啟 3 個分頁','🎲 智能推薦:勾選食材 → 系統推薦現有相似配方 (Jaccard 演算法)','🔍 反向搜尋:選食材 → 列出哪些配方在用、毛利排序','💡 組合分析:常一起用的食材對 + 閒置食材清單','閒置食材 = 沒被任何配方用到 → 可開新菜或停採購'],tip:'從食材庫設計新菜的最佳工具!研發新品時必用'},{title:'🆕 ♻️ 操作損耗率 (毛利不被低估)',steps:['配方編輯時可填「操作損耗率」(預設 0%)','例:廚房失誤+過期+員工偷吃 預估 5% → 填 5','配方詳情會顯示「全成本 = 真實成本 ÷ (1-損耗率)」','建議:看儀表板「♻️ 本月損耗成本」的損耗率','若整體損耗率 5% → 把每個配方的操作損耗率設 5%','毛利建議售價自動改用「全成本」算,確保不虧錢'],warn:'操作損耗率 ≠ 可食率!可食率是備料(食材本身),操作損耗是廚房作業',tip:'高風險食材(易腐壞/容易出錯)可設高,穩定食材設低'}]},
 
   transfer:{badge:'門市調撥作業',flow:['門市缺貨','建立調撥單','確認調撥','實際移轉','完成記錄'],sections:[{title:'調撥操作流程',steps:['確認調出門市有足夠庫存','點選「＋ 新增調撥」填寫品項與數量','調出與調入門市不可相同','調撥單建立後狀態為「待確認」'],tip:'建議先電話聯繫調出門市確認庫存'},{title:'調撥確認',steps:['調入門市收到貨品後點「確認」','狀態變更為「已完成」','若取消調撥點「取消」','所有記錄保留供日後查詢'],warn:'確認後無法撤銷，請確實點交貨品'}]},
   po:{badge:'採購單流程作業',flow:['需求確認','建立採購單','主管核准','供應商下單','到貨驗收'],sections:[{title:'採購申請流程',steps:['門市或中央廚房提出需求','點選「＋ 新增採購單」填寫品項數量','選擇供應商並填入單價','狀態為「申請中」等待核准'],tip:'可點「📊 供應商比價」參考歷史價格'},{title:'核准→下單→驗收',steps:['主管審核後點「核准」或「駁回」','核准後點「下單」通知供應商出貨','收到貨品後點「到貨驗收」','系統自動建立應付帳款（💳）','如有問題可點「退貨」記錄退貨數量'],warn:'到貨驗收前務必核對品項、數量、品質'}]},
@@ -795,7 +795,7 @@ function sopBox(pageId){const cfg=SOP_DATA[pageId];if(!cfg)return null;const wra
 
 // Navigation
 function setPage(p){state.page=p;$$('[data-cp]').forEach(b=>b.classList.toggle('active',b.dataset.cp===p));renderPage()}
-function renderPage(){const c=$('cost-content');if(!c)return;c.innerHTML='';const renders={dash:renderDash,ing:renderIng,recipe:renderRecipe,menu:renderMenuPage,waste:renderWaste,sup:renderSup,buy:renderBuy,ref:renderRef,'store-inv':renderStoreInv,transfer:renderTransfer,po:renderPO,ap:renderAP,batch:renderBatch,prod:renderProd,allergen:renderAllergen,contract:renderContract,users:renderUsers,label:renderLabel,qc:renderQC,trace:renderTrace,schedule:renderSchedule,equip:renderEquip,budget:renderBudget,'alert-center':renderAlertCenter,ar:renderAR,count:renderCount,rtn:renderReturn,tax:renderTax,'cost-analysis':renderCostAnalysis,wo:renderWorkOrder,customer:renderCustomer,asset:renderAssets,sales:renderSales,internal:renderInternalSales,cloud:renderCloud};const fn=renders[state.page];if(fn){const r=fn();if(r)c.appendChild(r)}else{c.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'此模組開發中...'))}}
+function renderPage(){const c=$('cost-content');if(!c)return;c.innerHTML='';const renders={dash:renderDash,ing:renderIng,recipe:renderRecipe,menu:renderMenuPage,waste:renderWaste,sup:renderSup,buy:renderBuy,order:renderOrder,ref:renderRef,'store-inv':renderStoreInv,transfer:renderTransfer,po:renderPO,ap:renderAP,batch:renderBatch,prod:renderProd,allergen:renderAllergen,contract:renderContract,users:renderUsers,label:renderLabel,qc:renderQC,trace:renderTrace,schedule:renderSchedule,equip:renderEquip,budget:renderBudget,'alert-center':renderAlertCenter,ar:renderAR,count:renderCount,rtn:renderReturn,tax:renderTax,'cost-analysis':renderCostAnalysis,wo:renderWorkOrder,customer:renderCustomer,asset:renderAssets,sales:renderSales,internal:renderInternalSales,cloud:renderCloud};const fn=renders[state.page];if(fn){const r=fn();if(r)c.appendChild(r)}else{c.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'此模組開發中...'))}}
 
 
 // ══════════════════════════════════════════════════════
@@ -1175,7 +1175,17 @@ window.scanAllRecipeAnomalies=function(){
   return result;
 };
 
-function calcCost(r){const mult=r.multiplier||1,im=imap();let tot=0;let ingCost=0,packCost=0;let missingCount=0;let missingNames=[];(r.ings||[]).forEach(ing=>{const inv=im[ing.name];if(!inv){missingCount++;missingNames.push(ing.name);return}var c=calcIngCost(inv,(ing.qty||0)*mult,ing.unit);tot+=c;if(inv.cat==='包材')packCost+=c;else ingCost+=c});return{total:tot,per:tot/((r.perBatch||1)*mult),ingCost:ingCost,packCost:packCost,perIng:ingCost/((r.perBatch||1)*mult),perPack:packCost/((r.perBatch||1)*mult),missingCount:missingCount,missingNames:missingNames}}
+function calcCost(r){const mult=r.multiplier||1,im=imap();let tot=0;let ingCost=0,packCost=0;let missingCount=0;let missingNames=[];(r.ings||[]).forEach(ing=>{const inv=im[ing.name];if(!inv){missingCount++;missingNames.push(ing.name);return}var c=calcIngCost(inv,(ing.qty||0)*mult,ing.unit);tot+=c;if(inv.cat==='包材')packCost+=c;else ingCost+=c});
+// 🆕 操作損耗率:配方填的 (例如廚房失誤+過期 5%)
+var opLossRate=+r.opLossRate||0;
+if(opLossRate<0)opLossRate=0;
+if(opLossRate>0.5)opLossRate=0.5;  // 上限 50%
+// 全成本 = 真實成本 ÷ (1 - 操作損耗率)
+// 邏輯:有 5% 操作損耗 = 100元成本實際消耗 100/(1-5%) = 105.26 才能產出
+var fullCost=opLossRate>0?tot/(1-opLossRate):tot;
+var fullIngCost=opLossRate>0?ingCost/(1-opLossRate):ingCost;
+var perBatchUnits=(r.perBatch||1)*mult;
+return{total:tot,per:tot/perBatchUnits,ingCost:ingCost,packCost:packCost,perIng:ingCost/perBatchUnits,perPack:packCost/perBatchUnits,fullCost:fullCost,perFull:fullCost/perBatchUnits,fullIngCost:fullIngCost,perFullIng:fullIngCost/perBatchUnits,opLossRate:opLossRate,missingCount:missingCount,missingNames:missingNames}}
 
 // 全配方缺料分析 (用於缺料報告)
 window.analyzeMissingIngs=function(){
@@ -1205,15 +1215,120 @@ window.analyzeMissingIngs=function(){
 
 // 將「重量/容量單位 + 數量」換算成公克(以重量單位看待容量,簡化計算)
 // 1 公斤 = 1000g, 1 台斤 = 600g, 1 公升 ≈ 1000g (水基準)
+// ══════════════════════════════════════════════════════
+// 🆕 完整單位資料庫 (台灣餐飲業常用)
+// type: weight=重量類 / volume=容量類 / count=計件類
+// ══════════════════════════════════════════════════════
+window.UNIT_DB={
+  // 重量類 (內部統一公克)
+  '公克':{type:'weight',toG:1,group:'重量',label:'公克 (g)'},
+  'g':{type:'weight',toG:1,group:'重量',label:'g',alias:'公克'},
+  '公斤':{type:'weight',toG:1000,group:'重量',label:'公斤 (kg)'},
+  'kg':{type:'weight',toG:1000,group:'重量',label:'kg',alias:'公斤'},
+  '台斤':{type:'weight',toG:600,group:'重量',label:'台斤 (斤)'},
+  '斤':{type:'weight',toG:600,group:'重量',label:'斤',alias:'台斤'},
+  '台兩':{type:'weight',toG:37.5,group:'重量',label:'台兩 (兩)'},
+  '兩':{type:'weight',toG:37.5,group:'重量',label:'兩',alias:'台兩'},
+  '磅':{type:'weight',toG:453.59237,group:'重量',label:'磅 (lb)'},
+  'lb':{type:'weight',toG:453.59237,group:'重量',label:'lb',alias:'磅'},
+  '盎司':{type:'weight',toG:28.3495,group:'重量',label:'盎司 (oz)'},
+  'oz':{type:'weight',toG:28.3495,group:'重量',label:'oz',alias:'盎司'},
+  // 容量類 (內部統一毫升,跨類別需密度)
+  '毫升':{type:'volume',toMl:1,group:'容量',label:'毫升 (ml)'},
+  'ml':{type:'volume',toMl:1,group:'容量',label:'ml',alias:'毫升'},
+  '公升':{type:'volume',toMl:1000,group:'容量',label:'公升 (L)'},
+  'L':{type:'volume',toMl:1000,group:'容量',label:'L',alias:'公升'},
+  '加侖':{type:'volume',toMl:3785.41,group:'容量',label:'加侖 (gal)'},
+  // 計件類 (不換算)
+  '顆':{type:'count',group:'計件',label:'顆'},
+  '塊':{type:'count',group:'計件',label:'塊'},
+  '包':{type:'count',group:'計件',label:'包'},
+  '箱':{type:'count',group:'計件',label:'箱'},
+  '條':{type:'count',group:'計件',label:'條'},
+  '個':{type:'count',group:'計件',label:'個'},
+  '張':{type:'count',group:'計件',label:'張'},
+  '盒':{type:'count',group:'計件',label:'盒'},
+  '份':{type:'count',group:'計件',label:'份'},
+  '罐':{type:'count',group:'計件',label:'罐'},
+  '瓶':{type:'count',group:'計件',label:'瓶'},
+  '隻':{type:'count',group:'計件',label:'隻'},
+  '粒':{type:'count',group:'計件',label:'粒'},
+  '把':{type:'count',group:'計件',label:'把'},
+  '束':{type:'count',group:'計件',label:'束'},
+  '袋':{type:'count',group:'計件',label:'袋'},
+  '串':{type:'count',group:'計件',label:'串'},
+  '捲':{type:'count',group:'計件',label:'捲'},
+  '卷':{type:'count',group:'計件',label:'捲',alias:'捲'},
+  '尾':{type:'count',group:'計件',label:'尾'}
+};
+
+// 取得單位資訊 (支援別名)
+window.getUnitInfo=function(unit){
+  if(!unit)return null;
+  var u=window.UNIT_DB[unit];
+  return u||null;
+};
+
 function unitToG(qty, unit){
   if(!qty)return 0;
+  var u=window.UNIT_DB[unit];
+  if(u&&u.type==='weight')return qty*u.toG;
+  // 舊版相容 + 容量類也算 (1ml = 1g 預設,跨類別需密度)
+  if(u&&u.type==='volume')return qty*u.toMl;
+  // fallback (舊版邏輯)
   if(unit==='公斤'||unit==='公升')return qty*1000;
   if(unit==='台斤')return qty*600;
   if(unit==='毫升'||unit==='公克')return qty;
   if(unit==='g'||unit==='ml')return qty;
-  return qty;  // 顆/塊/包/盒等不可重量化的單位,直接回傳數值
+  return qty;  // 計件單位直接回傳
 }
 window.unitToG=unitToG;
+
+// 🆕 容量單位 → 毫升
+window.unitToMl=function(qty,unit){
+  if(!qty)return 0;
+  var u=window.UNIT_DB[unit];
+  if(u&&u.type==='volume')return qty*u.toMl;
+  return qty;
+};
+
+// 🆕 兩個單位是否同類別 (重量 vs 重量、容量 vs 容量、計件 vs 計件)
+window.isSameUnitType=function(unit1,unit2){
+  var u1=window.UNIT_DB[unit1];
+  var u2=window.UNIT_DB[unit2];
+  if(!u1||!u2)return false;
+  return u1.type===u2.type;
+};
+
+// 🆕 智能換算:從 unit1 換到 unit2 (同類別)
+window.convertUnit=function(qty,unit1,unit2){
+  var u1=window.UNIT_DB[unit1];
+  var u2=window.UNIT_DB[unit2];
+  if(!u1||!u2||!qty)return null;
+  if(u1.type!==u2.type)return null;  // 不同類別不能換
+  if(u1.type==='weight')return qty*u1.toG/u2.toG;
+  if(u1.type==='volume')return qty*u1.toMl/u2.toMl;
+  return qty;  // 計件不換算
+};
+
+// 🆕 取得依「顯示偏好」應該顯示的單位
+window.getDisplayUnit=function(cat,fallbackUnit){
+  if(!state.meta||!state.meta.unitDisplay)return fallbackUnit;
+  return state.meta.unitDisplay[cat]||fallbackUnit;
+};
+
+// 🆕 格式化顯示:依偏好換算單位
+window.fmtUnitDisplay=function(qty,unit,cat){
+  if(!qty)return '0 '+(unit||'');
+  // 沒設偏好 → 原始顯示
+  if(!state.meta||!state.meta.unitDisplay)return fmt(qty,2)+' '+unit;
+  var prefer=state.meta.unitDisplay[cat];
+  if(!prefer||prefer==='auto'||prefer===unit)return fmt(qty,2)+' '+unit;
+  // 換算
+  var converted=window.convertUnit(qty,unit,prefer);
+  if(converted==null)return fmt(qty,2)+' '+unit;
+  return fmt(converted,2)+' '+prefer;
+};
 // ══════════════════════════════════════════════════════
 // 🔧 v2.1.0 重寫:配方營養計算
 // 改進:
@@ -1408,7 +1523,7 @@ if(rec.packWeight){
   var packU=rec.packUnit||'g';
   packSpecCard='<div style="background:#FCEFE5;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:0.84rem;color:#9A6210"><b>📏 包裝規格:</b> 每'+esc(rec.unit||'包')+' '+rec.packWeight+' '+packU+(rec.packNote?' ('+esc(rec.packNote)+')':'')+'</div>';
 }
-det.innerHTML='<div class="card"><div class="card-title" style="display:flex;justify-content:space-between"><span>💰 '+esc(rec.name)+'</span><span class="badge badge-blue">'+esc(rec.cat||'未分類')+'</span></div><div style="background:linear-gradient(135deg,#DFF5EC,#C0ECDA);border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end"><div><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">每 '+esc(rec.unit)+' 成本</div><div style="font-size:1.75rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.per,2)+'</div></div><div style="text-align:right"><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">批次總成本</div><div style="font-size:1.2rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.total,0)+'</div></div></div>'+packSpecCard+costBreakdownCard+anomalyCard+missingCard+yieldCompareCard+'<div class="grid3">'+[[55,'55%'],[60,'60%'],[65,'65%']].map(([m,lb])=>'<div class="metric"><span class="metric-label">毛利 '+lb+' 售價</span><div class="metric-val" style="font-size:1.1rem">'+CUR()+' '+fmt(rc.per/(1-m/100),0)+'</div></div>').join('')+'</div></div><div class="card"><div class="card-title">📋 食材明細（'+(rec.ings||[]).length+' 項）</div><div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">💡 點擊任一食材列展開計算過程</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>序</th><th>食材</th><th>用量</th><th>單位</th><th>型態</th><th>可食率</th><th style="text-align:right">帳面成本</th><th style="text-align:right">真實成本</th><th>庫存</th></tr></thead><tbody>'+ingRows+'</tbody></table></div></div>';
+det.innerHTML='<div class="card"><div class="card-title" style="display:flex;justify-content:space-between"><span>💰 '+esc(rec.name)+'</span><span class="badge badge-blue">'+esc(rec.cat||'未分類')+'</span></div><div style="background:linear-gradient(135deg,#DFF5EC,#C0ECDA);border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end"><div><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">每 '+esc(rec.unit)+' 成本'+(rc.opLossRate>0?' (含 '+(rc.opLossRate*100).toFixed(1)+'% 損耗)':'')+'</div><div style="font-size:1.75rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.opLossRate>0?rc.perFull:rc.per,2)+'</div>'+(rc.opLossRate>0?'<div style="font-size:0.74rem;color:#0A5A46;margin-top:2px">原始 '+CUR()+fmt(rc.per,2)+' / 全成本 '+CUR()+fmt(rc.perFull,2)+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">批次總成本</div><div style="font-size:1.2rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.opLossRate>0?rc.fullCost:rc.total,0)+'</div></div></div>'+packSpecCard+costBreakdownCard+anomalyCard+missingCard+yieldCompareCard+'<div class="grid3">'+[[55,'55%'],[60,'60%'],[65,'65%']].map(([m,lb])=>'<div class="metric"><span class="metric-label">毛利 '+lb+' 售價'+(rc.opLossRate>0?' (含損耗)':'')+'</span><div class="metric-val" style="font-size:1.1rem">'+CUR()+' '+fmt((rc.opLossRate>0?rc.perFull:rc.per)/(1-m/100),0)+'</div></div>').join('')+'</div></div><div class="card"><div class="card-title">📋 食材明細（'+(rec.ings||[]).length+' 項）</div><div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">💡 點擊任一食材列展開計算過程</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>序</th><th>食材</th><th>用量</th><th>單位</th><th>型態</th><th>可食率</th><th style="text-align:right">帳面成本</th><th style="text-align:right">真實成本</th><th>庫存</th></tr></thead><tbody>'+ingRows+'</tbody></table></div></div>';
 var rn=calcNut(rec);
 det.innerHTML+='<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn btn-sm btn-outline" onclick="showRecipeVersions(\''+rec.id+'\')">📜 版本歷史</button></div>';
 det.innerHTML+='<div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span>🏷️ 每100g 營養估算</span>'+(rn.ingCount>0?'<span style="font-size:0.78rem;color:'+(rn.completeness>=0.8?'#0A5A46':rn.completeness>=0.5?'#9A6210':'#B82525')+';font-weight:600">完整度 '+rn.withNutCount+'/'+rn.ingCount+' ('+Math.round(rn.completeness*100)+'%)</span>':'')+'</div>'+(rn.completeness<0.8&&rn.ingCount>0?'<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:0.82rem;color:#9A6210">⚠️ '+rn.ingCount+' 項食材中只有 '+rn.withNutCount+' 項有營養資料,實際營養值可能高於估算'+(rn.fromDbCount>0?' (其中 '+rn.fromDbCount+' 項用內建資料庫估算)':'')+'</div>':'')+(rn.totalWeight>0?'<div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">配方總重: <b>'+fmt(rn.totalWeight,0)+' g</b> (= '+fmt(rn.totalWeight/1000,2)+' 公斤)</div>':'')+'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+[['熱量',rn.kcal,'kcal','#B82525'],['蛋白質',rn.prot,'g','#1455A0'],['脂肪',rn.fat,'g','#9A6210'],['　飽和脂肪',rn.satFat,'g','#9A6210'],['　反式脂肪',rn.transFat,'g','#9A6210'],['碳水',rn.carb,'g','#0A6B30'],['　糖',rn.sugar,'g','#0A6B30'],['鈉',rn.sodium,'mg','#7B2D8E']].map(function(x){return'<div style="background:#F3F1EB;border-radius:6px;padding:10px;text-align:center;border:.5px solid #eee"><div style="font-size:1.15rem;font-weight:600;color:'+x[3]+'">'+fmt(x[1],1)+'<span style="font-size:0.72rem;font-weight:400;color:#706E68"> '+x[2]+'</span></div><div style="font-size:0.72rem;color:#706E68;margin-top:3px">'+x[0]+'</div></div>'}).join('')+'</div></div>'};
@@ -1432,7 +1547,7 @@ const bld=()=>(window._editR.ings||[]).map((ing,i)=>{
 // riSearch / riPick / riQuickAdd 函式定義在後面
 
 
-modal(mH(id?'編輯配方卡':'新增配方卡')+'<div class="form-row c5"><div class="fg"><label>配方ID</label><input id="rf-id" value="'+esc(rec.id)+'" disabled></div><div class="fg"><label>代碼</label><input id="rf-code" value="'+esc(rec.code)+'"></div><div class="fg" style="grid-column:span 2"><label>配方名稱 *</label><input id="rf-name" value="'+esc(rec.name)+'"></div><div class="fg"><label>分類</label><select id="rf-cat">'+opts(['醬料','主食','配料','湯品','甜點','飲品','其他'],rec.cat||'醬料')+'</select></div></div><div class="form-row c3"><div class="fg"><label>成品單位</label><select id="rf-unit">'+opts(state.refs.units||[],rec.unit)+'</select></div><div class="fg"><label>批次倍數</label><input id="rf-mult" type="number" min="0.1" step="0.5" value="'+rec.multiplier+'"></div><div class="fg"><label>每批產出</label><input id="rf-batch" type="number" min="1" value="'+rec.perBatch+'"></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:6px">📦 包裝規格 (每一'+esc(rec.unit||'包')+'重量)</div><div class="form-row c3"><div class="fg"><label style="font-size:0.78rem">每包淨重</label><input id="rf-pack-w" type="number" min="0" step="0.1" value="'+(rec.packWeight||'')+'" placeholder="如 1000"></div><div class="fg"><label style="font-size:0.78rem">單位</label><select id="rf-pack-u">'+opts(['g','ml','公斤','公升'],rec.packUnit||'g')+'</select></div><div class="fg"><label style="font-size:0.78rem">說明 (選填)</label><input id="rf-pack-note" value="'+esc(rec.packNote||'')+'" placeholder="如 4支/包"></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:4px">💡 影響:標籤淨重自動帶入、營養標示計算每份用量、成品標籤格式</div></div>'+window.buildPackagingPicker(rec)+'<div style="display:flex;justify-content:space-between;align-items:center;border-top:.5px solid #eee;padding-top:10px;margin:4px 0 8px"><span style="font-size:0.92rem;font-weight:600">🍽️ 食材明細 (不含包材)</span><button class="btn btn-sm btn-success" onclick="addRI()">＋ 新增食材</button></div><div id="ings-c" style="max-height:280px;overflow-y:auto">'+bld()+'</div>'+mF("saveRecipe('"+id+"')"),true);
+modal(mH(id?'編輯配方卡':'新增配方卡')+'<div class="form-row c5"><div class="fg"><label>配方ID</label><input id="rf-id" value="'+esc(rec.id)+'" disabled></div><div class="fg"><label>代碼</label><input id="rf-code" value="'+esc(rec.code)+'"></div><div class="fg" style="grid-column:span 2"><label>配方名稱 *</label><input id="rf-name" value="'+esc(rec.name)+'"></div><div class="fg"><label>分類</label><select id="rf-cat">'+opts(['醬料','主食','配料','湯品','甜點','飲品','其他'],rec.cat||'醬料')+'</select></div></div><div class="form-row c3"><div class="fg"><label>成品單位</label><select id="rf-unit">'+opts(state.refs.units||[],rec.unit)+'</select></div><div class="fg"><label>批次倍數</label><input id="rf-mult" type="number" min="0.1" step="0.5" value="'+rec.multiplier+'"></div><div class="fg"><label>每批產出</label><input id="rf-batch" type="number" min="1" value="'+rec.perBatch+'"></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:6px">📦 包裝規格 (每一'+esc(rec.unit||'包')+'重量)</div><div class="form-row c3"><div class="fg"><label style="font-size:0.78rem">每包淨重</label><input id="rf-pack-w" type="number" min="0" step="0.1" value="'+(rec.packWeight||'')+'" placeholder="如 1000"></div><div class="fg"><label style="font-size:0.78rem">單位</label><select id="rf-pack-u">'+opts(['g','ml','公斤','公升'],rec.packUnit||'g')+'</select></div><div class="fg"><label style="font-size:0.78rem">說明 (選填)</label><input id="rf-pack-note" value="'+esc(rec.packNote||'')+'" placeholder="如 4支/包"></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:4px">💡 影響:標籤淨重自動帶入、營養標示計算每份用量、成品標籤格式</div></div><div style="background:#FCE8E8;border:1px solid #f5b5b5;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#B82525;margin-bottom:6px">♻️ 操作損耗率 (廚房失誤+過期+員工偷吃 等預估損失)</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">操作損耗率 (%)</label><input id="rf-oploss" type="number" min="0" max="50" step="0.5" value="'+((+rec.opLossRate||0)*100).toFixed(1)+'" placeholder="如 5"></div><div class="fg" style="display:flex;align-items:flex-end;font-size:0.78rem;color:#B82525;line-height:1.5">📊 系統建議:依過去 90 天損耗 ÷ 進貨自動算<br>📌 留 0% 表示不計入(用其他方式管控)</div></div><div style="font-size:0.74rem;color:#B82525;margin-top:4px">💡 影響:配方詳情會顯示「全成本」(含可食率 + 操作損耗),建議用全成本計毛利</div></div>'+window.buildPackagingPicker(rec)+'<div style="display:flex;justify-content:space-between;align-items:center;border-top:.5px solid #eee;padding-top:10px;margin:4px 0 8px"><span style="font-size:0.92rem;font-weight:600">🍽️ 食材明細 (不含包材)</span><button class="btn btn-sm btn-success" onclick="addRI()">＋ 新增食材</button></div><div id="ings-c" style="max-height:280px;overflow-y:auto">'+bld()+'</div>'+mF("saveRecipe('"+id+"')"),true);
 window._rebuildRI=()=>{const c=$('ings-c');if(c){c.innerHTML=bld();setTimeout(function(){if(typeof autoUpgradeSelects==='function')autoUpgradeSelects()},30)}}}
 
 // 🆕 智慧搜尋 - 移到 openRecipeModal 外面 (確保第一次載入即可用)
@@ -1523,7 +1638,11 @@ var existIngs=(window._editR.ings||[]).filter(function(ing){
   return !inv||inv.cat!=='包材';
 });
 var mergedIngs=existIngs.concat(pickedPacks);
-const obj={...window._editR,id:eid||$('rf-id')?.value||nxtId(state.recipes,'R'),code:$('rf-code')?.value||'',name,cat:$('rf-cat')?.value||'其他',unit:$('rf-unit')?.value||'包',multiplier:+$('rf-mult')?.value||1,perBatch:+$('rf-batch')?.value||1,packWeight:+$('rf-pack-w')?.value||0,packUnit:$('rf-pack-u')?.value||'g',packNote:$('rf-pack-note')?.value||'',ings:mergedIngs};
+// 操作損耗率 (% → 小數)
+var opLossRate=(+$('rf-oploss')?.value||0)/100;
+if(opLossRate<0)opLossRate=0;
+if(opLossRate>0.5)opLossRate=0.5;
+const obj={...window._editR,id:eid||$('rf-id')?.value||nxtId(state.recipes,'R'),code:$('rf-code')?.value||'',name,cat:$('rf-cat')?.value||'其他',unit:$('rf-unit')?.value||'包',multiplier:+$('rf-mult')?.value||1,perBatch:+$('rf-batch')?.value||1,packWeight:+$('rf-pack-w')?.value||0,packUnit:$('rf-pack-u')?.value||'g',packNote:$('rf-pack-note')?.value||'',opLossRate:opLossRate,ings:mergedIngs};
 if(eid)state.recipes=state.recipes.map(x=>x.id===eid?obj:x);else state.recipes.push(obj);if(eid)saveRecipeVersion(eid,obj);addAudit(eid?'編輯配方':'新增配方',name);saveState();closeModal();renderPage();toast('✅ '+name+' 已儲存 ('+pickedPacks.length+' 項包材)')};
 window.delRecipe=function(id){if(!confirm('確定刪除？'))return;const nm=state.recipes.find(r=>r.id===id)?.name||id;state.recipes=state.recipes.filter(r=>r.id!==id);addAudit('刪除配方',nm);saveState();renderPage()};
 
@@ -1811,7 +1930,17 @@ return pg}
 
 // ── INGREDIENT ───
 function renderIng(){const pg=dv({});const sw=sopBox('ing');if(sw)pg.appendChild(sw);pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'},dv({cls:'page-title',style:'margin:0'},'🥬 食材庫存管理'),dv({style:'display:flex;gap:8px;flex-wrap:wrap'},btn('btn btn-sm btn-outline','📥 匯入缺料',function(){importMissingIngs()},'background:#FCE8E8;color:#B82525;border-color:#f5b5b5'),btn('btn btn-sm btn-outline','📦 匯入包材',function(){importPackagingFromSheets()}),btn('btn btn-sm btn-outline','📊 包材報表',function(){showPackagingReport()},'background:#FCEFE5;color:#9A6210;border-color:#E8C098'),btn('btn btn-primary','＋ 新增食材',()=>openIngModal('')))));
-pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>編號</th><th>食材名稱</th><th>類別</th><th>庫存量</th><th>安全量</th><th>進價/單位</th><th>狀態</th><th style="min-width:140px">操作</th></tr></thead><tbody>'+state.ings.map(i=>`<tr><td style="font-family:monospace;font-size:0.78rem;color:#706E68">${esc(i.id)}</td><td style="font-weight:600">${esc(i.name)}</td><td><span class="badge badge-gray">${esc(i.cat)}</span></td><td style="font-weight:600">${fmt(i.stock,2)} ${esc(i.unit)}</td><td style="color:#706E68">${fmt(i.safety,0)}</td><td>${CUR()} ${fmt(i.price,2)}${i.solidWeight?'<div style="font-size:0.7rem;color:#9A6210">固'+Math.round(i.solidWeight/i.totalWeight*100)+'% $'+getSolidPrice(i).toFixed(0)+'/kg</div>':''}</td><td>${sbadge(i.stock,i.safety)}</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openStockAdj('${i.id}')">📦</button><button class="btn btn-sm btn-outline" onclick="showSubstitutes('${esc(i.name)}')">🔄</button><button class="btn btn-sm btn-outline" onclick="openIngModal('${i.id}')">編輯</button><button class="btn btn-sm btn-danger" onclick="delIng('${i.id}')">刪除</button></div></td></tr>`).join('')+'</tbody></table></div>'}));return pg}
+pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>編號</th><th>食材名稱</th><th>類別</th><th>庫存量</th><th>安全量</th><th>進價/單位</th><th>狀態</th><th style="min-width:140px">操作</th></tr></thead><tbody>'+state.ings.map(i=>{
+  // 🆕 依顯示偏好換算庫存
+  var stockDisplay=fmt(i.stock,2)+' '+esc(i.unit);
+  if(state.meta&&state.meta.unitDisplay&&state.meta.unitDisplay[i.cat]&&state.meta.unitDisplay[i.cat]!=='auto'&&state.meta.unitDisplay[i.cat]!==i.unit){
+    var prefer=state.meta.unitDisplay[i.cat];
+    var converted=window.convertUnit?window.convertUnit(i.stock||0,i.unit,prefer):null;
+    if(converted!=null){
+      stockDisplay='<span title="原始: '+fmt(i.stock,2)+' '+esc(i.unit)+'">'+fmt(converted,2)+' '+esc(prefer)+' <span style="color:#0369a1;font-size:0.74rem">📏</span></span>';
+    }
+  }
+  return `<tr><td style="font-family:monospace;font-size:0.78rem;color:#706E68">${esc(i.id)}</td><td style="font-weight:600">${esc(i.name)}</td><td><span class="badge badge-gray">${esc(i.cat)}</span></td><td style="font-weight:600">${stockDisplay}</td><td style="color:#706E68">${fmt(i.safety,0)}</td><td>${CUR()} ${fmt(i.price,2)}${i.solidWeight?'<div style="font-size:0.7rem;color:#9A6210">固'+Math.round(i.solidWeight/i.totalWeight*100)+'% $'+getSolidPrice(i).toFixed(0)+'/kg</div>':''}</td><td>${sbadge(i.stock,i.safety)}</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openStockAdj('${i.id}')">📦</button><button class="btn btn-sm btn-outline" onclick="showSubstitutes('${esc(i.name)}')">🔄</button><button class="btn btn-sm btn-outline" onclick="openIngModal('${i.id}')">編輯</button><button class="btn btn-sm btn-danger" onclick="delIng('${i.id}')">刪除</button></div></td></tr>`}).join('')+'</tbody></table></div>'}));return pg}
 
 function openIngModal(id){const def={id:nxtId(state.ings,'I'),name:'',cat:'肉類',unit:'公斤',stock:0,safety:0,price:0,sup:'S001',form:'整顆/原形',meatSrc:'',kcal:0,prot:0,fat:0,carb:0,sodium:0};const ing=id?state.ings.find(x=>x.id===id):def;if(!ing)return;
 modal(mH(id?'編輯食材':'新增食材')+`<div class="form-row c3"><div class="fg"><label>食材編號</label><input id="fi-id" value="${esc(ing.id)}"${id?' disabled':''}></div><div class="fg"><label>食材名稱 *</label><input id="fi-name" value="${esc(ing.name)}"></div><div class="fg"><label>類別</label><select id="fi-cat">${opts(state.refs.cats||[],ing.cat)}</select></div></div><div class="form-row c4"><div class="fg"><label>單位</label><select id="fi-unit" onchange="updatePriceConv()">${opts(state.refs.units||[],ing.unit)}</select></div><div class="fg"><label>型態</label><select id="fi-form">${opts(state.refs.forms||[],ing.form)}</select></div><div class="fg"><label>供應商</label><select id="fi-sup">${state.sups.map(s=>`<option value="${s.id}"${s.id===ing.sup?' selected':''}>${s.id} ${esc(s.name)}</option>`).join('')}</select></div><div class="fg"><label>進價 (${CUR()}/單位)</label><input id="fi-price" type="number" min="0" step="0.01" value="${ing.price||0}" oninput="updatePriceConv()"><div id="fi-price-conv" style="font-size:0.74rem;color:#999;margin-top:3px;min-height:14px"></div></div></div><div class="form-row c3"><div class="fg"><label>現有庫存</label><input id="fi-stock" type="number" min="0" step="0.01" value="${ing.stock||0}"></div><div class="fg"><label>安全庫存</label><input id="fi-safety" type="number" min="0" step="0.01" value="${ing.safety||0}"></div><div class="fg"><label>肉品來源</label><select id="fi-meat"><option value="">—</option>${opts(state.refs.meatSrc||[],ing.meatSrc)}</select></div></div><div style="background:#FFF8ED;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📦 固形物重量（罐頭/醃漬品用）</div><div class="form-row c3"><div class="fg"><label>總重量(g)</label><input id="fi-tw" type="number" min="0" step="1" value="${ing.totalWeight||''}" placeholder="整罐/整包重量"></div><div class="fg"><label>固形物重量(g)</label><input id="fi-sw" type="number" min="0" step="1" value="${ing.solidWeight||''}" placeholder="瀝乾後實際重量"></div><div class="fg"><label>固形物比例 / 實際成本</label><div style="padding:8px 0;font-weight:700;color:#0A5A46">${ing.totalWeight&&ing.solidWeight?Math.round(ing.solidWeight/ing.totalWeight*100)+'% ｜ $'+((ing.price||0)/(ing.solidWeight/1000)).toFixed(1)+'/kg':'填入上方欄位自動計算'}</div></div></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🍽️ 可食率 / 備料良率 (Yield Rate)</div><div class="form-row c3"><div class="fg"><label>可食率 (%)</label><input id="fi-yield" type="number" min="1" max="100" step="1" value="${Math.round((ing.yieldRate||1)*100)}" oninput="updateYieldPreview()"><div style="font-size:0.74rem;color:#999;margin-top:3px">100% = 全部可食 (預設)</div></div><div class="fg"><label>真實單位成本 (含損耗)</label><input id="fi-real-cost" type="text" disabled value="—" style="background:#F3F1EB;color:#B82525;font-weight:700"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動 = 進價 ÷ 可食率</div></div><div class="fg"><label>備料損耗預估</label><input id="fi-yield-loss" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">每 1 單位進貨會損耗多少</div></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px;line-height:1.5">💡 範例:鳳梨整顆 60元/kg, 去皮去芯後可食 60% → 真實成本 100元/kg<br>計件類食材 (顆/包/盒) 通常維持 100% (除非有耗損)</div></div><div style="background:#E8F4EE;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="fi-cust-sell" ${ing.customerSell?'checked':''} onchange="toggleCustSellPrice()"><span>🛒 對外可賣 (B2B 客戶可訂購)</span></label></div><div id="fi-cust-sell-price" style="${ing.customerSell?'':'display:none;'}margin-top:8px"><div class="form-row c2"><div class="fg"><label>對外售價 (${CUR()}/單位)</label><input id="fi-sell-price" type="number" min="0" step="0.01" value="${ing.sellPrice||ing.price||0}" oninput="updateMargin()"><div style="font-size:0.74rem;color:#0A5A46;margin-top:3px">客戶下單預設售價,可在客戶資料設專屬價</div></div><div class="fg"><label>毛利率 (參考)</label><input id="fi-margin" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動依進價計算</div></div></div></div></div><div style="background:#F3F1EB;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🏷️ 每100g 營養值（以固形物為基準）</div><div class="form-row c5">${[['fi-kcal','熱量 kcal',ing.kcal||0],['fi-prot','蛋白質 g',ing.prot||0],['fi-fat','脂肪 g',ing.fat||0],['fi-carb','碳水 g',ing.carb||0],['fi-sodium','鈉 mg',ing.sodium||0]].map(([fid,lb,v])=>`<div class="fg"><label>${lb}</label><input id="${fid}" type="number" min="0" step="0.01" value="${v}"></div>`).join('')}</div></div>${mF("saveIng('"+id+"')")}`);
@@ -1819,25 +1948,34 @@ modal(mH(id?'編輯食材':'新增食材')+`<div class="form-row c3"><div class=
 setTimeout(function(){if(typeof updatePriceConv==='function')updatePriceConv();if(typeof updateMargin==='function')updateMargin();if(typeof updateYieldPreview==='function')updateYieldPreview()},80);
 }
 
-// 進價對照工具:當單位是「台斤」時自動顯示對應「公斤」的價格
+// 進價對照工具:依單位類別自動顯示對應換算 (升級版,支援所有單位)
 window.updatePriceConv=function(){
   var unitEl=$('fi-unit'),priceEl=$('fi-price'),convEl=$('fi-price-conv');
   if(!unitEl||!priceEl||!convEl)return;
   var unit=unitEl.value,price=+priceEl.value||0;
-  if(unit==='台斤'&&price>0){
-    var pricePerKg=Math.round(price/0.6*100)/100;
-    convEl.innerHTML='💡 換算：<b style="color:#0A5A46">'+pricePerKg.toLocaleString()+' 元/公斤</b>（1 台斤 = 600g）';
+  if(price<=0){convEl.innerHTML='';return}
+  var u=window.UNIT_DB?window.UNIT_DB[unit]:null;
+  if(!u||u.type==='count'){convEl.innerHTML='';return}
+  
+  if(u.type==='weight'){
+    // 以「每公斤」為基準,加上「每台斤、每磅」做對照
+    var perKg=price/u.toG*1000;
+    var perJin=price/u.toG*600;
+    var perLb=price/u.toG*453.59237;
+    var lines=[];
+    if(unit!=='公斤'&&unit!=='kg')lines.push('<b style="color:#0A5A46">'+perKg.toFixed(2)+' 元/公斤</b>');
+    if(unit!=='台斤'&&unit!=='斤')lines.push(perJin.toFixed(2)+' 元/台斤');
+    if(unit!=='磅'&&unit!=='lb')lines.push(perLb.toFixed(2)+' 元/磅');
+    convEl.innerHTML='💡 換算: '+lines.slice(0,2).join(' ｜ ');
     convEl.style.color='#444';
-  }else if(unit==='公斤'&&price>0){
-    var pricePerJin=Math.round(price*0.6*100)/100;
-    convEl.innerHTML='💡 換算：'+pricePerJin.toLocaleString()+' 元/台斤';
-    convEl.style.color='#999';
-  }else if(unit==='公克'&&price>0){
-    var pricePerKg2=Math.round(price*1000*100)/100;
-    convEl.innerHTML='💡 換算：'+pricePerKg2.toLocaleString()+' 元/公斤';
-    convEl.style.color='#999';
-  }else{
-    convEl.innerHTML='';
+  }else if(u.type==='volume'){
+    var perL=price/u.toMl*1000;
+    var perGal=price/u.toMl*3785.41;
+    var lines=[];
+    if(unit!=='公升'&&unit!=='L')lines.push('<b style="color:#0A5A46">'+perL.toFixed(2)+' 元/公升</b>');
+    if(unit!=='加侖')lines.push(perGal.toFixed(2)+' 元/加侖');
+    convEl.innerHTML='💡 換算: '+lines.slice(0,2).join(' ｜ ');
+    convEl.style.color='#444';
   }
 };
 
@@ -2499,6 +2637,128 @@ window.pushBuyToFinance=function(buyRec){
   }catch(e){}
 };
 
+// ══════════════════════════════════════════════════════
+// 🆕 損耗自動推送到財會
+// ══════════════════════════════════════════════════════
+window.pushWasteToFinance=function(wasteRec){
+  if(!wasteRec||!wasteRec.costAmt||wasteRec.costAmt<=0)return;
+  
+  // 損耗類型 → 財會類別
+  var typeMap={
+    'normal':'損耗-正常',
+    'abnormal':'損耗-異常',
+    'staff':'員工福利-員工餐',
+    'vendor_return':'損耗-廠商退貨'  // 已在 saveWaste 自動抵扣 AP,這裡仍記錄
+  };
+  var category=typeMap[wasteRec.type]||'損耗-其他';
+  
+  var store='總公司';  // 預設總公司,未來可從 wasteRec 取
+  
+  var ledgerEntry={
+    id:'lg'+Date.now()+'_w',
+    date:wasteRec.date||toDay(),
+    store:store,
+    category:category,
+    item:wasteRec.name||'',
+    qty:wasteRec.lossQty||0,
+    unit:wasteRec.unit||'',
+    unitPrice:0,
+    amount:-(wasteRec.costAmt||0),  // 支出為負
+    source:'erp_waste',
+    sourceId:wasteRec.id,
+    note:'損耗 - '+(wasteRec.reason||'')+(wasteRec.handle?' | '+wasteRec.handle:''),
+    createdAt:new Date().toISOString()
+  };
+  
+  // 寫到 Firebase 跨系統共用路徑
+  if(typeof firebase!=='undefined'&&firebase.firestore){
+    try{
+      var db=firebase.firestore();
+      db.collection('prod_finance').doc('ledger').get().then(function(doc){
+        var data=doc.exists?doc.data().entries||[]:[];
+        if(data.find(function(e){return e.sourceId===wasteRec.id&&e.source==='erp_waste'}))return;
+        data.push(ledgerEntry);
+        db.collection('prod_finance').doc('ledger').set({entries:data}).then(function(){
+          console.log('[ERP→財會] 已推送損耗',wasteRec.name);
+        }).catch(function(e){
+          console.warn('[ERP→財會] 推送失敗',e.message);
+        });
+      }).catch(function(e){
+        console.warn('[ERP→財會] 連線失敗',e.message);
+      });
+    }catch(e){
+      console.warn('[ERP→財會] Firebase 不可用',e.message);
+    }
+  }
+  // 本地暫存備份
+  try{
+    var local=JSON.parse(localStorage.getItem('hm_pending_finance')||'[]');
+    local.push(ledgerEntry);
+    if(local.length>500)local=local.slice(-500);
+    localStorage.setItem('hm_pending_finance',JSON.stringify(local));
+  }catch(e){}
+};
+
+// ══════════════════════════════════════════════════════
+// 🆕 計算歷史平均損耗率 (給配方/食材參考)
+// 過去 90 天內某食材的損耗 ÷ 進貨
+// ══════════════════════════════════════════════════════
+window.calcHistoricalLossRate=function(ingName){
+  if(!ingName)return 0;
+  var now=new Date();
+  var cutoff=new Date(now.getTime()-90*24*60*60*1000);
+  var cutoffStr=cutoff.toISOString().substring(0,10);
+  
+  // 過去 90 天的進貨總量 (公克單位)
+  var totalBuyG=0;
+  (state.buyLog||[]).forEach(function(b){
+    if(b.ingName!==ingName||b.date<cutoffStr)return;
+    var inv=(state.ings||[]).find(function(x){return x.name===ingName});
+    if(!inv)return;
+    var g=unitToG(b.qty||0,b.unit||inv.unit);
+    if(!isNaN(g))totalBuyG+=g;
+  });
+  
+  // 過去 90 天的損耗總量
+  var totalLossG=0;
+  (state.waste||[]).forEach(function(w){
+    if(w.name!==ingName||w.date<cutoffStr)return;
+    var g=unitToG(w.lossQty||0,w.unit||'');
+    if(!isNaN(g))totalLossG+=g;
+  });
+  
+  if(totalBuyG<=0)return 0;
+  var rate=totalLossG/totalBuyG;
+  // 上限 50% 防止極端值
+  return Math.min(rate,0.5);
+};
+
+// 計算本月損耗統計 (儀表板用)
+window.calcMonthlyWasteStats=function(){
+  var now=new Date();
+  var monthStart=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';
+  
+  var stats={total:0,normal:0,abnormal:0,staff:0,vendor_return:0,count:0,buyTotal:0,wasteRate:0};
+  
+  (state.waste||[]).forEach(function(w){
+    if(w.date<monthStart)return;
+    var amt=+w.costAmt||0;
+    stats.total+=amt;
+    stats.count++;
+    if(w.type)stats[w.type]=(stats[w.type]||0)+amt;
+  });
+  
+  // 算進貨總額作分母
+  (state.buyLog||[]).forEach(function(b){
+    if(b.date<monthStart)return;
+    stats.buyTotal+=+b.total||0;
+  });
+  
+  if(stats.buyTotal>0)stats.wasteRate=stats.total/stats.buyTotal;
+  return stats;
+};
+
+
 // 顯示「待推送財會」狀態
 window.showFinancePending=function(){
   var local=[];
@@ -2762,6 +3022,11 @@ window.saveWaste=function(){
   addAudit('記錄損耗('+window.WASTE_TYPES[type].label+')',nm+' '+loss+unit+' 扣庫存 '+fmt(deductInStockUnit,2)+ing.unit+' 損耗成本 '+CUR()+fmt(costAmt,0));
   saveState();closeModal();renderPage();
   toast('✅ 損耗已記錄並扣減庫存\n'+nm+' -'+fmt(deductInStockUnit,2)+ing.unit);
+  // 🆕 自動推送到財會
+  var lastWaste=state.waste[state.waste.length-1];
+  if(typeof pushWasteToFinance==='function'&&lastWaste){
+    try{pushWasteToFinance(lastWaste)}catch(e){console.warn('損耗→財會推送失敗',e)}
+  }
 };
 
 // ── SUPPLIER ───
@@ -2783,6 +3048,194 @@ window.saveSup=function(eid){const name=$('s-name')?.value?.trim();if(!name){ale
 window.delSup=function(id){if(!confirm('確定刪除？'))return;state.sups=state.sups.filter(s=>s.id!==id);saveState();renderPage()};
 
 // ── BUY LOG ───
+// ── ORDER (叫/出貨表) ───
+// 配合既有 SHEETS 全域變數 (4 張表 231 項)
+function renderOrder(){
+  const pg=dv({});
+  const sw=sopBox('order');
+  if(sw)pg.appendChild(sw);
+  
+  // 取/設目前分頁
+  if(!state._orderTab)state._orderTab=SHEETS[0]?.id||'';
+  // 確保 state.orderLog 存在
+  if(!state.orderLog)state.orderLog=[];
+  // 確保暫存買數
+  if(!state._orderDraft)state._orderDraft={};
+  
+  const curSheet=SHEETS.find(function(s){return s.id===state._orderTab})||SHEETS[0];
+  
+  // 標題列 + 動作按鈕
+  pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px'},
+    dv({cls:'page-title',style:'margin:0'},'📋 叫/出貨表'),
+    dv({style:'display:flex;gap:6px;flex-wrap:wrap'},
+      btn('btn btn-sm btn-outline','📥 匯入 Excel',function(){if(typeof openXlModal==='function')openXlModal();else alert('Excel 匯入功能未載入')}),
+      btn('btn btn-sm btn-outline','📦 匯出全部',function(){if(typeof exportAllSheets==='function')exportAllSheets();else alert('匯出功能未載入')}),
+      btn('btn btn-sm btn-outline','📄 列印目前表單',function(){window.print()}),
+      btn('btn btn-primary','💾 儲存叫貨單',function(){saveOrderLog()})
+    )
+  ));
+  
+  // 4 張分頁切換
+  var tabBar=dv({style:'display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;border-bottom:2px solid #E0E0E0;padding-bottom:0'});
+  SHEETS.forEach(function(s){
+    var isActive=s.id===state._orderTab;
+    var tabBtn=dv({style:'padding:10px 16px;cursor:pointer;border-radius:6px 6px 0 0;font-weight:'+(isActive?'700':'400')+';background:'+(isActive?'#0A5A46':'transparent')+';color:'+(isActive?'#fff':'#555')+';border-bottom:'+(isActive?'2px solid #0A5A46':'2px solid transparent')+';margin-bottom:-2px',html:s.title+' <span style="font-size:0.74rem;opacity:0.85">('+(s.items||[]).length+')</span>'});
+    tabBtn.onclick=function(){state._orderTab=s.id;renderPage()};
+    tabBar.appendChild(tabBtn);
+  });
+  pg.appendChild(tabBar);
+  
+  if(!curSheet){
+    pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'尚無叫貨表資料'));
+    return pg;
+  }
+  
+  // 統計目前有填數量的數
+  var draft=state._orderDraft[curSheet.id]||{};
+  var filledCount=0,subtotal=0;
+  (curSheet.items||[]).forEach(function(it){
+    var qty=+draft[it.seq]||0;
+    if(qty>0){filledCount++;subtotal+=qty*(it.price||0)}
+  });
+  
+  // 統計卡
+  pg.appendChild(dv({cls:'grid3',style:'margin-bottom:14px'},
+    metCard('表單編號',curSheet.formNo||'—',''),
+    metCard('已填項目',filledCount+' / '+(curSheet.items||[]).length+' 項',''),
+    metCard('小計金額',CUR()+fmt(subtotal,0),'',subtotal>0?'#0A5A46':'#999')
+  ));
+  
+  // 主表格
+  var card=dv({cls:'card',style:'padding:0;overflow:hidden'});
+  var rows=(curSheet.items||[]).map(function(it){
+    var qty=+draft[it.seq]||0;
+    var total=qty*(it.price||0);
+    var rowStyle=qty>0?'background:#F5FBF8':'';
+    return '<tr style="'+rowStyle+'"><td style="text-align:center;color:#706E68;font-size:0.78rem;width:50px">'+it.seq+'</td><td style="font-weight:'+(qty>0?'600':'400')+';color:#1E1E1C">'+esc(it.name)+'</td><td style="text-align:center;width:60px;color:#706E68;font-size:0.86rem">'+esc(it.unit)+'</td><td style="text-align:right;width:90px;color:#0A5A46;font-weight:600">'+CUR()+(it.price||0)+'</td><td style="width:120px"><input type="number" min="0" step="0.5" value="'+(qty>0?qty:'')+'" data-seq="'+it.seq+'" placeholder="0" style="width:90px;padding:6px 8px;border:1px solid #ddd;border-radius:4px;text-align:right" onchange="updateOrderQty(\''+curSheet.id+'\','+it.seq+',this.value)"></td><td style="text-align:right;width:90px;color:'+(total>0?'#0A5A46':'#ccc')+';font-weight:'+(total>0?'700':'400')+'">'+(total>0?CUR()+fmt(total,0):'—')+'</td></tr>';
+  }).join('');
+  
+  card.innerHTML='<div style="overflow-x:auto;max-height:60vh;overflow-y:auto"><table class="tbl" style="margin:0"><thead style="position:sticky;top:0;background:#FAFBF7;z-index:5"><tr><th>序</th><th>品項</th><th>單位</th><th style="text-align:right">單價</th><th>數量</th><th style="text-align:right">小計</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  pg.appendChild(card);
+  
+  // 歷史叫貨單
+  var myLogs=(state.orderLog||[]).filter(function(o){return o.sheetId===curSheet.id}).slice(-5).reverse();
+  if(myLogs.length>0){
+    var logCard=dv({cls:'card',style:'margin-top:14px'});
+    logCard.innerHTML='<div class="card-title">📋 近期叫貨記錄 ('+curSheet.title+')</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>品項數</th><th>合計金額</th><th>狀態</th><th>操作</th></tr></thead><tbody>'+myLogs.map(function(o){var statusBg=o.status==='已出貨'?'#dcfce7':o.status==='已取消'?'#fee2e2':'#dbeafe';var statusColor=o.status==='已出貨'?'#166534':o.status==='已取消'?'#991b1b':'#1e40af';return '<tr><td>'+esc(o.date)+'</td><td>'+(o.items||[]).length+' 項</td><td style="color:#0A5A46;font-weight:700">'+CUR()+fmt(o.totalAmt||0,0)+'</td><td><span style="background:'+statusBg+';color:'+statusColor+';padding:2px 8px;border-radius:4px;font-size:0.78rem;font-weight:700">'+esc(o.status||'草稿')+'</span></td><td><button class="btn btn-sm btn-outline" onclick="viewOrderLog(\''+o.id+'\')">查看</button>'+(o.status==='草稿'?' <button class="btn btn-sm btn-outline" onclick="markOrderShipped(\''+o.id+'\')" style="background:#dcfce7;color:#166534">✓ 標記出貨</button>':'')+' <button class="btn btn-sm btn-danger" onclick="delOrderLog(\''+o.id+'\')">刪除</button></td></tr>'}).join('')+'</tbody></table></div>';
+    pg.appendChild(logCard);
+  }
+  
+  return pg;
+}
+
+// 更新叫貨數量 (暫存)
+window.updateOrderQty=function(sheetId,seq,val){
+  if(!state._orderDraft)state._orderDraft={};
+  if(!state._orderDraft[sheetId])state._orderDraft[sheetId]={};
+  var qty=+val||0;
+  if(qty>0)state._orderDraft[sheetId][seq]=qty;
+  else delete state._orderDraft[sheetId][seq];
+  // 重算小計但不整頁刷新 (太重)
+  var draft=state._orderDraft[sheetId]||{};
+  var sheet=SHEETS.find(function(s){return s.id===sheetId});
+  if(!sheet)return;
+  var filledCount=0,subtotal=0;
+  (sheet.items||[]).forEach(function(it){
+    var q=+draft[it.seq]||0;
+    if(q>0){filledCount++;subtotal+=q*(it.price||0)}
+  });
+  // 更新統計卡 (找特定 metric-val)
+  var cards=document.querySelectorAll('.metric-val');
+  if(cards.length>=3){
+    cards[1].textContent=filledCount+' / '+(sheet.items||[]).length+' 項';
+    cards[2].textContent=CUR()+fmt(subtotal,0);
+    cards[2].style.color=subtotal>0?'#0A5A46':'#999';
+  }
+  // 高亮該行
+  var tr=document.querySelector('input[data-seq="'+seq+'"]')?.closest('tr');
+  if(tr){
+    tr.style.background=qty>0?'#F5FBF8':'';
+    var totalCell=tr.querySelector('td:last-child');
+    if(totalCell){
+      var t=qty*(sheet.items.find(function(x){return x.seq===seq})?.price||0);
+      totalCell.innerHTML=t>0?CUR()+fmt(t,0):'—';
+      totalCell.style.color=t>0?'#0A5A46':'#ccc';
+      totalCell.style.fontWeight=t>0?'700':'400';
+    }
+  }
+};
+
+// 儲存叫貨單
+window.saveOrderLog=function(){
+  var sheetId=state._orderTab;
+  var sheet=SHEETS.find(function(s){return s.id===sheetId});
+  if(!sheet){alert('未選擇叫貨表');return}
+  var draft=state._orderDraft[sheetId]||{};
+  var items=[];
+  var totalAmt=0;
+  (sheet.items||[]).forEach(function(it){
+    var qty=+draft[it.seq]||0;
+    if(qty>0){
+      var subtotal=qty*(it.price||0);
+      items.push({seq:it.seq,name:it.name,unit:it.unit,qty:qty,price:it.price||0,subtotal:subtotal});
+      totalAmt+=subtotal;
+    }
+  });
+  if(items.length===0){alert('請至少填一個項目的數量');return}
+  if(!confirm('確認儲存叫貨單?\n\n表單:'+sheet.title+'\n項目:'+items.length+' 項\n合計:'+CUR()+fmt(totalAmt,0)))return;
+  
+  if(!state.orderLog)state.orderLog=[];
+  var rec={
+    id:'O'+Date.now(),
+    sheetId:sheetId,
+    sheetTitle:sheet.title,
+    date:toDay(),
+    items:items,
+    totalAmt:totalAmt,
+    status:'草稿',
+    createdAt:new Date().toISOString()
+  };
+  state.orderLog.push(rec);
+  // 清空 draft
+  delete state._orderDraft[sheetId];
+  addAudit('儲存叫貨單',sheet.title+' '+items.length+'項 '+CUR()+fmt(totalAmt,0));
+  saveState();
+  toast('✅ 叫貨單已儲存 ('+items.length+' 項,'+CUR()+fmt(totalAmt,0)+')');
+  renderPage();
+};
+
+window.viewOrderLog=function(id){
+  var rec=(state.orderLog||[]).find(function(o){return o.id===id});
+  if(!rec)return;
+  var rows=(rec.items||[]).map(function(it,idx){
+    return '<tr><td style="text-align:center;color:#706E68">'+(idx+1)+'</td><td style="font-weight:600">'+esc(it.name)+'</td><td>'+it.qty+' '+esc(it.unit)+'</td><td style="text-align:right">'+CUR()+it.price+'</td><td style="text-align:right;color:#0A5A46;font-weight:700">'+CUR()+fmt(it.subtotal,0)+'</td></tr>';
+  }).join('');
+  modal(mH('📋 叫貨單明細 - '+esc(rec.sheetTitle))+
+    '<div style="background:#F3F1EB;border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;font-size:0.86rem"><div><b>日期:</b> '+esc(rec.date)+'</div><div><b>狀態:</b> '+esc(rec.status||'草稿')+'</div><div><b>合計:</b> <span style="color:#0A5A46;font-weight:700">'+CUR()+fmt(rec.totalAmt||0,0)+'</span></div></div>'+
+    '<div style="overflow-x:auto;max-height:60vh;overflow-y:auto"><table class="tbl"><thead><tr><th>序</th><th>品項</th><th>數量</th><th>單價</th><th>小計</th></tr></thead><tbody>'+rows+'</tbody></table></div>',
+  true);
+};
+
+window.markOrderShipped=function(id){
+  var rec=(state.orderLog||[]).find(function(o){return o.id===id});
+  if(!rec)return;
+  if(!confirm('確認此叫貨單已出貨?'))return;
+  rec.status='已出貨';
+  rec.shippedAt=new Date().toISOString();
+  addAudit('叫貨單出貨',rec.sheetTitle);
+  saveState();
+  toast('✅ 已標記為出貨');
+  renderPage();
+};
+
+window.delOrderLog=function(id){
+  if(!confirm('確認刪除此叫貨單?'))return;
+  state.orderLog=(state.orderLog||[]).filter(function(o){return o.id!==id});
+  saveState();
+  toast('✅ 已刪除');
+  renderPage();
+};
+
 function renderBuy(){const pg=dv({});const sw=sopBox('buy');if(sw)pg.appendChild(sw);const total=state.buyLog.reduce((s,b)=>s+b.total,0);
 pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'},dv({cls:'page-title',style:'margin:0'},'🛍️ 進貨記錄'),btn('btn btn-primary','＋ 登錄進貨',()=>openBuyModal(''))));
 pg.appendChild(dv({cls:'grid3',style:'margin-bottom:12px'},metCard('進貨記錄',state.buyLog.length,'筆'),metCard('本月進貨',CUR()+fmt(state.buyLog.filter(b=>b.date.startsWith(toMon())).reduce((s,b)=>s+b.total,0)),''),metCard('累積進貨',CUR()+fmt(total),'')));
@@ -2801,6 +3254,33 @@ function renderRef(){const pg=dv({});const sw=sopBox('ref');if(sw)pg.appendChild
 var dcCard=dv({cls:'card',style:'background:linear-gradient(135deg,#fff4e6,#fff8ed);border:1px solid #f5c98a'});
 dcCard.innerHTML='<div class="card-title" style="color:#9A6210">🗑️ 資料清理工具</div><div style="font-size:0.86rem;color:#9A6210;margin-bottom:10px;line-height:1.6">系統使用一段時間後可能累積無用資料 (未使用食材、過期訂單、停用客戶等),建議定期清理以提升效能與資料整潔度。</div><button class="btn btn-primary" onclick="showDataCleaning()" style="background:#9A6210">🗑️ 開啟資料清理</button>';
 pg.appendChild(dcCard);
+
+// 🆕 顯示單位偏好設定 (依類別客製化)
+var udPref=(state.meta&&state.meta.unitDisplay)||{};
+var weightOpts=['auto','公斤','台斤','磅','公克','盎司'];
+var volumeOpts=['auto','公升','毫升','加侖'];
+var udCard=dv({cls:'card',style:'background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #7dd3fc'});
+var udHtml='<div class="card-title" style="color:#0369a1">📏 顯示單位偏好 (依類別)</div>';
+udHtml+='<div style="font-size:0.86rem;color:#0369a1;margin-bottom:12px;line-height:1.6">系統內部統一以「公克」儲存,但顯示時可依你習慣的單位呈現。<br>例如:肉類顯示「台斤」、海鮮顯示「公斤」、調味料顯示「公升」<br>「auto」 = 顯示原始輸入單位</div>';
+// 重量類別
+udHtml+='<div style="font-weight:700;color:#0A5A46;margin-bottom:6px;font-size:0.9rem">⚖️ 重量類食材</div><div class="form-row c4">';
+[['肉類','meat'],['海鮮','seafood'],['蔬菜','vege'],['穀物','grain'],['乳製品','dairy'],['豆製品','soy'],['調味料','sauce'],['香料','spice'],['半成品','semi'],['其他','other']].forEach(function(c){
+  var current=udPref[c[0]]||'auto';
+  udHtml+='<div class="fg"><label>'+c[0]+'</label><select id="ud-'+c[1]+'" data-cat="'+c[0]+'">'+weightOpts.map(function(o){return '<option value="'+o+'"'+(o===current?' selected':'')+'>'+(o==='auto'?'auto (原單位)':o)+'</option>'}).join('')+'</select></div>';
+});
+udHtml+='</div>';
+// 容量類別
+udHtml+='<div style="font-weight:700;color:#0A5A46;margin:12px 0 6px;font-size:0.9rem">💧 容量類食材</div><div class="form-row c3">';
+[['食用油','oil'],['飲品材料','drink']].forEach(function(c){
+  var current=udPref[c[0]]||'auto';
+  udHtml+='<div class="fg"><label>'+c[0]+'</label><select id="ud-'+c[1]+'" data-cat="'+c[0]+'">'+volumeOpts.map(function(o){return '<option value="'+o+'"'+(o===current?' selected':'')+'>'+(o==='auto'?'auto (原單位)':o)+'</option>'}).join('')+'</select></div>';
+});
+udHtml+='</div>';
+udHtml+='<div style="margin-top:14px"><button class="btn btn-primary" onclick="saveUnitDisplay()" style="background:#0369a1">💾 儲存顯示偏好</button>';
+udHtml+=' <button class="btn btn-outline btn-sm" onclick="resetUnitDisplay()" style="margin-left:6px">↻ 全部重設為 auto</button></div>';
+udCard.innerHTML=udHtml;
+pg.appendChild(udCard);
+
 const mc=dv({cls:'card'});mc.appendChild(dv({cls:'card-title'},'🏢 公司基本資訊'));mc.innerHTML+=`<div class="form-row c2"><div class="fg"><label>公司名稱</label><input id="mc-name" value="${esc(state.meta.company||'')}"></div><div class="fg"><label>統一編號</label><input id="mc-taxid" value="${esc(state.meta.taxId||'')}"></div></div><div class="form-row c2"><div class="fg"><label>電話</label><input id="mc-phone" value="${esc(state.meta.phone||'')}"></div><div class="fg"><label>地址</label><input id="mc-addr" value="${esc(state.meta.address||'')}"></div></div><div class="fg" style="margin-bottom:10px"><label>門市列表（逗號分隔）</label><input id="mc-stores" value="${esc((state.meta.stores||[]).join(', '))}"></div><div class="form-row c2"><div class="fg"><label>目標毛利率 (%)</label><input id="mc-margin" type="number" min="1" max="99" value="${Math.round((state.meta.targetMargin||0.65)*100)}"></div><div class="fg"><label>貨幣符號</label><input id="mc-cur" value="${esc(state.meta.currency||'NT$')}"></div></div><div><button class="btn btn-primary" onclick="saveMetaSettings()">💾 儲存公司設定</button></div>`;pg.appendChild(mc);
 var verCard=dv({cls:'card'});verCard.appendChild(dv({cls:'card-title'},'📌 系統版本'));
 verCard.innerHTML+='<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:1.1rem;font-weight:700;color:#0A5A46">v'+SYSTEM_VERSION+'</span><span style="font-size:0.82rem;color:#706E68;margin-left:8px">Build '+BUILD_NUMBER+'</span></div><button class="btn btn-sm btn-outline" onclick="showVersionInfo()">查看修改紀錄</button></div>';
@@ -2827,6 +3307,29 @@ const FL=[{k:'cats',l:'食材類別'},{k:'units',l:'計量單位'},{k:'forms',l:
 const grid=dv({cls:'grid2'});FL.forEach(({k,l})=>{const items=state.refs[k]||[];const card=dv({cls:'card'});card.appendChild(dv({cls:'card-title'},l+'（'+items.length+' 項）'));const tg=dv({style:'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px'});items.forEach((item,i)=>{const tag=dv({style:'display:inline-flex;align-items:center;gap:3px;background:#eee;border-radius:20px;padding:3px 10px;font-size:0.85rem'},item);const del=el('button',{style:'border:none;background:none;cursor:pointer;color:#706E68;font-size:0.85rem;padding:0',txt:'✕'});del.addEventListener('click',()=>{if(confirm('確定刪除「'+item+'」？')){state.refs[k]=items.filter((_,j)=>j!==i);saveState();renderPage()}});tag.appendChild(del);tg.appendChild(tag)});card.appendChild(tg);const row=dv({style:'display:flex;gap:6px'});const inp=el('input',{type:'text',placeholder:'輸入新選項...',style:'flex:1;border:.5px solid #d0d0d0;border-radius:6px;padding:5px 8px;font-size:0.85rem;outline:none;font-family:inherit'});const addB=btn('btn btn-sm btn-primary','新增',()=>{const v=inp.value.trim();if(!v||items.includes(v))return;state.refs[k]=[...items,v];saveState();renderPage()});inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addB.click()}});row.appendChild(inp);row.appendChild(addB);card.appendChild(row);grid.appendChild(card)});pg.appendChild(grid);return pg}
 
 window.saveMetaSettings=function(){state.meta.company=$('mc-name')?.value||'';state.meta.taxId=$('mc-taxid')?.value||'';state.meta.phone=$('mc-phone')?.value||'';state.meta.address=$('mc-addr')?.value||'';state.meta.stores=($('mc-stores')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);state.meta.targetMargin=(+$('mc-margin')?.value||65)/100;state.meta.currency=$('mc-cur')?.value||'NT$';saveState();renderPage();toast('✅ 公司設定已儲存')};
+
+// 🆕 儲存顯示單位偏好
+window.saveUnitDisplay=function(){
+  if(!state.meta)state.meta={};
+  if(!state.meta.unitDisplay)state.meta.unitDisplay={};
+  document.querySelectorAll('[id^="ud-"]').forEach(function(s){
+    var cat=s.dataset.cat;
+    var val=s.value;
+    if(cat)state.meta.unitDisplay[cat]=val;
+  });
+  saveState();
+  toast('✅ 顯示單位偏好已儲存\n食材列表/配方頁將依此顯示');
+  setTimeout(function(){renderPage()},300);
+};
+
+// 🆕 重設顯示偏好
+window.resetUnitDisplay=function(){
+  if(!confirm('確認全部重設為 auto (原始單位)?'))return;
+  if(state.meta)state.meta.unitDisplay={};
+  saveState();
+  toast('✅ 已全部重設');
+  setTimeout(function(){renderPage()},300);
+};
 function exportBackup(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='好洺ERP備份_'+toDay()+'.json';a.click();toast('✅ 備份已下載')}
 function importBackup(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.ings)throw new Error();if(!confirm('確定匯入？目前資料將被覆蓋'))return;Object.assign(state,d);saveState();renderPage();toast('✅ 備份已匯入')}catch{alert('❌ 無效的備份檔案')}};reader.readAsText(file);e.target.value=''}
 function clearAllData(){if(!confirm('⚠️ 確定清除所有資料？'))return;if(!confirm('再次確認？'))return;localStorage.removeItem(COST_KEY);location.reload()}
@@ -3631,21 +4134,153 @@ rv.innerHTML=html};
 // 📅 生產排程
 // ══════════════════════════════════════════
 function renderSchedule(){var pg=dv({});var sw=sopBox('schedule');if(sw)pg.appendChild(sw);var list=state.prodSchedule||[];
-pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px'},dv({cls:'page-title',style:'margin:0'},'📅 生產排程'),btn('btn btn-primary','＋ 新增排程',function(){openScheduleModal()})));
+
+if(!state._scheduleView)state._scheduleView='list';
+
+pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px'},
+  dv({cls:'page-title',style:'margin:0'},'📅 生產排程'),
+  dv({style:'display:flex;gap:6px;flex-wrap:wrap'},
+    btn('btn '+(state._scheduleView==='list'?'btn-primary':'btn-outline')+' btn-sm','📋 清單',function(){state._scheduleView='list';renderPage()}),
+    btn('btn '+(state._scheduleView==='calendar'?'btn-primary':'btn-outline')+' btn-sm','📆 日曆',function(){state._scheduleView='calendar';renderPage()}),
+    btn('btn btn-primary','＋ 新增排程',function(){openScheduleModal()})
+  )
+));
+
 pg.appendChild(dv({cls:'grid4',style:'margin-bottom:16px'},metCard('排程總數',list.length+' 筆',''),metCard('今日排程',list.filter(function(s){return s.date===toDay()}).length+' 筆',''),metCard('待生產',list.filter(function(s){return s.status==='待生產'}).length+' 筆',''),metCard('已完成',list.filter(function(s){return s.status==='已完成'}).length+' 筆','')));
-if(!list.length){pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'尚無排程，點擊「＋ 新增排程」開始規劃生產'));return pg}
-pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>時段</th><th>配方</th><th>倍數</th><th>預計產出</th><th>負責人</th><th>狀態</th><th>操作</th></tr></thead><tbody>'+list.slice().reverse().map(function(s){var stMap={'待生產':'badge-warn','生產中':'badge-blue','已完成':'badge-green','已取消':'badge-red'};return'<tr><td style="font-weight:600">'+esc(s.date)+'</td><td>'+esc(s.timeSlot||'—')+'</td><td style="font-weight:700">'+esc(s.recipeName)+'</td><td>x'+fmt(s.multiplier,1)+'</td><td style="color:#7A4D0B;font-weight:700">'+fmt(s.output,1)+' '+esc(s.unit)+'</td><td>'+esc(s.assignee||'—')+'</td><td><span class="badge '+(stMap[s.status]||'badge-gray')+'">'+esc(s.status)+'</span></td><td><div style="display:flex;gap:4px">'+(s.status==='待生產'?'<button class="btn btn-sm btn-success" onclick="execSchedule(\''+s.id+'\')">開始生產</button><button class="btn btn-sm btn-danger" onclick="cancelSchedule(\''+s.id+'\')">取消</button>':'')+(s.status==='生產中'?'<button class="btn btn-sm btn-primary" onclick="completeSchedule(\''+s.id+'\')">完成</button>':'—')+'</div></td></tr>'}).join('')+'</tbody></table></div>'}));return pg}
+
+if(!list.length){pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'尚無排程,點擊「＋ 新增排程」開始規劃生產'));return pg}
+
+// 日曆視圖
+if(state._scheduleView==='calendar'){
+  var now=new Date();
+  var year=now.getFullYear(),month=now.getMonth();
+  var firstDay=new Date(year,month,1);
+  var lastDay=new Date(year,month+1,0);
+  var startWeekDay=firstDay.getDay();
+  var daysInMonth=lastDay.getDate();
+  var weekNames=['日','一','二','三','四','五','六'];
+  
+  var byDate={};
+  list.forEach(function(s){if(!byDate[s.date])byDate[s.date]=[];byDate[s.date].push(s)});
+  
+  var calCard=dv({cls:'card'});
+  var html='<div class="card-title">📆 '+year+' 年 '+(month+1)+' 月排程</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-weight:700;text-align:center;padding:8px 0;background:#F3F1EB;border-radius:6px;margin-bottom:8px">';
+  weekNames.forEach(function(w,i){html+='<div style="color:'+(i===0||i===6?'#B82525':'#1E1E1C')+';font-size:0.86rem">'+w+'</div>'});
+  html+='</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">';
+  // 空白格
+  for(var i=0;i<startWeekDay;i++)html+='<div></div>';
+  // 月份格子
+  for(var d=1;d<=daysInMonth;d++){
+    var dStr=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var dayItems=byDate[dStr]||[];
+    var isToday=dStr===toDay();
+    var bg=isToday?'#FCEFE5':'#fff';
+    var border=isToday?'2px solid #9A6210':'1px solid #E0E0E0';
+    html+='<div style="background:'+bg+';border:'+border+';border-radius:6px;padding:6px;min-height:80px;font-size:0.78rem"><div style="font-weight:700;color:'+(isToday?'#9A6210':'#555')+';margin-bottom:3px">'+d+(isToday?' 今天':'')+'</div>';
+    dayItems.slice(0,3).forEach(function(s){
+      var stColor={'待生產':'#9A6210','生產中':'#1455A0','已完成':'#0A5A46','已取消':'#999'}[s.status]||'#555';
+      html+='<div style="background:'+stColor+';color:#fff;padding:2px 4px;border-radius:3px;margin-bottom:2px;font-size:0.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(s.recipeName)+' x'+s.multiplier+' ['+s.status+']">'+esc(s.recipeName.substring(0,8))+(s.recipeName.length>8?'...':'')+'</div>';
+    });
+    if(dayItems.length>3)html+='<div style="font-size:0.7rem;color:#666;text-align:center">+'+(dayItems.length-3)+' 筆</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div style="display:flex;justify-content:center;gap:14px;margin-top:14px;font-size:0.78rem"><span><span style="display:inline-block;width:14px;height:14px;background:#9A6210;border-radius:3px;vertical-align:middle;margin-right:4px"></span>待生產</span><span><span style="display:inline-block;width:14px;height:14px;background:#1455A0;border-radius:3px;vertical-align:middle;margin-right:4px"></span>生產中</span><span><span style="display:inline-block;width:14px;height:14px;background:#0A5A46;border-radius:3px;vertical-align:middle;margin-right:4px"></span>已完成</span></div>';
+  calCard.innerHTML=html;
+  pg.appendChild(calCard);
+  return pg;
+}
+
+// 清單視圖 (預設)
+pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>時段</th><th>配方</th><th>倍數</th><th>預計產出</th><th>負責人</th><th>狀態</th><th>操作</th></tr></thead><tbody>'+list.slice().reverse().map(function(s){var stMap={'待生產':'badge-warn','生產中':'badge-blue','已完成':'badge-green','已取消':'badge-red'};return'<tr><td style="font-weight:600">'+esc(s.date)+'</td><td>'+esc(s.timeSlot||'—')+'</td><td style="font-weight:700">'+esc(s.recipeName)+'</td><td>x'+fmt(s.multiplier,1)+'</td><td style="color:#7A4D0B;font-weight:700">'+fmt(s.output,1)+' '+esc(s.unit)+'</td><td>'+esc(s.assignee||'—')+'</td><td><span class="badge '+(stMap[s.status]||'badge-gray')+'">'+esc(s.status)+'</span>'+(s.deductedAt?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">✓ 已扣料</div>':'')+'</td><td><div style="display:flex;gap:4px;flex-wrap:wrap">'+(s.status==='待生產'?'<button class="btn btn-sm btn-success" onclick="execSchedule(\''+s.id+'\')">▶️ 開始+扣料</button><button class="btn btn-sm btn-danger" onclick="cancelSchedule(\''+s.id+'\')">取消</button>':'')+(s.status==='生產中'?'<button class="btn btn-sm btn-primary" onclick="completeSchedule(\''+s.id+'\')">✓ 完成</button>':'')+(s.status==='已完成'||s.status==='已取消'?'—':'')+'</div></td></tr>'}).join('')+'</tbody></table></div>'}));return pg}
 
 window.openScheduleModal=function(){var recs=state.recipes||[];
-modal(mH('新增生產排程')+'<div class="form-row c3"><div class="fg"><label>生產日期</label><input id="sc-date" type="date" value="'+toDay()+'"></div><div class="fg"><label>時段</label><select id="sc-time"><option>06:00-09:00 早班</option><option>09:00-12:00 上午</option><option>13:00-17:00 下午</option><option>17:00-21:00 晚班</option></select></div><div class="fg"><label>負責人</label><input id="sc-who" placeholder="姓名"></div></div><div class="form-row c3"><div class="fg"><label>配方</label><select id="sc-rec">'+recs.map(function(r){return'<option value="'+r.id+'" data-name="'+esc(r.name)+'" data-batch="'+r.perBatch+'" data-unit="'+esc(r.unit)+'">'+esc(r.name)+'</option>'}).join('')+'</select></div><div class="fg"><label>倍數</label><input id="sc-mult" type="number" min="0.1" step="0.5" value="1"></div><div class="fg"><label>備註</label><input id="sc-note" placeholder="特殊要求..."></div></div>'+mF('saveSchedule()'))};
+modal(mH('新增生產排程')+'<div class="form-row c3"><div class="fg"><label>生產日期</label><input id="sc-date" type="date" value="'+toDay()+'"></div><div class="fg"><label>時段</label><select id="sc-time"><option>06:00-09:00 早班</option><option>09:00-12:00 上午</option><option>13:00-17:00 下午</option><option>17:00-21:00 晚班</option></select></div><div class="fg"><label>負責人</label><input id="sc-who" placeholder="姓名"></div></div><div class="form-row c3"><div class="fg"><label>配方</label><select id="sc-rec">'+recs.map(function(r){return'<option value="'+r.id+'" data-name="'+esc(r.name)+'" data-batch="'+r.perBatch+'" data-unit="'+esc(r.unit)+'">'+esc(r.name)+'</option>'}).join('')+'</select></div><div class="fg"><label>倍數</label><input id="sc-mult" type="number" min="0.1" step="0.5" value="1"></div><div class="fg"><label>備註</label><input id="sc-note" placeholder="特殊要求..."></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-top:6px;font-size:0.82rem;color:#9A6210">💡 點「▶️ 開始+扣料」會自動從庫存扣料,點「✓ 完成」會標記完成</div>'+mF('saveSchedule()'))};
 
-window.saveSchedule=function(){var sel=$('sc-rec');var opt=sel?sel.options[sel.selectedIndex]:null;var rec=(state.recipes||[]).find(function(r){return r.id===(sel?sel.value:'')});if(!rec){alert('請選擇配方');return}var mult=+($('sc-mult')?$('sc-mult').value:1)||1;
+window.saveSchedule=function(){var sel=$('sc-rec');var rec=(state.recipes||[]).find(function(r){return r.id===(sel?sel.value:'')});if(!rec){alert('請選擇配方');return}var mult=+($('sc-mult')?$('sc-mult').value:1)||1;
 var obj={id:'SC'+Date.now(),date:$('sc-date')?$('sc-date').value:toDay(),timeSlot:$('sc-time')?$('sc-time').value:'',recipeId:rec.id,recipeName:rec.name,multiplier:mult,output:mult*rec.perBatch,unit:rec.unit,assignee:$('sc-who')?$('sc-who').value:'',status:'待生產',note:$('sc-note')?$('sc-note').value:''};
-state.prodSchedule.push(obj);addAudit('新增排程',rec.name+' x'+mult);saveState();closeModal();renderPage();toast('✅ 排程已建立')};
+if(!state.prodSchedule)state.prodSchedule=[];state.prodSchedule.push(obj);addAudit('新增排程',rec.name+' x'+mult);saveState();closeModal();renderPage();toast('✅ 排程已建立')};
 
-window.execSchedule=function(id){var s=state.prodSchedule.find(function(x){return x.id===id});if(!s)return;s.status='生產中';addAudit('開始生產',s.recipeName);saveState();renderPage();toast('✅ 已開始生產')};
-window.completeSchedule=function(id){var s=state.prodSchedule.find(function(x){return x.id===id});if(!s)return;s.status='已完成';addAudit('完成生產',s.recipeName);saveState();renderPage();toast('✅ 生產完成')};
-window.cancelSchedule=function(id){if(!confirm('確定取消？'))return;var s=state.prodSchedule.find(function(x){return x.id===id});if(!s)return;s.status='已取消';saveState();renderPage()};
+// 🆕 開始生產 = 自動從庫存扣料 (連動 prod)
+window.execSchedule=function(id){
+  var s=state.prodSchedule.find(function(x){return x.id===id});
+  if(!s)return;
+  var rec=(state.recipes||[]).find(function(r){return r.id===s.recipeId});
+  if(!rec){alert('找不到對應配方');return}
+  
+  // 預檢扣料
+  var im=imap();
+  var shortage=[];
+  var deductPlan=[];
+  (rec.ings||[]).forEach(function(ri){
+    var inv=im[ri.name];
+    if(!inv){shortage.push({name:ri.name,reason:'食材不在庫存中'});return}
+    var qtyToDeduct=(ri.qty||0)*s.multiplier;
+    // 換算到食材庫存單位
+    var deductInStockUnit=qtyToDeduct;
+    if(ri.unit!==inv.unit){
+      var weightUnits=['公斤','台斤','公升','公克','毫升','g','ml','kg','L'];
+      if(weightUnits.indexOf(ri.unit)>=0&&weightUnits.indexOf(inv.unit)>=0){
+        var lossInG=unitToG(qtyToDeduct,ri.unit);
+        var oneStockUnitInG=unitToG(1,inv.unit);
+        deductInStockUnit=lossInG/oneStockUnitInG;
+      }
+    }
+    if(deductInStockUnit>(inv.stock||0)){
+      shortage.push({name:ri.name,need:deductInStockUnit,have:inv.stock||0,unit:inv.unit});
+    }
+    deductPlan.push({inv:inv,qty:deductInStockUnit});
+  });
+  
+  if(shortage.length>0){
+    var msg='⚠️ 庫存不足!\n\n';
+    shortage.forEach(function(sh){
+      msg+='• '+sh.name+(sh.reason?' - '+sh.reason:': 需 '+fmt(sh.need,2)+' '+sh.unit+',庫存只有 '+fmt(sh.have,2))+'\n';
+    });
+    msg+='\n是否強制開始生產? (庫存會被扣到負/0)';
+    if(!confirm(msg))return;
+  }
+  
+  // 執行扣料
+  var deducted=[];
+  deductPlan.forEach(function(d){
+    var oldStock=d.inv.stock||0;
+    d.inv.stock=Math.max(0,oldStock-d.qty);
+    d.inv.updatedAt=toDay();
+    deducted.push(d.inv.name+' -'+fmt(d.qty,2)+' '+d.inv.unit);
+  });
+  
+  s.status='生產中';
+  s.startedAt=new Date().toISOString();
+  s.deductedAt=new Date().toISOString();
+  s.deductedItems=deducted;
+  
+  // 推一筆到 prodLog
+  if(!state.prodLog)state.prodLog=[];
+  state.prodLog.push({
+    id:'P'+Date.now(),
+    date:toDay(),
+    recipeId:rec.id,
+    recipeName:rec.name,
+    multiplier:s.multiplier,
+    output:s.output,
+    unit:s.unit,
+    source:'schedule',
+    sourceId:s.id,
+    note:'從排程自動扣料 - '+s.timeSlot,
+    deductedItems:deducted
+  });
+  
+  addAudit('開始生產+扣料',s.recipeName+' x'+s.multiplier+' ('+deducted.length+' 項食材扣減)');
+  saveState();
+  renderPage();
+  toast('✅ 已開始生產\n扣減 '+deducted.length+' 項食材庫存');
+};
+
+window.completeSchedule=function(id){var s=state.prodSchedule.find(function(x){return x.id===id});if(!s)return;s.status='已完成';s.completedAt=new Date().toISOString();addAudit('完成生產',s.recipeName);saveState();renderPage();toast('✅ 生產完成')};
+window.cancelSchedule=function(id){if(!confirm('確定取消?'))return;var s=state.prodSchedule.find(function(x){return x.id===id});if(!s)return;s.status='已取消';saveState();renderPage()};
 
 // ══════════════════════════════════════════
 // 🔧 設備保養
@@ -3672,10 +4307,35 @@ window.maintDone=function(id){var eq=(state.equipment||[]).find(function(x){retu
 function renderBudget(){var pg=dv({});var sw=sopBox('budget');if(sw)pg.appendChild(sw);var bud=state.budget||{};var mon=toMon();var mb=bud[mon]||{procurement:0,waste:0,maintenance:0,other:0};
 var actualProcure=(state.buyLog||[]).filter(function(b){return b.date&&b.date.startsWith(mon)}).reduce(function(s,b){return s+b.total},0);
 var actualWaste=(state.waste||[]).filter(function(w){return w.date&&w.date.startsWith(mon)}).reduce(function(s,w){var im=imap();return s+(im[w.name]?calcIngCost(im[w.name],w.lossQty||0,w.unit||im[w.name].unit):0)},0);
+var actualMaint=(state.equipment||[]).reduce(function(s,e){return s+(e.lastMaintCost||0)},0);  // 暫用設備保養成本
+var actualOther=0;  // 其他類別
 
 pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px'},dv({cls:'page-title',style:'margin:0'},'💹 預算管控 / KPI'),btn('btn btn-primary','⚙️ 設定本月預算',function(){openBudgetModal()})));
 
-pg.appendChild(dv({cls:'card',html:'<div class="card-title">📊 '+mon+' 預算 vs 實際</div><table class="tbl"><thead><tr><th>項目</th><th>預算</th><th>實際</th><th>差異</th><th>執行率</th></tr></thead><tbody><tr><td style="font-weight:700">採購進貨</td><td>'+CUR()+fmt(mb.procurement,0)+'</td><td style="font-weight:700">'+CUR()+fmt(actualProcure,0)+'</td><td style="color:'+(actualProcure>mb.procurement&&mb.procurement>0?'#B82525':'#0A5A46')+';font-weight:700">'+(mb.procurement?CUR()+fmt(actualProcure-mb.procurement,0):'—')+'</td><td>'+(mb.procurement?Math.round(actualProcure/mb.procurement*100)+'%':'—')+'</td></tr><tr><td style="font-weight:700">損耗成本</td><td>'+CUR()+fmt(mb.waste,0)+'</td><td style="font-weight:700">'+CUR()+fmt(actualWaste,0)+'</td><td style="color:'+(actualWaste>mb.waste&&mb.waste>0?'#B82525':'#0A5A46')+';font-weight:700">'+(mb.waste?CUR()+fmt(actualWaste-mb.waste,0):'—')+'</td><td>'+(mb.waste?Math.round(actualWaste/mb.waste*100)+'%':'—')+'</td></tr></tbody></table>'}));
+// 🆕 超支警示卡 (放最上面)
+var overBudget=[];
+if(mb.procurement>0&&actualProcure>mb.procurement)overBudget.push({name:'採購進貨',budget:mb.procurement,actual:actualProcure,over:actualProcure-mb.procurement});
+if(mb.waste>0&&actualWaste>mb.waste)overBudget.push({name:'損耗成本',budget:mb.waste,actual:actualWaste,over:actualWaste-mb.waste});
+if(mb.maintenance>0&&actualMaint>mb.maintenance)overBudget.push({name:'設備維護',budget:mb.maintenance,actual:actualMaint,over:actualMaint-mb.maintenance});
+if(overBudget.length>0){
+  pg.appendChild(dv({style:'background:#FCE8E8;border:2px solid #B82525;border-radius:8px;padding:14px 16px;margin-bottom:14px'},dv({},'<div style="font-size:1rem;font-weight:700;color:#B82525;margin-bottom:8px">🚨 預算超支警示</div>'+overBudget.map(function(o){return '<div style="font-size:0.86rem;color:#B82525;margin:4px 0">• '+o.name+' 超支 <b>'+CUR()+fmt(o.over,0)+'</b> ('+(o.over/o.budget*100).toFixed(1)+'%) - 實際 '+CUR()+fmt(o.actual,0)+' / 預算 '+CUR()+fmt(o.budget,0)+'</div>'}).join(''))));
+}
+
+// 4 類別比對 (升級版)
+pg.appendChild(dv({cls:'card',html:'<div class="card-title">📊 '+mon+' 預算 vs 實際 (4 大類別)</div><table class="tbl"><thead><tr><th>類別</th><th>預算</th><th>實際</th><th>差異</th><th>執行率</th><th>狀態</th></tr></thead><tbody>'+[['採購進貨',mb.procurement,actualProcure],['損耗成本',mb.waste,actualWaste],['設備維護',mb.maintenance,actualMaint],['其他',mb.other,actualOther]].map(function(row){var name=row[0],budget=row[1],actual=row[2];var diff=actual-budget;var rate=budget>0?actual/budget:0;var color=budget===0?'#999':rate>1?'#B82525':rate>=0.8?'#9A6210':'#0A5A46';var status=budget===0?'未設':rate>1?'🚨 超支':rate>=0.9?'⚠️ 接近上限':rate>=0.5?'⚡ 正常':'✅ 寬裕';return '<tr><td style="font-weight:700">'+name+'</td><td>'+CUR()+fmt(budget,0)+'</td><td style="font-weight:700">'+CUR()+fmt(actual,0)+'</td><td style="color:'+color+';font-weight:700">'+(budget>0?(diff>=0?'+':'')+CUR()+fmt(diff,0):'—')+'</td><td>'+(budget>0?Math.round(rate*100)+'%':'—')+'</td><td style="font-size:0.78rem">'+status+'</td></tr>'}).join('')+'</tbody></table>'}));
+
+// 🆕 6 個月預算 vs 實際趨勢
+var months=[];var monthKeys=[];
+for(var i=5;i>=0;i--){var d=new Date();d.setMonth(d.getMonth()-i);var mk=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');monthKeys.push(mk);months.push({key:mk,label:mk.slice(5)+'月'})}
+var monthlyData=monthKeys.map(function(mk){
+  var b=state.budget?state.budget[mk]:null;
+  var totalBud=b?(b.procurement||0)+(b.waste||0)+(b.maintenance||0)+(b.other||0):0;
+  var totalAct=(state.buyLog||[]).filter(function(x){return x.date&&x.date.startsWith(mk)}).reduce(function(s,x){return s+(x.total||0)},0);
+  totalAct+=(state.waste||[]).filter(function(w){return w.date&&w.date.startsWith(mk)}).reduce(function(s,w){var im=imap();return s+(im[w.name]?calcIngCost(im[w.name],w.lossQty||0,w.unit||im[w.name].unit):0)},0);
+  return{key:mk,budget:totalBud,actual:totalAct}
+});
+var maxV=Math.max.apply(null,monthlyData.map(function(d){return Math.max(d.budget,d.actual)}).concat([1]));
+pg.appendChild(dv({cls:'card',html:'<div class="card-title">📈 6 個月預算執行趨勢</div><div style="height:220px;display:flex;align-items:flex-end;gap:14px;padding:10px 0">'+monthlyData.map(function(d,i){var bH=maxV>0?Math.max(d.budget/maxV*180,5):5;var aH=maxV>0?Math.max(d.actual/maxV*180,5):5;var aColor=d.budget>0&&d.actual>d.budget?'#B82525':'#0A5A46';return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="display:flex;gap:3px;align-items:flex-end;height:180px"><div style="background:#9CA3AF;width:18px;height:'+bH+'px;border-radius:3px 3px 0 0" title="預算"></div><div style="background:'+aColor+';width:18px;height:'+aH+'px;border-radius:3px 3px 0 0" title="實際"></div></div><div style="font-size:0.7rem;color:#706E68">'+months[i].label+'</div><div style="font-size:0.65rem;color:#999">'+CUR()+fmt(d.actual/1000,0)+'K</div></div>'}).join('')+'</div><div style="display:flex;justify-content:center;gap:14px;font-size:0.74rem;margin-top:6px"><span><span style="display:inline-block;width:12px;height:12px;background:#9CA3AF;margin-right:4px;vertical-align:middle"></span>預算</span><span><span style="display:inline-block;width:12px;height:12px;background:#0A5A46;margin-right:4px;vertical-align:middle"></span>實際 (正常)</span><span><span style="display:inline-block;width:12px;height:12px;background:#B82525;margin-right:4px;vertical-align:middle"></span>實際 (超支)</span></div>'}));
 
 var im=imap();var tgt=state.meta.targetMargin||0.65;var menuItems=(state.menu||[]).map(function(m){var inv=im[m.ing1];var c=inv?calcIngCost(inv,m.qty1||0,m.unit1||inv.unit):0;return{name:m.name,cost:c,price:m.price,margin:m.price>0?(m.price-c)/m.price:null}});
 var avgMargin=menuItems.filter(function(m){return m.margin!==null}).reduce(function(s,m){return s+m.margin},0)/(menuItems.filter(function(m){return m.margin!==null}).length||1);
@@ -3704,26 +4364,120 @@ window.saveBudget=function(){var mon=toMon();if(!state.budget)state.budget={};st
 // 🔔 智慧警示中心
 // ══════════════════════════════════════════
 function renderAlertCenter(){var pg=dv({});var sw=sopBox('alert-center');if(sw)pg.appendChild(sw);
-pg.appendChild(dv({cls:'page-title'},'🔔 智慧警示中心'));
+
+// 確保歷史警示記錄存在
+if(!state._alertHistory)state._alertHistory={};  // {alertKey: {firstSeen, resolvedAt}}
+
+// Tab 狀態
+if(!state._alertTab)state._alertTab='active';
+
+pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px'},
+  dv({cls:'page-title',style:'margin:0'},'🔔 智慧警示中心'),
+  dv({style:'display:flex;gap:6px;flex-wrap:wrap'},
+    btn('btn '+(state._alertTab==='active'?'btn-primary':'btn-outline')+' btn-sm','🔥 進行中',function(){state._alertTab='active';renderPage()}),
+    btn('btn '+(state._alertTab==='resolved'?'btn-primary':'btn-outline')+' btn-sm','✅ 已處理 (30 天內)',function(){state._alertTab='resolved';renderPage()}),
+    btn('btn btn-outline btn-sm','🗑️ 清理舊紀錄',function(){clearOldAlertHistory()})
+  )
+));
+
+// 收集當下警示
 var alerts=[];
-(state.ings||[]).filter(function(i){return i.stock<=0}).forEach(function(i){alerts.push({level:'danger',icon:'❌',msg:i.name+' 已缺貨',module:'ing'})});
-(state.ings||[]).filter(function(i){return i.stock>0&&i.stock<=i.safety}).forEach(function(i){alerts.push({level:'warn',icon:'⚠️',msg:i.name+' 低庫存 ('+fmt(i.stock,1)+'/'+fmt(i.safety,0)+')',module:'ing'})});
-(state.batchList||[]).filter(function(b){if(b.status==='已用完')return false;if(!b.expiryDate)return false;var days=Math.ceil((new Date(b.expiryDate)-new Date())/86400000);return days<0}).forEach(function(b){alerts.push({level:'danger',icon:'🚫',msg:'批次 '+b.batchNo+' '+b.itemName+' 已過期',module:'batch'})});
-(state.batchList||[]).filter(function(b){if(b.status==='已用完')return false;if(!b.expiryDate)return false;var days=Math.ceil((new Date(b.expiryDate)-new Date())/86400000);return days>=0&&days<=7}).forEach(function(b){alerts.push({level:'warn',icon:'⏰',msg:'批次 '+b.batchNo+' '+b.itemName+' 將於 '+b.expiryDate+' 到期',module:'batch'})});
-(state.apList||[]).filter(function(a){return a.status==='未付款'&&a.dueDate&&a.dueDate<toDay()}).forEach(function(a){alerts.push({level:'danger',icon:'💳',msg:a.supplier+' 帳款 '+CUR()+fmt(a.amount,0)+' 已逾期',module:'ap'})});
-(state.equipment||[]).filter(function(e){return e.nextMaint&&e.nextMaint<toDay()}).forEach(function(e){alerts.push({level:'warn',icon:'🔧',msg:e.name+' 逾期未保養 (應於 '+e.nextMaint+')',module:'equip'})});
-(state.poList||[]).filter(function(p){return p.status==='申請中'}).forEach(function(p){alerts.push({level:'info',icon:'📋',msg:'採購單待核准：'+p.itemName+' '+CUR()+fmt(p.totalAmt,0),module:'po'})});
-(state.contracts||[]).filter(function(c){if(c.status!=='有效'||!c.endDate)return false;var days=Math.ceil((new Date(c.endDate)-new Date())/86400000);return days>=0&&days<=30}).forEach(function(c){alerts.push({level:'warn',icon:'📄',msg:'合約即將到期：'+c.supplier+' ('+c.endDate+')',module:'contract'})});
-var wa=checkWasteAlerts();wa.forEach(function(a){alerts.push({level:'danger',icon:'♻️',msg:a.name+' 損耗率異常 '+pct(a.rate),module:'waste'})});
+(state.ings||[]).filter(function(i){return i.stock<=0}).forEach(function(i){alerts.push({key:'ing-out-'+i.id,level:'danger',category:'庫存',icon:'❌',msg:i.name+' 已缺貨',module:'ing'})});
+(state.ings||[]).filter(function(i){return i.stock>0&&i.stock<=i.safety}).forEach(function(i){alerts.push({key:'ing-low-'+i.id,level:'warn',category:'庫存',icon:'⚠️',msg:i.name+' 低庫存 ('+fmt(i.stock,1)+'/'+fmt(i.safety,0)+')',module:'ing'})});
+(state.batchList||[]).filter(function(b){if(b.status==='已用完')return false;if(!b.expiryDate)return false;var days=Math.ceil((new Date(b.expiryDate)-new Date())/86400000);return days<0}).forEach(function(b){alerts.push({key:'batch-exp-'+b.id,level:'danger',category:'批次',icon:'🚫',msg:'批次 '+b.batchNo+' '+b.itemName+' 已過期',module:'batch'})});
+(state.batchList||[]).filter(function(b){if(b.status==='已用完')return false;if(!b.expiryDate)return false;var days=Math.ceil((new Date(b.expiryDate)-new Date())/86400000);return days>=0&&days<=7}).forEach(function(b){alerts.push({key:'batch-soon-'+b.id,level:'warn',category:'批次',icon:'⏰',msg:'批次 '+b.batchNo+' '+b.itemName+' 將於 '+b.expiryDate+' 到期',module:'batch'})});
+(state.apList||[]).filter(function(a){return a.status==='未付款'&&a.dueDate&&a.dueDate<toDay()}).forEach(function(a){alerts.push({key:'ap-overdue-'+a.id,level:'danger',category:'帳款',icon:'💳',msg:a.supplier+' 帳款 '+CUR()+fmt(a.amount,0)+' 已逾期',module:'ap'})});
+(state.equipment||[]).filter(function(e){return e.nextMaint&&e.nextMaint<toDay()}).forEach(function(e){alerts.push({key:'equip-maint-'+e.id,level:'warn',category:'設備',icon:'🔧',msg:e.name+' 逾期未保養 (應於 '+e.nextMaint+')',module:'equip'})});
+(state.poList||[]).filter(function(p){return p.status==='申請中'}).forEach(function(p){alerts.push({key:'po-pending-'+p.id,level:'info',category:'採購',icon:'📋',msg:'採購單待核准:'+p.itemName+' '+CUR()+fmt(p.totalAmt,0),module:'po'})});
+(state.contracts||[]).filter(function(c){if(c.status!=='有效'||!c.endDate)return false;var days=Math.ceil((new Date(c.endDate)-new Date())/86400000);return days>=0&&days<=30}).forEach(function(c){alerts.push({key:'contract-soon-'+c.id,level:'warn',category:'合約',icon:'📄',msg:'合約即將到期:'+c.supplier+' ('+c.endDate+')',module:'contract'})});
+var wa=checkWasteAlerts();wa.forEach(function(a){alerts.push({key:'waste-'+a.name,level:'danger',category:'損耗',icon:'♻️',msg:a.name+' 損耗率異常 '+pct(a.rate),module:'waste'})});
+
+// 標記首次出現時間 + 自動標已處理 (上次有的不在了 = 已處理)
+var todayStr=new Date().toISOString();
+var currentKeys={};
+alerts.forEach(function(a){
+  currentKeys[a.key]=true;
+  if(!state._alertHistory[a.key]){
+    state._alertHistory[a.key]={firstSeen:todayStr,msg:a.msg,level:a.level,category:a.category,resolvedAt:null};
+  }else if(state._alertHistory[a.key].resolvedAt){
+    state._alertHistory[a.key].resolvedAt=null;  // 重新出現
+  }
+});
+// 把不在 currentKeys 中、但 history 有未解除的標為已解除
+Object.keys(state._alertHistory).forEach(function(k){
+  if(!currentKeys[k]&&!state._alertHistory[k].resolvedAt){
+    state._alertHistory[k].resolvedAt=todayStr;
+  }
+});
+// 自動清理 30 天前的已解除記錄
+var cutoff=new Date(Date.now()-30*86400000).toISOString();
+Object.keys(state._alertHistory).forEach(function(k){
+  var h=state._alertHistory[k];
+  if(h.resolvedAt&&h.resolvedAt<cutoff)delete state._alertHistory[k];
+});
+saveState();
 
 alerts.sort(function(a,b){var order={danger:0,warn:1,info:2};return(order[a.level]||9)-(order[b.level]||9)});
 
-pg.appendChild(dv({cls:'grid3',style:'margin-bottom:16px'},metCard('危險警示',alerts.filter(function(a){return a.level==='danger'}).length+' 項','',alerts.some(function(a){return a.level==='danger'})?'#B82525':'#0A5A46'),metCard('注意事項',alerts.filter(function(a){return a.level==='warn'}).length+' 項','','#9A6210'),metCard('待處理',alerts.filter(function(a){return a.level==='info'}).length+' 項','','#1455A0')));
+// 摘要卡 (含已處理數)
+var resolvedList=Object.entries(state._alertHistory).filter(function(e){return e[1].resolvedAt}).sort(function(a,b){return a[1].resolvedAt<b[1].resolvedAt?1:-1});
+pg.appendChild(dv({cls:'grid4',style:'margin-bottom:16px'},
+  metCard('🚨 緊急',alerts.filter(function(a){return a.level==='danger'}).length+' 項','',alerts.some(function(a){return a.level==='danger'})?'#B82525':'#0A5A46'),
+  metCard('⚠️ 一般',alerts.filter(function(a){return a.level==='warn'}).length+' 項','','#9A6210'),
+  metCard('💡 提醒',alerts.filter(function(a){return a.level==='info'}).length+' 項','','#1455A0'),
+  metCard('✅ 已處理 (30天)',resolvedList.length+' 項','','#0A5A46')
+));
 
-if(!alerts.length){pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#0A5A46;font-size:1.1rem'},'✅ 目前無任何警示，一切正常！'));return pg}
+// 分頁內容
+if(state._alertTab==='resolved'){
+  // 已處理 tab
+  if(resolvedList.length===0){
+    pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#999'},'30 天內無已處理警示記錄'));
+  }else{
+    pg.appendChild(dv({cls:'card',html:'<div class="card-title">✅ 已處理警示 (近 30 天)</div><div style="overflow-x:auto;max-height:60vh;overflow-y:auto"><table class="tbl"><thead><tr><th>類別</th><th>警示內容</th><th>首次出現</th><th>解除時間</th><th>持續</th></tr></thead><tbody>'+resolvedList.slice(0,100).map(function(e){var h=e[1];var firstD=new Date(h.firstSeen);var resolvedD=new Date(h.resolvedAt);var hours=Math.round((resolvedD-firstD)/3600000);var dur=hours>=24?Math.round(hours/24)+' 天':hours+' 小時';var lvlColor=h.level==='danger'?'#B82525':h.level==='warn'?'#9A6210':'#1455A0';return '<tr><td><span style="background:'+lvlColor+';color:#fff;padding:2px 6px;border-radius:4px;font-size:0.74rem">'+esc(h.category||'')+'</span></td><td style="font-weight:600">'+esc(h.msg)+'</td><td style="font-size:0.78rem;color:#666">'+h.firstSeen.slice(0,10)+' '+h.firstSeen.slice(11,16)+'</td><td style="font-size:0.78rem;color:#0A5A46">'+h.resolvedAt.slice(0,10)+' '+h.resolvedAt.slice(11,16)+'</td><td style="font-size:0.78rem">'+dur+'</td></tr>'}).join('')+'</tbody></table></div>'}));
+  }
+  return pg;
+}
+
+// active tab (預設)
+if(!alerts.length){pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#0A5A46;font-size:1.1rem'},'✅ 目前無任何警示,一切正常!'));return pg}
+
+// 依分類分組
+var byCategory={};
+alerts.forEach(function(a){if(!byCategory[a.category])byCategory[a.category]=[];byCategory[a.category].push(a)});
+
 var colorMap={danger:'border-left:4px solid #B82525;background:#FDE8E8',warn:'border-left:4px solid #9A6210;background:#FFF4E0',info:'border-left:4px solid #1455A0;background:#E6F1FB'};
-alerts.forEach(function(a){pg.appendChild(dv({style:colorMap[a.level]+';border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer',onclick:function(){goPage(a.module)},html:'<div style="display:flex;align-items:center;gap:10px"><span style="font-size:1.2rem">'+a.icon+'</span><span style="font-weight:600;color:#1E1E1C">'+a.msg+'</span></div><span style="font-size:0.82rem;color:#706E68">點擊前往 →</span>'}))});
+
+Object.keys(byCategory).forEach(function(cat){
+  var list=byCategory[cat];
+  var dangerCount=list.filter(function(a){return a.level==='danger'}).length;
+  var groupCard=dv({cls:'card',style:'margin-bottom:12px'});
+  var headerHtml='<div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span>📁 '+esc(cat)+' ('+list.length+' 項)</span>'+(dangerCount>0?'<span style="background:#B82525;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.74rem">🚨 '+dangerCount+' 緊急</span>':'')+'</div>';
+  groupCard.innerHTML=headerHtml;
+  list.forEach(function(a){
+    var alertDiv=dv({style:colorMap[a.level]+';border-radius:0 6px 6px 0;padding:10px 14px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer'});
+    alertDiv.onclick=function(){goPage(a.module)};
+    alertDiv.innerHTML='<div style="display:flex;align-items:center;gap:10px;flex:1"><span style="font-size:1.2rem">'+a.icon+'</span><span style="font-weight:600;color:#1E1E1C">'+esc(a.msg)+'</span></div><span style="font-size:0.78rem;color:#706E68">點擊前往 '+esc(a.module)+' →</span>';
+    groupCard.appendChild(alertDiv);
+  });
+  pg.appendChild(groupCard);
+});
+
 return pg}
+
+window.clearOldAlertHistory=function(){
+  if(!confirm('確認清理所有已處理警示歷史紀錄?\n(進行中的警示不會被清除)'))return;
+  var cleared=0;
+  Object.keys(state._alertHistory||{}).forEach(function(k){
+    if(state._alertHistory[k].resolvedAt){
+      delete state._alertHistory[k];
+      cleared++;
+    }
+  });
+  saveState();
+  toast('✅ 已清理 '+cleared+' 筆已處理警示歷史');
+  renderPage();
+};
 
 
 
@@ -5677,16 +6431,64 @@ pg.appendChild(dv({cls:'page-title'},'📈 成本分析報表'));
 var buys=state.buyLog||[];var months={};
 buys.forEach(function(b){if(!b.date)return;var m=b.date.slice(0,7);if(!months[m])months[m]={total:0,count:0};months[m].total+=b.total||0;months[m].count++});
 var sortedM=Object.keys(months).sort();
-pg.appendChild(dv({cls:'card',html:'<div class="card-title">📊 月度進貨成本趨勢</div><div style="height:250px;display:flex;align-items:flex-end;gap:6px;padding:10px 0">'+
-(sortedM.length?sortedM.map(function(m){var maxV=Math.max.apply(null,sortedM.map(function(k){return months[k].total}));var h=maxV>0?Math.max(months[m].total/maxV*200,20):20;
-return'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:#0A5A46;width:100%;height:'+h+'px;border-radius:4px 4px 0 0;min-width:30px"></div><div style="font-size:0.72rem;font-weight:700;color:#0A5A46">'+CUR()+fmt(months[m].total/1000,0)+'K</div><div style="font-size:0.7rem;color:#706E68">'+m.slice(5)+'月</div></div>'}).join(''):'<div style="flex:1;text-align:center;color:#706E68;padding:40px">尚無進貨資料</div>')+'</div>'}));
+
+// 🆕 KPI 摘要卡 (本月 vs 上月)
+var thisMon=toMon();var lastMonDate=new Date();lastMonDate.setMonth(lastMonDate.getMonth()-1);var lastMon=lastMonDate.getFullYear()+'-'+String(lastMonDate.getMonth()+1).padStart(2,'0');
+var thisMonTotal=(months[thisMon]||{total:0}).total;
+var lastMonTotal=(months[lastMon]||{total:0}).total;
+var growth=lastMonTotal>0?((thisMonTotal-lastMonTotal)/lastMonTotal*100):0;
+var growthColor=growth>10?'#B82525':growth>0?'#9A6210':'#0A5A46';
+var growthIcon=growth>10?'⚠️':growth>0?'↗':'↘';
+// 6 個月平均
+var last6=sortedM.slice(-6);var avg6=last6.length?last6.reduce(function(s,m){return s+months[m].total},0)/last6.length:0;
+pg.appendChild(dv({cls:'grid4',style:'margin-bottom:14px'},
+  metCard('本月成本',CUR()+fmt(thisMonTotal,0),''),
+  metCard('上月成本',CUR()+fmt(lastMonTotal,0),''),
+  metCard('成本變化',(growth>=0?'+':'')+growth.toFixed(1)+'% '+growthIcon,'',growthColor),
+  metCard('6 個月平均',CUR()+fmt(avg6,0),'')
+));
+
+pg.appendChild(dv({cls:'card',html:'<div class="card-title">📊 月度進貨成本趨勢 (近 12 個月)</div><div style="height:250px;display:flex;align-items:flex-end;gap:6px;padding:10px 0">'+
+(sortedM.length?sortedM.slice(-12).map(function(m){var lastSorted=sortedM.slice(-12);var maxV=Math.max.apply(null,lastSorted.map(function(k){return months[k].total}));var h=maxV>0?Math.max(months[m].total/maxV*200,20):20;var isThisMon=m===thisMon;return'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="background:'+(isThisMon?'#B82525':'#0A5A46')+';width:100%;height:'+h+'px;border-radius:4px 4px 0 0;min-width:30px"></div><div style="font-size:0.72rem;font-weight:700;color:'+(isThisMon?'#B82525':'#0A5A46')+'">'+CUR()+fmt(months[m].total/1000,0)+'K</div><div style="font-size:0.7rem;color:#706E68">'+m.slice(5)+'月</div></div>'}).join(''):'<div style="flex:1;text-align:center;color:#706E68;padding:40px">尚無進貨資料</div>')+'</div><div style="font-size:0.72rem;color:#706E68;text-align:center">紅色 = 本月,綠色 = 過去月份</div>'}));
+
+// 🆕 品項成本占比 TOP 10
+var itemCost={};buys.forEach(function(b){var key=b.ingName||'未知';itemCost[key]=(itemCost[key]||0)+(b.total||0)});
+var itemSorted=Object.entries(itemCost).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
+var itemTotalAll=Object.values(itemCost).reduce(function(s,v){return s+v},0);
+pg.appendChild(dv({cls:'card',html:'<div class="card-title">🥇 品項成本排行 TOP 10</div>'+
+(itemSorted.length?'<div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">這 10 項佔總成本 '+(itemTotalAll>0?(itemSorted.reduce(function(s,e){return s+e[1]},0)/itemTotalAll*100).toFixed(1):0)+'%</div>'+itemSorted.map(function(e,idx){var pct=itemTotalAll>0?e[1]/itemTotalAll*100:0;var rankColor=idx<3?'#B82525':idx<6?'#9A6210':'#0A5A46';return'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="background:'+rankColor+';color:#fff;font-weight:700;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-size:0.78rem">'+(idx+1)+'</div><div style="width:160px;font-size:0.84rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(e[0])+'</div><div style="flex:1;height:18px;background:#F3F1EB;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+rankColor+';border-radius:4px"></div></div><div style="min-width:80px;text-align:right;font-size:0.84rem;font-weight:700">'+CUR()+fmt(e[1],0)+'</div><div style="min-width:40px;text-align:right;font-size:0.78rem;color:#706E68">'+fmt(pct,1)+'%</div></div>'}).join(''):'<div style="color:#706E68;padding:20px;text-align:center">尚無資料</div>')}));
+
+// 🆕 食材進價變動追蹤
+var priceChange={};buys.forEach(function(b){if(!b.ingName||!b.unitPrice)return;var key=b.ingName;if(!priceChange[key])priceChange[key]=[];priceChange[key].push({date:b.date,price:b.unitPrice})});
+var priceWarn=[];Object.keys(priceChange).forEach(function(k){var arr=priceChange[k].sort(function(a,b){return a.date<b.date?-1:1});if(arr.length<2)return;var oldPrice=arr[0].price;var newPrice=arr[arr.length-1].price;var change=oldPrice>0?(newPrice-oldPrice)/oldPrice*100:0;if(Math.abs(change)>=10)priceWarn.push({name:k,oldPrice:oldPrice,newPrice:newPrice,change:change,count:arr.length})});
+priceWarn.sort(function(a,b){return Math.abs(b.change)-Math.abs(a.change)});
+if(priceWarn.length>0){
+  pg.appendChild(dv({cls:'card',html:'<div class="card-title">⚠️ 進價異常變動 (變動 ≥ 10%)</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>食材</th><th>最早價</th><th>最近價</th><th>變動</th><th>進貨次數</th></tr></thead><tbody>'+priceWarn.slice(0,15).map(function(p){var changeColor=p.change>0?'#B82525':'#0A5A46';return'<tr><td style="font-weight:600">'+esc(p.name)+'</td><td>'+CUR()+fmt(p.oldPrice,2)+'</td><td>'+CUR()+fmt(p.newPrice,2)+'</td><td style="color:'+changeColor+';font-weight:700">'+(p.change>0?'+':'')+p.change.toFixed(1)+'%</td><td>'+p.count+' 次</td></tr>'}).join('')+'</tbody></table></div>'}));
+}
+
+// 🆕 配方毛利率排行 (用 calcCost + menu)
+if(state.recipes&&state.recipes.length){
+  var marginRanks=state.recipes.map(function(r){
+    var rc=calcCost(r);
+    var unitCost=rc.opLossRate>0?rc.perFull:rc.per;
+    // 找 menu 中對應的售價
+    var menuItem=(state.menu||[]).find(function(m){return m.recipeId===r.id||m.name===r.name});
+    var sellPrice=menuItem?(menuItem.price||0):0;
+    var margin=sellPrice>0?((sellPrice-unitCost)/sellPrice*100):null;
+    return{recipe:r,unitCost:unitCost,sellPrice:sellPrice,margin:margin,rc:rc}
+  }).filter(function(x){return x.margin!==null}).sort(function(a,b){return a.margin-b.margin});  // 毛利低的排前
+  
+  if(marginRanks.length>0){
+    pg.appendChild(dv({cls:'card',html:'<div class="card-title">📉 配方毛利率關注名單 (低毛利 → 高毛利)</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>配方</th><th>單位成本</th><th>售價</th><th>毛利</th><th>毛利率</th></tr></thead><tbody>'+marginRanks.slice(0,10).map(function(m){var marginColor=m.margin<40?'#B82525':m.margin<55?'#9A6210':'#0A5A46';return'<tr><td style="font-weight:600">'+esc(m.recipe.name)+'</td><td>'+CUR()+fmt(m.unitCost,2)+'</td><td>'+CUR()+fmt(m.sellPrice,2)+'</td><td style="color:'+marginColor+'">'+CUR()+fmt(m.sellPrice-m.unitCost,2)+'</td><td style="color:'+marginColor+';font-weight:700">'+m.margin.toFixed(1)+'% '+(m.margin<40?'⚠️':m.margin<55?'⚡':'✅')+'</td></tr>'}).join('')+'</tbody></table></div>'}));
+  }
+}
 
 // 供應商成本佔比
 var supCost={};buys.forEach(function(b){var key=b.supId||'未知';supCost[key]=(supCost[key]||0)+(b.total||0)});
 var supSorted=Object.entries(supCost).sort(function(a,b){return b[1]-a[1]}).slice(0,10);
 var totalCost=supSorted.reduce(function(s,e){return s+e[1]},0);
 pg.appendChild(dv({cls:'card',html:'<div class="card-title">🏪 供應商成本佔比（前10）</div>'+
-(supSorted.length?supSorted.map(function(e){var pct=totalCost>0?e[1]/totalCost*100:0;return'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:120px;font-size:0.84rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(e[0])+'</div><div style="flex:1;height:20px;background:#F3F1EB;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#0A5A46;border-radius:4px"></div></div><div style="min-width:80px;text-align:right;font-size:0.84rem;font-weight:700">'+CUR()+fmt(e[1],0)+'</div><div style="min-width:40px;text-align:right;font-size:0.78rem;color:#706E68">'+fmt(pct,1)+'%</div></div>'}).join(''):'<div style="color:#706E68;padding:20px;text-align:center">尚無資料</div>')+'</div>'}));
+(supSorted.length?supSorted.map(function(e){var pct=totalCost>0?e[1]/totalCost*100:0;var sup=(state.sups||[]).find(function(s){return s.id===e[0]});var supName=sup?sup.name:e[0];return'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="width:140px;font-size:0.84rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(supName)+'</div><div style="flex:1;height:20px;background:#F3F1EB;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#0A5A46;border-radius:4px"></div></div><div style="min-width:80px;text-align:right;font-size:0.84rem;font-weight:700">'+CUR()+fmt(e[1],0)+'</div><div style="min-width:40px;text-align:right;font-size:0.78rem;color:#706E68">'+fmt(pct,1)+'%</div></div>'}).join(''):'<div style="color:#706E68;padding:20px;text-align:center">尚無資料</div>')}));
 
 // 門市成本比較
 var storeCost={};(state.internalOrders||[]).forEach(function(o){if(!o.store||o.status==='已取消')return;storeCost[o.store]=(storeCost[o.store]||0)+(o.totalCost||0)});
@@ -6921,6 +7723,25 @@ function renderDash(){
   var unpaidAR=ar.filter(function(a){return a.status!=='已收款'}).reduce(function(s,a){return s+(a.amount-(a.paidAmt||0))},0);
   
   pg.appendChild(dv({cls:'page-title'},'📊 經營儀表板'));
+  
+  // 🆕 本月損耗成本卡
+  if(typeof window.calcMonthlyWasteStats==='function'){
+    var ws=window.calcMonthlyWasteStats();
+    if(ws.total>0){
+      var rate=ws.wasteRate||0;
+      var rateColor=rate>=0.05?'#B82525':rate>=0.03?'#9A6210':'#0A5A46';
+      var rateLabel=rate>=0.05?'⚠️ 偏高':rate>=0.03?'⚡ 注意':'✅ 正常';
+      var wasteCard=dv({style:'background:#fff;border:1px solid #E0E0E0;border-radius:8px;padding:14px 16px;margin-bottom:14px;cursor:pointer'});
+      wasteCard.onclick=function(){state.page='waste';renderPage()};
+      var typeBreakdown='';
+      if(ws.normal>0)typeBreakdown+='<span style="margin-right:14px"><span style="color:#999">正常</span> <b>'+CUR()+fmt(ws.normal,0)+'</b></span>';
+      if(ws.abnormal>0)typeBreakdown+='<span style="margin-right:14px"><span style="color:#B82525">異常</span> <b style="color:#B82525">'+CUR()+fmt(ws.abnormal,0)+'</b></span>';
+      if(ws.staff>0)typeBreakdown+='<span style="margin-right:14px"><span style="color:#0369a1">員工餐</span> <b style="color:#0369a1">'+CUR()+fmt(ws.staff,0)+'</b></span>';
+      if(ws.vendor_return>0)typeBreakdown+='<span><span style="color:#7c3aed">廠商退貨</span> <b style="color:#7c3aed">'+CUR()+fmt(ws.vendor_return,0)+'</b></span>';
+      wasteCard.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="flex:1;min-width:0"><div style="font-size:1rem;font-weight:700;color:#0A5A46;margin-bottom:4px">♻️ 本月損耗成本</div><div style="font-size:0.86rem;color:#666;margin-bottom:6px">'+ws.count+' 筆損耗 ｜ 損耗率 <span style="color:'+rateColor+';font-weight:700">'+(rate*100).toFixed(2)+'%</span> '+rateLabel+'</div><div style="font-size:0.78rem;color:#666">'+typeBreakdown+'</div></div><div style="text-align:right"><div style="font-size:1.6rem;font-weight:700;color:#B82525">'+CUR()+fmt(ws.total,0)+'</div><div style="font-size:0.74rem;color:#999">點此查看詳情 →</div></div></div>';
+      pg.appendChild(wasteCard);
+    }
+  }
   
   // 缺料警示 (跨配方分析,放最上面)
   if(typeof window.analyzeMissingIngs==='function'){
