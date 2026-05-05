@@ -262,7 +262,7 @@ const DB_MENU=[{"id": "M001", "code": "M001", "name": "紅燒豬里肌", "price"
 const DB_SUPS=[{"id": "S001", "name": "鮮蔬農場", "contact": "陳大明", "phone": "02-1234-5678", "addr": "台北市信義區農業路1號", "type": "蔬菜/水果", "pay": "月結30天", "days": 2, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S002", "name": "海鮮直送", "contact": "林小美", "phone": "02-8765-4321", "addr": "基隆市海港路88號", "type": "海鮮/魚類", "pay": "月結15天", "days": 1, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S003", "name": "肉品供應商", "contact": "王志明", "phone": "03-9876-5432", "addr": "桃園市中山路200號", "type": "豬/牛/雞肉", "pay": "月結30天", "days": 2, "score": 7, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S004", "name": "南北乾貨", "contact": "張麗華", "phone": "04-5555-1234", "addr": "台中市民生路45號", "type": "乾貨/調味料", "pay": "月結60天", "days": 3, "score": 8, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""}, {"id": "S005", "name": "頂級食用油", "contact": "黃建國", "phone": "07-3333-8888", "addr": "高雄市工業區三路10號", "type": "食用油/醬料", "pay": "月結30天", "days": 5, "score": 9, "accountName": "", "bankName": "", "bankCode": "", "branchName": "", "branchCode": ""},
   {"id":"S006","name":"沁味(福聯)食品有限公司","contact":"業務","phone":"03-656-3850","addr":"新竹縣竹北市新工三路80號","type":"乾貨/調味料","pay":"月結30天","days":3,"score":4,"accountName":"","bankName":"","bankCode":"","branchName":"","branchCode":"","accountNo":""},
   {"id":"S007","name":"志祥企業社","contact":"廖文祥","phone":"03-5971723","addr":"新竹縣湖口鄉勝利村安宅九街43號","type":"包材","pay":"月結30天","days":3,"score":4,"accountName":"","bankName":"","bankCode":"","branchName":"","branchCode":"","accountNo":""}];
-const DB_REFS={"cats": ["肉類", "海鮮", "蔬菜", "穀物", "乳製品", "蛋類", "調味料", "香料", "食用油", "豆製品", "飲品材料", "包材", "半成品", "其他"], "units": ["公斤", "公克", "公升", "毫升", "台斤", "台兩", "磅", "盎司", "加侖", "顆", "塊", "包", "箱", "條", "個", "張", "盒", "份", "罐", "瓶", "隻", "粒", "把", "束", "袋", "串", "捲", "尾"], "forms": ["整顆/原形", "切片", "切丁", "切碎", "切絲", "切塊", "切段", "切末", "切條", "滾刀塊", "片狀", "去蒂", "絞肉", "去骨", "帶骨", "去皮", "去殼/去皮", "三去", "整瓣", "整束", "整形", "碎末", "打散", "泥狀", "醬狀", "粉末", "顆粒", "乾燥/粉", "濃縮", "稀釋", "醃漬", "真空醃漬", "水煮", "熟食/已烹調", "半成品", "生鮮", "冷凍", "冷藏", "真空包裝", "罐裝", "其他"], "supTypes": ["乳製品", "乾貨/調味料", "包材", "其他", "海鮮/魚類", "蔬菜/水果", "豬/牛/雞肉", "食用油/醬料"], "payTerms": ["現金", "貨到付款", "預付", "月結15天", "月結30天", "月結45天", "月結60天"], "lossReasons": ["備料損耗", "其他", "受潮", "撞傷", "溢出", "烹調損耗", "發芽", "碎裂", "腐爛", "過期"], "lossHandles": ["丟棄", "其他", "員工餐", "捐贈", "調整食譜", "退貨"], "meatSrc": ["其他", "國產CAS", "國產有機認證", "溯源牛肉", "溯源豬肉", "溯源雞肉", "產銷履歷", "進口加拿大", "進口巴西", "進口澳洲", "進口紐西蘭", "進口美國"]};
+const DB_REFS={"cats": ["肉類", "海鮮", "蛋類", "蔬菜", "水果", "乳製品", "豆製品", "穀物", "調味料", "香料", "食用油", "飲品材料", "麵包/烘焙", "半成品", "包材", "其他"], "units": ["公斤", "公克", "台斤", "台兩", "磅", "盎司", "公升", "毫升", "加侖", "包", "盒", "罐", "瓶", "箱", "袋", "顆", "粒", "個", "塊", "片", "條", "份", "張", "把", "束", "串", "隻", "尾", "捲"], "forms": ["生鮮", "冷藏", "冷凍", "整顆/原形", "整瓣", "整束", "切片", "切塊", "切丁", "切絲", "切段", "切碎", "切末", "切條", "滾刀塊", "片狀", "絞肉", "去骨", "帶骨", "去皮", "去殼/去皮", "去蒂", "三去", "打散", "整形", "碎末", "泥狀", "醬狀", "粉末", "顆粒", "醃漬", "真空醃漬", "水煮", "熟食/已烹調", "半成品", "乾燥/粉", "濃縮", "稀釋", "罐裝", "真空包裝", "其他"], "supTypes": ["乳製品", "乾貨/調味料", "包材", "其他", "海鮮/魚類", "蔬菜/水果", "豬/牛/雞肉", "食用油/醬料"], "payTerms": ["現金", "貨到付款", "預付", "月結15天", "月結30天", "月結45天", "月結60天"], "lossReasons": ["備料損耗", "其他", "受潮", "撞傷", "溢出", "烹調損耗", "發芽", "碎裂", "腐爛", "過期"], "lossHandles": ["丟棄", "其他", "員工餐", "捐贈", "調整食譜", "退貨"], "meatSrc": ["國產CAS", "國產有機認證", "溯源豬肉", "溯源雞肉", "溯源牛肉", "產銷履歷", "進口澳洲", "進口紐西蘭", "進口美國", "進口加拿大", "進口巴西", "其他"]};
 const SHEETS=[{"id": "yi_food_order", "title": "義早食材叫貨", "formNo": "表格編號：1140401", "items": [{"seq": 1, "name": "紐澳良雞腿排(4支/包)", "unit": "包", "price": 200}, {"seq": 2, "name": "蒜香雞肉(1kg/包)", "unit": "包", "price": 210}, {"seq": 3, "name": "綜合鮮菇(1kg/包)", "unit": "包", "price": 180}, {"seq": 4, "name": "炭香燒肉(1kg/包)", "unit": "包", "price": 260}, {"seq": 5, "name": "鮪魚醬(1kg/包)", "unit": "包", "price": 290}, {"seq": 6, "name": "凱撒醬(1kg/包)", "unit": "包", "price": 275}, {"seq": 7, "name": "蜂蜜芥末醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 8, "name": "塔塔醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 9, "name": "藍莓優格醬(1kg/包)", "unit": "包", "price": 270}, {"seq": 10, "name": "大蒜醬(500g/盒)", "unit": "盒", "price": 230}, {"seq": 11, "name": "杏仁奶酥醬(500g/盒)", "unit": "盒", "price": 245}, {"seq": 12, "name": "紅醬(1kg/包)", "unit": "包", "price": 160}, {"seq": 13, "name": "白醬(1kg/包)", "unit": "包", "price": 160}, {"seq": 14, "name": "青醬(1kg/包)", "unit": "包", "price": 210}, {"seq": 15, "name": "肉醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 16, "name": "泰式打拋豬(1kg/包)", "unit": "包", "price": 195}, {"seq": 17, "name": "麻辣醬(1kg/包)", "unit": "包", "price": 270}, {"seq": 18, "name": "辣椒醬(500g/包)", "unit": "包", "price": 140}, {"seq": 19, "name": "醬油膏(1kg/包)", "unit": "包", "price": 95}, {"seq": 20, "name": "料理調味粉(1kg/包)", "unit": "包", "price": 130}, {"seq": 21, "name": "義大利直麵(熟)(200g/包)", "unit": "包", "price": 10}, {"seq": 22, "name": "蜜汁鴨胸(500g/23包/箱)", "unit": "包", "price": 315}, {"seq": 23, "name": "青花菜(1kg/10包/箱)", "unit": "包", "price": 70}, {"seq": 24, "name": "玉米筍(1kg/10包/箱)", "unit": "包", "price": 126}, {"seq": 25, "name": "紅蘿蔔片(1kg/10包/箱)", "unit": "包", "price": 58}, {"seq": 26, "name": "大魚排(60片/箱)(5片為單位)", "unit": "包", "price": 75}, {"seq": 27, "name": "日式雪花豬排(130g/45片/6kg箱)(5片為單位)", "unit": "包", "price": 175}, {"seq": 28, "name": "鯰魚排(5片/10包/箱)", "unit": "包", "price": 179}, {"seq": 29, "name": "鯰魚排(3片/10包/箱)", "unit": "包", "price": 95}, {"seq": 30, "name": "韓式泡菜(3kg/桶)", "unit": "包", "price": 480}, {"seq": 31, "name": "優質雞塊(1kg/12包)", "unit": "包", "price": 142}, {"seq": 32, "name": "紅皮熟栗地瓜(1kg/12包/箱)", "unit": "包", "price": 116}, {"seq": 33, "name": "玉米粒易開罐(285g/24罐/箱)", "unit": "罐", "price": 22}, {"seq": 34, "name": "義大利直麵(生)(500g/20包/箱)", "unit": "包", "price": 26}, {"seq": 35, "name": "鮮奶油23.3%(12罐/箱)", "unit": "罐", "price": 105}, {"seq": 36, "name": "原味乳酪醬(500g/盒)", "unit": "盒", "price": 194}, {"seq": 37, "name": "藍莓乳酪醬(500g/盒)", "unit": "盒", "price": 200}, {"seq": 38, "name": "青蘋果餡(2.7g/6罐/箱)", "unit": "罐", "price": 683}, {"seq": 39, "name": "美乃滋(600g/包)", "unit": "包", "price": 76}, {"seq": 40, "name": "美式鬆餅(2片/50包/箱)", "unit": "包", "price": 12}, {"seq": 41, "name": "乳酪燒餅(10片/3盒/箱)", "unit": "箱", "price": 320}, {"seq": 42, "name": "光頭堡(30顆/籃)", "unit": "顆", "price": 7}, {"seq": 43, "name": "帕尼尼(30顆/籃)", "unit": "顆", "price": 13}, {"seq": 44, "name": "帕瑪森熱狗堡(12入/包)", "unit": "包", "price": 164}, {"seq": 45, "name": "泰式紅茶葉(600g*/30包/箱)", "unit": "包", "price": 157}, {"seq": 46, "name": "奶香金萱(600g/30包/箱)", "unit": "包", "price": 224}, {"seq": 47, "name": "白葡萄風味烏龍茶包(6.5g*50入/20包/箱)", "unit": "包", "price": 242}, {"seq": 48, "name": "南非國寶茶(7g*50入/20包/箱)", "unit": "包", "price": 453}, {"seq": 49, "name": "南非綠國寶茶(3.5g*50入/20包/箱)", "unit": "包", "price": 389}, {"seq": 50, "name": "南非紫蘇綠國寶茶(4.5g*50入/20包/箱)", "unit": "包", "price": 389}, {"seq": 51, "name": "專用奶精粉(1kg/20包/箱)", "unit": "包", "price": 173}, {"seq": 52, "name": "什穀芝麻飲粉(500g/40包/箱)", "unit": "包", "price": 168}, {"seq": 53, "name": "比利時風味巧克力粉(1kg/20包/箱)", "unit": "包", "price": 420}]}, {"id": "yi_pack_order", "title": "義早包材叫貨", "formNo": "表格編號：1150325", "items": [{"seq": 1, "name": "PET8OZ透明沙拉碗(25個/20包/箱)", "unit": "包", "price": 44}, {"seq": 2, "name": "PET8OZ透明沙拉蓋(50個/10包/箱)", "unit": "包", "price": 53}, {"seq": 3, "name": "PET24OZ花型沙拉碗、蓋(50個/3組/箱)", "unit": "組", "price": 273}, {"seq": 4, "name": "500空白紙杯(50個/20包/箱)", "unit": "包", "price": 60}, {"seq": 5, "name": "400空白紙杯(50個/20包/箱)", "unit": "包", "price": 55}, {"seq": 6, "name": "360空白紙杯(50個/20包/箱)", "unit": "包", "price": 53}, {"seq": 7, "name": "8OZ空白紙杯(50個/20包/箱)", "unit": "包", "price": 54}, {"seq": 8, "name": "凸杯蓋 90mm(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 9, "name": "凸杯蓋 78mm(50個/20包/箱)", "unit": "包", "price": 57}, {"seq": 10, "name": "90熱杯套(25個/40包/箱)", "unit": "串", "price": 20}, {"seq": 11, "name": "1.5OZ PET塑膠杯蓋(100個/25包/箱)", "unit": "包", "price": 92}, {"seq": 12, "name": "902塑膠內襯(50個/12包/箱)", "unit": "包", "price": 63}, {"seq": 13, "name": "902空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 81}, {"seq": 14, "name": "902凸蓋(50個/12包/箱)", "unit": "包", "price": 66}, {"seq": 15, "name": "850透明塑膠湯碗(50個/12包/箱)", "unit": "包", "price": 103}, {"seq": 16, "name": "850空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 60}, {"seq": 17, "name": "850平蓋(50個/12包/箱)", "unit": "包", "price": 29}, {"seq": 18, "name": "L300(50個/10包/箱)", "unit": "包", "price": 276}, {"seq": 19, "name": "L500(50個/10包/箱)", "unit": "包", "price": 171}, {"seq": 20, "name": "9吋披薩盒(50個/箱)", "unit": "箱", "price": 630}, {"seq": 21, "name": "3號內折牛皮方形餐盒(50個/4包/箱)", "unit": "包", "price": 315}, {"seq": 22, "name": "空白一體小(60個/10包/箱)", "unit": "包", "price": 83}, {"seq": 23, "name": "空白點心盒(100個/10包/箱)", "unit": "包", "price": 95}, {"seq": 24, "name": "20*20CM防油牛皮L袋(100個/40包/箱)", "unit": "包", "price": 88}, {"seq": 25, "name": "#70平口金色三角袋(100只/包)", "unit": "包", "price": 91}, {"seq": 26, "name": "鐵炮竹竹籤9cm(250支/80包)", "unit": "包", "price": 58}, {"seq": 27, "name": "黑色西餐匙(100支/40包/箱)", "unit": "包", "price": 46}, {"seq": 28, "name": "黑色西餐叉(100支/30包/2箱)", "unit": "包", "price": 45}, {"seq": 29, "name": "單支膠裝斜口6*18透明吸管(200支/20包/箱)", "unit": "包", "price": 26}, {"seq": 30, "name": "單支膠裝斜口12*21透明吸管(50支/40包/箱)", "unit": "包", "price": 14}, {"seq": 31, "name": "單支紙包斜口6*21透明吸管(100支/40包/箱)", "unit": "包", "price": 40}, {"seq": 32, "name": "單支紙包斜口6*21透明吸管(100支/50包/箱)", "unit": "包", "price": 46}, {"seq": 33, "name": "單支紙包斜口12*21透明吸管(50支/40包/箱)", "unit": "包", "price": 47}, {"seq": 34, "name": "免洗筷(80雙/30包/袋)", "unit": "包", "price": 21}, {"seq": 35, "name": "環保餐巾紙23cm單層(100張/60包/箱)", "unit": "包", "price": 22}, {"seq": 36, "name": "平邊牛皮色-四折扇形紙(100張/100包/箱)", "unit": "包", "price": 16}, {"seq": 37, "name": "空白封口膜(350m/6捲/箱)", "unit": "捲", "price": 352}, {"seq": 38, "name": "感熱紙80*80mm(60捲/箱)", "unit": "捲", "price": 22}, {"seq": 39, "name": "標籤貼紙40*30mm(5捲/20包/箱)", "unit": "包", "price": 139}, {"seq": 40, "name": "保鮮膜30公分 X 500公尺", "unit": "盒", "price": 399}, {"seq": 41, "name": "透明1號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 42, "name": "透明2號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 43, "name": "透明3號提袋(1kg/包)", "unit": "包", "price": 120}, {"seq": 44, "name": "透明1號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 45, "name": "透明2號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 46, "name": "透明3號提袋(2kg/包)", "unit": "包", "price": 240}, {"seq": 47, "name": "PS黑色雙杯座(100個/20包/箱)", "unit": "包", "price": 56}, {"seq": 48, "name": "PS黑色四杯座(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 49, "name": "煎板清潔劑", "unit": "瓶", "price": 303}, {"seq": 50, "name": "塑膠垃圾袋66*80(10包/箱)", "unit": "包", "price": 97}, {"seq": 51, "name": "義早logo圓貼(5000張)(約1~4天)", "unit": "包", "price": 1380}, {"seq": 52, "name": "收入傳票", "unit": "本", "price": 25}, {"seq": 53, "name": "支出傳票", "unit": "本", "price": 25}, {"seq": 54, "name": "二聯收據(50組/本)", "unit": "本", "price": 35}, {"seq": 55, "name": "透明膠帶18mm(8入/捆)", "unit": "捆", "price": 95}, {"seq": 56, "name": "BUNN12.75*5.25濾紙(500pcs/箱)", "unit": "箱", "price": 1102.5}, {"seq": 57, "name": "NBR無粉手套紫S號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 58, "name": "NBR無粉手套紫M號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 59, "name": "NBR無粉手套紫L號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 60, "name": "NBR無粉手套紫XL號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 61, "name": "立領長袖反摺-淺灰襯衫(M) 義早", "unit": "件", "price": 700}, {"seq": 62, "name": "立領長袖反摺-淺灰襯衫(L) 義早", "unit": "件", "price": 700}, {"seq": 63, "name": "立領長袖反摺-淺灰襯衫(XL) 義早", "unit": "件", "price": 700}, {"seq": 64, "name": "立領長袖反摺-淺灰襯衫(2L) 義早", "unit": "件", "price": 700}, {"seq": 65, "name": "立領長袖反摺-淺灰襯衫(3L) 義早", "unit": "件", "price": 700}, {"seq": 66, "name": "雙肩銅鈎耐磨咖啡色背心圍裙", "unit": "件", "price": 600}, {"seq": 67, "name": "深麻灰打鳥帽 義早", "unit": "件", "price": 200}]}, {"id": "gu_food_order", "title": "咕咕食材叫貨", "formNo": "表格編號：1140622", "items": [{"seq": 1, "name": "蒜香雞肉(1kg/包)", "unit": "包", "price": 210}, {"seq": 2, "name": "綜合鮮菇(1kg/包)", "unit": "包", "price": 180}, {"seq": 3, "name": "炭香燒肉(1kg/包)", "unit": "包", "price": 260}, {"seq": 4, "name": "鮪魚醬(1kg/包)", "unit": "包", "price": 290}, {"seq": 5, "name": "肉醬(1kg/包)", "unit": "包", "price": 180}, {"seq": 6, "name": "泰式打拋豬(1kg/包)", "unit": "包", "price": 195}, {"seq": 7, "name": "辣椒醬(500g/包)", "unit": "包", "price": 140}, {"seq": 8, "name": "醬油膏(1kg/包)", "unit": "包", "price": 95}, {"seq": 9, "name": "酸菜(1kg/包)", "unit": "包", "price": 110}, {"seq": 10, "name": "菜脯(1kg/包)", "unit": "包", "price": 90}, {"seq": 11, "name": "焢肉(1kg/包)", "unit": "包", "price": 185}, {"seq": 12, "name": "料理調味粉(1kg/包)", "unit": "包", "price": 130}, {"seq": 13, "name": "小熱狗(50支/20包/箱)", "unit": "包", "price": 120}, {"seq": 14, "name": "起司片(90片/12包)", "unit": "包", "price": 265}, {"seq": 15, "name": "乳酪絲(1kg/10包/箱)", "unit": "包", "price": 245}, {"seq": 16, "name": "薯餅(20片/12包/箱)", "unit": "包", "price": 150}, {"seq": 17, "name": "脆皮薯條(2kg/6包/箱)", "unit": "包", "price": 210}, {"seq": 18, "name": "鮮奶油23.3%(12罐/箱)", "unit": "罐", "price": 105}, {"seq": 19, "name": "美乃滋(600g/包)", "unit": "包", "price": 76}, {"seq": 20, "name": "老麵饅頭(6入/包)", "unit": "包", "price": 78}, {"seq": 21, "name": "黑糖饅頭(6入/包)", "unit": "包", "price": 92}, {"seq": 22, "name": "蔥捲(6入/包)", "unit": "包", "price": 135}, {"seq": 23, "name": "芋頭捲(6入/包)", "unit": "包", "price": 143}, {"seq": 24, "name": "雜糧堅果饅頭(6入/包)", "unit": "包", "price": 168}, {"seq": 25, "name": "鮮蔥黑豚包(6入/包)", "unit": "包", "price": 152}, {"seq": 26, "name": "金沙包(6入/包)", "unit": "包", "price": 152}, {"seq": 27, "name": "芝麻包(6入/包)", "unit": "包", "price": 143}, {"seq": 28, "name": "刈包(20入/8包/箱)", "unit": "包", "price": 150}, {"seq": 29, "name": "蛋餅皮(30片/12包/箱)", "unit": "包", "price": 65}, {"seq": 30, "name": "厚切蔥抓餅(10片/10包/箱)", "unit": "包", "price": 90}, {"seq": 31, "name": "河粉皮(10片/10包/箱)", "unit": "包", "price": 50}, {"seq": 32, "name": "乳酪燒餅(10片/3盒/箱)", "unit": "箱", "price": 320}, {"seq": 33, "name": "蘿蔔糕(10片/10包/箱)", "unit": "包", "price": 60}, {"seq": 34, "name": "鍋貼(50入/12包/箱)", "unit": "包", "price": 100}, {"seq": 35, "name": "生煎包(50入/12包/箱)", "unit": "包", "price": 100}, {"seq": 36, "name": "肉粽(10入/12包/箱)", "unit": "包", "price": 250}, {"seq": 37, "name": "老油條(300入/3kg/箱)", "unit": "箱", "price": 650}, {"seq": 38, "name": "肉鬆(3kg/桶)", "unit": "包", "price": 400}, {"seq": 39, "name": "優質雞塊(1kg/12包/箱)", "unit": "包", "price": 142}, {"seq": 40, "name": "黃金脆皮雞排(30片/箱)(5片/包)", "unit": "包", "price": 105}, {"seq": 41, "name": "玉米粒易開罐(285g/24罐/箱)", "unit": "罐", "price": 22}, {"seq": 42, "name": "滷蛋(30粒/8包/箱)", "unit": "包", "price": 240}, {"seq": 43, "name": "豆皮菜鬆(600g/包)", "unit": "包", "price": 110}, {"seq": 44, "name": "豆棗(3kg/包)", "unit": "包", "price": 320}, {"seq": 45, "name": "牛蒡絲(3kg/包)", "unit": "包", "price": 425}, {"seq": 46, "name": "飯糰米(5kg/1包)", "unit": "包", "price": 260}, {"seq": 47, "name": "紅藜麥(1kg/1包)", "unit": "包", "price": 165}, {"seq": 48, "name": "花生粉(600g/包)", "unit": "包", "price": 100}, {"seq": 49, "name": "低筋麵粉(3kg/包)", "unit": "包", "price": 110}, {"seq": 50, "name": "鹽(1kg/1包)", "unit": "包", "price": 20}, {"seq": 51, "name": "二砂(1kg/1包)", "unit": "包", "price": 40}, {"seq": 52, "name": "胡椒鹽(600g/包)", "unit": "包", "price": 120}, {"seq": 53, "name": "番茄醬(3.15kg/桶)", "unit": "桶", "price": 200}, {"seq": 54, "name": "醬油膏(6kg/桶)", "unit": "桶", "price": 235}, {"seq": 55, "name": "沙拉油(18L/桶)", "unit": "桶", "price": 865}, {"seq": 56, "name": "耐炸油(18L/桶)", "unit": "桶", "price": 875}, {"seq": 57, "name": "泰式紅茶葉(600g*/30包/箱)", "unit": "包", "price": 157}, {"seq": 58, "name": "蔗糖液(3kg/8包/箱)", "unit": "包", "price": 125}, {"seq": 59, "name": "專用奶精粉(1kg/20包/箱)", "unit": "包", "price": 173}]}, {"id": "gu_pack_order", "title": "咕咕包材叫貨", "formNo": "表格編號：1140401", "items": [{"seq": 1, "name": "400空白紙杯(50個/20包/箱)", "unit": "包", "price": 53}, {"seq": 2, "name": "凸杯蓋 90mm(50個/20包/箱)", "unit": "包", "price": 49}, {"seq": 3, "name": "90熱杯套(25個/40包/箱)", "unit": "串", "price": 20}, {"seq": 4, "name": "1.5OZ PET塑膠杯蓋(100個/25包/箱)", "unit": "包", "price": 92}, {"seq": 5, "name": "850空白紙湯碗(50個/12包/箱)", "unit": "包", "price": 60}, {"seq": 6, "name": "850平蓋(50個/12包/箱)", "unit": "包", "price": 29}, {"seq": 7, "name": "260空白紙湯碗(50個/40包/箱)", "unit": "包", "price": 30}, {"seq": 8, "name": "空白一體小(60個/10包/箱)", "unit": "包", "price": 83}, {"seq": 9, "name": "空白點心盒(100個/10包/箱)", "unit": "包", "price": 95}, {"seq": 10, "name": "20*20CM防油牛皮L袋(100張/40包/箱)", "unit": "包", "price": 88}, {"seq": 11, "name": "20*20CM防油牛皮L袋(200張/25包/箱)", "unit": "包", "price": 172}, {"seq": 12, "name": "30*30CM空白淋膜紙(1000張/4包/箱)", "unit": "包", "price": 900}, {"seq": 13, "name": "4兩防油紙袋(100入/束)", "unit": "束", "price": 40}, {"seq": 14, "name": "薯條袋", "unit": "束", "price": 35}, {"seq": 15, "name": "橡皮筋小", "unit": "包", "price": 50}, {"seq": 16, "name": "0號夾鏈袋", "unit": "包", "price": 15}, {"seq": 17, "name": "擦手紙(120抽/20包/箱)", "unit": "箱", "price": 410}, {"seq": 18, "name": "黑色西餐匙(100支/40包/箱)", "unit": "包", "price": 46}, {"seq": 19, "name": "黑色西餐叉(100支/30包/2箱)", "unit": "包", "price": 45}, {"seq": 20, "name": "單支膠裝斜口6*18透明吸管(200支/20包/箱)", "unit": "包", "price": 26}, {"seq": 21, "name": "單支紙包斜口6*21透明吸管(100支/50包/箱)", "unit": "包", "price": 46}, {"seq": 22, "name": "免洗筷(80雙/30包/袋)", "unit": "包", "price": 21}, {"seq": 23, "name": "環保餐巾紙23cm單層(100張/60包/箱)", "unit": "包", "price": 22}, {"seq": 24, "name": "空白封口膜(350m/6捲/箱)", "unit": "捲", "price": 352}, {"seq": 25, "name": "感熱紙80*80mm(60捲/箱)", "unit": "捲", "price": 22}, {"seq": 26, "name": "標籤貼紙40*30mm(5捲/20包/箱)", "unit": "包", "price": 139}, {"seq": 27, "name": "保鮮膜30公分 X 500公尺", "unit": "盒", "price": 399}, {"seq": 28, "name": "4兩耐熱袋", "unit": "包", "price": 40}, {"seq": 29, "name": "6兩耐熱袋", "unit": "包", "price": 40}, {"seq": 30, "name": "6兩耐熱袋(捲)", "unit": "捲", "price": 180}, {"seq": 31, "name": "1斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 32, "name": "3斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 33, "name": "10斤耐熱袋", "unit": "捲", "price": 180}, {"seq": 34, "name": "煎板清潔劑", "unit": "瓶", "price": 303}, {"seq": 35, "name": "水槽濾網(50入/包)", "unit": "包", "price": 35}, {"seq": 36, "name": "沙拉脫", "unit": "桶", "price": 50}, {"seq": 37, "name": "漂白水", "unit": "桶", "price": 50}, {"seq": 38, "name": "除油劑", "unit": "桶", "price": 210}, {"seq": 39, "name": "酒精", "unit": "桶", "price": 505}, {"seq": 40, "name": "3M菜瓜布(2入/包)", "unit": "包", "price": 45}, {"seq": 41, "name": "3M綠菜瓜布(2入/包)", "unit": "包", "price": 45}, {"seq": 42, "name": "好神拖布盤", "unit": "個", "price": 230}, {"seq": 43, "name": "塑膠垃圾袋66*80(10包/箱)", "unit": "包", "price": 97}, {"seq": 44, "name": "咕咕logo圓貼(5000張)(約1~4天)", "unit": "包", "price": 1380}, {"seq": 45, "name": "收入傳票", "unit": "本", "price": 25}, {"seq": 46, "name": "支出傳票", "unit": "本", "price": 25}, {"seq": 47, "name": "二聯收據(50組/本)", "unit": "本", "price": 35}, {"seq": 48, "name": "透明膠帶18mm(8入/捆)", "unit": "捆", "price": 95}, {"seq": 49, "name": "NBR無粉手套紫S號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 50, "name": "NBR無粉手套紫M號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 51, "name": "NBR無粉手套紫L號(100入/盒)", "unit": "盒", "price": 185}, {"seq": 52, "name": "NBR無粉手套紫XL號(100入/盒)", "unit": "盒", "price": 185}]}];
 </script>
 <script>
@@ -343,6 +343,27 @@ window.runMigrations=function(){
     if(changed2){
       console.log('[Migrate] refs.forms 已補入新型態');
     }
+  }
+  // 🆕 refs.cats 自動補新類別 (餐飲業細分)
+  if(state.refs&&state.refs.cats){
+    var newCats=['水果','麵包/烘焙'];
+    var changed3=false;
+    newCats.forEach(function(c){
+      if(state.refs.cats.indexOf(c)<0){
+        var otherIdx=state.refs.cats.indexOf('其他');
+        if(otherIdx>=0)state.refs.cats.splice(otherIdx,0,c);
+        else state.refs.cats.push(c);
+        changed3=true;
+      }
+    });
+    if(changed3){
+      console.log('[Migrate] refs.cats 已補入新類別');
+    }
+  }
+  // 🆕 補新單位「片」
+  if(state.refs&&state.refs.units&&state.refs.units.indexOf('片')<0){
+    state.refs.units.push('片');
+    console.log('[Migrate] refs.units 已補入「片」');
   }
   return true;  // 表示 migrate 完成
 };
@@ -1296,10 +1317,42 @@ window.analyzeMissingIngs=function(){
 // ══════════════════════════════════════════════════════
 
 // 建立快速搜尋下拉的 HTML
+// 🆕 計算食材使用頻率,作為下拉排序依據
+window.getOptionUsage=function(field){
+  if(!state.ings||!state.ings.length)return {};
+  var counts={};
+  state.ings.forEach(function(ing){
+    var val=ing[field];
+    if(val){
+      if(Array.isArray(val))val.forEach(function(v){counts[v]=(counts[v]||0)+1});
+      else counts[val]=(counts[val]||0)+1;
+    }
+  });
+  return counts;
+};
+
+// 🆕 依使用頻率排序 (常用的排前面,沒用過的維持原始順序)
+window.sortByUsage=function(options,field){
+  if(!options||!options.length||!field)return options;
+  var usage=window.getOptionUsage(field);
+  // 分兩組:有用過的(按次數降序) + 沒用過的(維持原順序)
+  var used=[],unused=[];
+  options.forEach(function(o){
+    if(usage[o]&&usage[o]>0)used.push(o);
+    else unused.push(o);
+  });
+  used.sort(function(a,b){return (usage[b]||0)-(usage[a]||0)});
+  return used.concat(unused);
+};
+
 window.buildSearchSelect=function(opts){
-  // opts = {id, options:[...], value, placeholder, width, onChange}
+  // opts = {id, options:[...], value, placeholder, width, sortField}
   var id=opts.id;
   var arr=opts.options||[];
+  // 🆕 如果指定 sortField,依該欄位的使用頻率排序
+  if(opts.sortField&&typeof window.sortByUsage==='function'){
+    arr=window.sortByUsage(arr,opts.sortField);
+  }
   var val=opts.value||'';
   var placeholder=opts.placeholder||'點此搜尋或選擇...';
   var width=opts.width||'100%';
@@ -1526,7 +1579,7 @@ window.getPriceLines=function(ing){
   if(!ing)return '';
   // 主進價:整數用千分位,小數用 toFixed (避免 fmt 的千分位 bug)
   var mainPrice=(+ing.price||0)>=10?fmt(ing.price||0,2):(+ing.price||0).toFixed(2);
-  var html='<div style="font-weight:700;color:#0A5A46;font-size:0.92rem">'+CUR()+' '+mainPrice+' / '+esc(ing.unit||'')+'</div>';
+  var html='<div style="font-weight:700;color:#0A5A46;font-size:0.92rem">'+CUR()+' '+mainPrice+' / '+esc(ing.unit||'')+' <span style="font-size:0.66rem;color:#9A6210;background:#FFF8ED;padding:1px 4px;border-radius:3px;font-weight:600">未稅</span></div>';
   // 最小單位價格
   var minUnit=window.getMinUnit(ing.unit);
   if(minUnit&&minUnit!==ing.unit){
@@ -1538,9 +1591,10 @@ window.getPriceLines=function(ing){
       html+='<div style="font-size:0.74rem;color:#706E68;margin-top:2px">≈ '+CUR()+' '+minPriceStr+' / '+minUnit+'</div>';
     }
   }
-  // 包裝資訊 (如有)
+  // 包裝資訊 (如有,顯示原輸入價含/未稅)
   if(ing.pkgCount&&ing.pkgContent&&ing.pkgTotal){
-    html+='<div style="font-size:0.74rem;color:#9A6210;margin-top:2px">📦 '+CUR()+' '+fmt(ing.pkgTotal,0)+' / '+ing.pkgCount+'包 ('+ing.pkgContent+esc(ing.pkgUnit||'')+')</div>';
+    var inclLabel=ing.pkgIncl==='incl'?'含稅':'未稅';
+    html+='<div style="font-size:0.74rem;color:#9A6210;margin-top:2px">📦 '+CUR()+' '+fmt(ing.pkgTotal,0)+' ('+inclLabel+') / '+ing.pkgCount+'包 ('+ing.pkgContent+esc(ing.pkgUnit||'')+')</div>';
   }
   return html;
 };
@@ -2254,10 +2308,17 @@ window.buildIngDetailRow=function(i){
   html+='<div style="background:#fff;border-radius:6px;padding:10px 12px;border-left:3px solid #0A5A46">';
   html+='<div style="font-size:0.78rem;font-weight:700;color:#0A5A46;margin-bottom:6px">💰 採購資訊</div>';
   html+='<div style="font-size:0.86rem;line-height:1.7">';
-  html+='<b style="color:#0A5A46">'+CUR()+' '+fmt(i.price||0,2)+' / '+esc(i.unit)+'</b>';
+  html+='<b style="color:#0A5A46">'+CUR()+' '+fmt(i.price||0,2)+' / '+esc(i.unit)+' <span style="font-size:0.66rem;color:#9A6210;background:#FFF8ED;padding:1px 4px;border-radius:3px">未稅</span></b>';
+  // 🆕 顯示含稅對照
+  var taxRate=i.pkgTaxRate||0.05;
+  if(taxRate>0&&i.price){
+    var inclPrice=(i.price*(1+taxRate)).toFixed(2);
+    html+='<div style="font-size:0.74rem;color:#9A6210;margin-top:2px">含稅: '+CUR()+inclPrice+'/'+esc(i.unit)+' (稅率 '+(taxRate*100)+'%)</div>';
+  }
   html+=priceConv;
   if(i.pkgCount&&i.pkgContent){
-    html+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;font-size:0.78rem;color:#9A6210">📦 包裝: '+i.pkgCount+'包 × '+i.pkgContent+esc(i.pkgUnit||'')+' = '+CUR()+fmt(i.pkgTotal||0,0)+'</div>';
+    var pkgInclLabel=i.pkgIncl==='incl'?'含稅':'未稅';
+    html+='<div style="margin-top:6px;padding-top:6px;border-top:1px solid #eee;font-size:0.78rem;color:#9A6210">📦 包裝: '+i.pkgCount+'包 × '+i.pkgContent+esc(i.pkgUnit||'')+' = '+CUR()+fmt(i.pkgTotal||0,0)+' ('+pkgInclLabel+')</div>';
   }
   html+='<div style="margin-top:6px;font-size:0.78rem;color:#666">';
   html+='供應: '+esc(supName)+'<br>';
@@ -2330,7 +2391,7 @@ window.ingFilterReset=function(){
 };
 
 function openIngModal(id){const def={id:nxtId(state.ings,'I'),name:'',cat:'肉類',unit:'公斤',stock:0,safety:0,price:0,sup:'S001',form:'整顆/原形',meatSrc:'',kcal:0,prot:0,fat:0,carb:0,sodium:0};const ing=id?state.ings.find(x=>x.id===id):def;if(!ing)return;
-modal(mH(id?'編輯食材':'新增食材')+`<div class="form-row c3"><div class="fg"><label>食材編號</label><input id="fi-id" value="${esc(ing.id)}"${id?' disabled':''}></div><div class="fg"><label>食材名稱 *</label><input id="fi-name" value="${esc(ing.name)}"></div><div class="fg"><label>類別 🔍</label>${window.buildSearchSelect({id:'fi-cat',options:state.refs.cats||[],value:ing.cat,placeholder:'點此搜尋類別...'})}</div></div><div class="form-row c4"><div class="fg"><label>單位 🔍</label>${window.buildSearchSelect({id:'fi-unit',options:state.refs.units||[],value:ing.unit,placeholder:'點此搜尋單位...'})}</div><div class="fg"><label>型態 🔍</label>${window.buildSearchSelect({id:'fi-form',options:state.refs.forms||[],value:ing.form,placeholder:'點此搜尋型態...'})}</div><div class="fg"><label>供應商 🔍</label>${window.buildSearchSelect({id:'fi-sup',options:state.sups.map(function(s){return s.id+' '+s.name}),value:(function(){var s=state.sups.find(function(x){return x.id===ing.sup});return s?s.id+' '+s.name:''})(),placeholder:'點此搜尋供應商...'})}</div><div class="fg"><label>進價 (${CUR()}/單位)</label><input id="fi-price" type="number" min="0" step="0.01" value="${ing.price||0}" oninput="updatePriceConv()"><div id="fi-price-conv" style="font-size:0.74rem;color:#999;margin-top:3px;min-height:14px"></div></div></div><div style="background:#E8F4EE;border:1px solid #b5d4c5;border-radius:8px;padding:10px 12px;margin-top:6px"><div style="font-size:0.86rem;font-weight:600;color:#0A5A46;margin-bottom:6px">📦 包裝採購試算 (買 1 包/罐 N 公斤 NT$X 自動算單價)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.74rem">買幾包/罐</label><input id="fi-pkg-count" type="number" min="1" step="1" value="${ing.pkgCount||1}" placeholder="如 1" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">每包內容量</label><input id="fi-pkg-content" type="number" min="0" step="0.01" value="${ing.pkgContent||''}" placeholder="如 2" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">內容量單位</label>${window.buildSearchSelect({id:'fi-pkg-unit',options:(state.refs.units||[]).filter(function(u){var info=window.UNIT_DB?window.UNIT_DB[u]:null;return info&&(info.type==='weight'||info.type==='volume')}),value:ing.pkgUnit||'公斤',placeholder:'公斤/公升...'})}</div><div class="fg"><label style="font-size:0.74rem">總價 (含稅)</label><input id="fi-pkg-total" type="number" min="0" step="0.01" value="${ing.pkgTotal||''}" placeholder="如 440" oninput="updatePkgPrice()"></div></div><div id="fi-pkg-result" style="font-size:0.82rem;color:#0A5A46;margin-top:6px;font-weight:700">💡 填入上方數值,自動計算「進價/單位」</div><button type="button" onclick="applyPkgPrice()" class="btn btn-sm" style="background:#0A5A46;color:#fff;margin-top:6px;padding:4px 14px;font-size:0.78rem">📥 套用為食材主進價</button></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label>現有庫存</label><input id="fi-stock" type="number" min="0" step="0.01" value="${ing.stock||0}"></div><div class="fg"><label>安全庫存</label><input id="fi-safety" type="number" min="0" step="0.01" value="${ing.safety||0}"></div><div class="fg"><label>肉品來源 🔍</label>${window.buildSearchSelect({id:'fi-meat',options:state.refs.meatSrc||[],value:ing.meatSrc||'',placeholder:'點此搜尋或選擇...'})}</div></div><div style="background:#FFF8ED;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📦 固形物重量（罐頭/醃漬品用）</div><div class="form-row c3"><div class="fg"><label>總重量(g)</label><input id="fi-tw" type="number" min="0" step="1" value="${ing.totalWeight||''}" placeholder="整罐/整包重量"></div><div class="fg"><label>固形物重量(g)</label><input id="fi-sw" type="number" min="0" step="1" value="${ing.solidWeight||''}" placeholder="瀝乾後實際重量"></div><div class="fg"><label>固形物比例 / 實際成本</label><div style="padding:8px 0;font-weight:700;color:#0A5A46">${ing.totalWeight&&ing.solidWeight?Math.round(ing.solidWeight/ing.totalWeight*100)+'% ｜ $'+((ing.price||0)/(ing.solidWeight/1000)).toFixed(1)+'/kg':'填入上方欄位自動計算'}</div></div></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🍽️ 可食率 / 備料良率 (Yield Rate)</div><div class="form-row c3"><div class="fg"><label>可食率 (%)</label><input id="fi-yield" type="number" min="1" max="100" step="1" value="${Math.round((ing.yieldRate||1)*100)}" oninput="updateYieldPreview()"><div style="font-size:0.74rem;color:#999;margin-top:3px">100% = 全部可食 (預設)</div></div><div class="fg"><label>真實單位成本 (含損耗)</label><input id="fi-real-cost" type="text" disabled value="—" style="background:#F3F1EB;color:#B82525;font-weight:700"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動 = 進價 ÷ 可食率</div></div><div class="fg"><label>備料損耗預估</label><input id="fi-yield-loss" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">每 1 單位進貨會損耗多少</div></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px;line-height:1.5">💡 範例:鳳梨整顆 60元/kg, 去皮去芯後可食 60% → 真實成本 100元/kg<br>計件類食材 (顆/包/盒) 通常維持 100% (除非有耗損)</div></div><div style="background:#E8F4EE;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="fi-cust-sell" ${ing.customerSell?'checked':''} onchange="toggleCustSellPrice()"><span>🛒 對外可賣 (B2B 客戶可訂購)</span></label></div><div id="fi-cust-sell-price" style="${ing.customerSell?'':'display:none;'}margin-top:8px"><div class="form-row c2"><div class="fg"><label>對外售價 (${CUR()}/單位)</label><input id="fi-sell-price" type="number" min="0" step="0.01" value="${ing.sellPrice||ing.price||0}" oninput="updateMargin()"><div style="font-size:0.74rem;color:#0A5A46;margin-top:3px">客戶下單預設售價,可在客戶資料設專屬價</div></div><div class="fg"><label>毛利率 (參考)</label><input id="fi-margin" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動依進價計算</div></div></div></div></div><div style="background:#F3F1EB;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🏷️ 每100g 營養值（以固形物為基準）</div><div class="form-row c5">${[['fi-kcal','熱量 kcal',ing.kcal||0],['fi-prot','蛋白質 g',ing.prot||0],['fi-fat','脂肪 g',ing.fat||0],['fi-carb','碳水 g',ing.carb||0],['fi-sodium','鈉 mg',ing.sodium||0]].map(([fid,lb,v])=>`<div class="fg"><label>${lb}</label><input id="${fid}" type="number" min="0" step="0.01" value="${v}"></div>`).join('')}</div></div><div style="background:#FFF4E6;border:1px solid #f5c98a;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#9A6210">⚠️ 過敏原標示 (8 大法定過敏原)</div><div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${['麩質','蛋','奶','花生','堅果','大豆','魚','甲殼類'].map(function(a){var checked=(ing.allergens||[]).indexOf(a)>=0;return '<label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer;padding:4px 6px;background:#fff;border-radius:4px"><input type="checkbox" name="fi-allergen" value="'+a+'"'+(checked?' checked':'')+'>'+a+'</label>'}).join('')}</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 依照「食品過敏原標示規定」設定,菜單會自動帶入過敏原警示</div></div><div style="background:#F0F9FF;border:1px solid #7dd3fc;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#0369a1">📋 ERP 進階資訊 (採購/庫存管控)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.78rem">條碼/SKU</label><input id="fi-barcode" type="text" value="${esc(ing.barcode||'')}" placeholder="如 4710..."></div><div class="fg"><label style="font-size:0.78rem">品牌</label><input id="fi-brand" type="text" value="${esc(ing.brand||'')}" placeholder="如 義美"></div><div class="fg"><label style="font-size:0.78rem">規格</label><input id="fi-spec" type="text" value="${esc(ing.spec||'')}" placeholder="如 500g x 24"></div><div class="fg"><label style="font-size:0.78rem">儲存位置</label><input id="fi-location" type="text" value="${esc(ing.location||'')}" placeholder="如 冷藏A1"></div></div><div class="form-row c4" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">最低訂購量(MOQ)</label><input id="fi-moq" type="number" min="0" step="1" value="${ing.minOrderQty||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">前置時間(天)</label><input id="fi-leadtime" type="number" min="0" step="1" value="${ing.leadTime||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">最高庫存量</label><input id="fi-maxstock" type="number" min="0" step="0.01" value="${ing.maxStock||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">儲存溫度</label>${window.buildSearchSelect({id:'fi-storage',options:['常溫','冷藏(0~7°C)','冷凍(-18°C↓)','陰涼乾燥處','避光保存'],value:ing.storageTemp||'',placeholder:'選擇儲存條件...'})}</div></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">保存期限(天)</label><input id="fi-shelflife" type="number" min="0" step="1" value="${ing.shelfLife||0}" placeholder="如 30"></div><div class="fg"><label style="font-size:0.78rem">原產地</label><input id="fi-origin" type="text" value="${esc(ing.originCountry||'')}" placeholder="如 台灣/澳洲"></div><div class="fg"><label style="font-size:0.78rem">認證標章</label>${window.buildSearchSelect({id:'fi-cert',options:['有機認證','HACCP','ISO22000','清真認證','產銷履歷','無認證','其他'],value:ing.certification||'',placeholder:'選擇認證...'})}</div></div></div><div style="background:#F8F9FA;border:1px solid #d1d5db;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📝 餐飲業特化欄位</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">季節性</label>${window.buildSearchSelect({id:'fi-seasonal',options:['全年','春','夏','秋','冬','春夏','秋冬'],value:ing.seasonal||'全年',placeholder:'選擇季節...'})}</div><div class="fg"><label style="font-size:0.78rem">使用備註</label><input id="fi-usage" type="text" value="${esc(ing.usageNote||'')}" placeholder="例:解凍後使用、需先汆燙..."></div></div></div>${mF("saveIng('"+id+"')")}`);
+modal(mH(id?'編輯食材':'新增食材')+`<div class="form-row c3"><div class="fg"><label>食材編號</label><input id="fi-id" value="${esc(ing.id)}"${id?' disabled':''}></div><div class="fg"><label>食材名稱 *</label><input id="fi-name" value="${esc(ing.name)}"></div><div class="fg"><label>類別 🔍</label>${window.buildSearchSelect({id:'fi-cat',options:state.refs.cats||[],value:ing.cat,placeholder:'點此搜尋類別...',sortField:'cat'})}</div></div><div class="form-row c4"><div class="fg"><label>單位 🔍</label>${window.buildSearchSelect({id:'fi-unit',options:state.refs.units||[],value:ing.unit,placeholder:'點此搜尋單位...',sortField:'unit'})}</div><div class="fg"><label>型態 🔍</label>${window.buildSearchSelect({id:'fi-form',options:state.refs.forms||[],value:ing.form,placeholder:'點此搜尋型態...',sortField:'form'})}</div><div class="fg"><label>供應商 🔍</label>${window.buildSearchSelect({id:'fi-sup',options:state.sups.map(function(s){return s.id+' '+s.name}),value:(function(){var s=state.sups.find(function(x){return x.id===ing.sup});return s?s.id+' '+s.name:''})(),placeholder:'點此搜尋供應商...'})}</div><div class="fg"><label>進價 (${CUR()}/單位)</label><input id="fi-price" type="number" min="0" step="0.01" value="${ing.price||0}" oninput="updatePriceConv()"><div id="fi-price-conv" style="font-size:0.74rem;color:#999;margin-top:3px;min-height:14px"></div></div></div><div style="background:#E8F4EE;border:1px solid #b5d4c5;border-radius:8px;padding:10px 12px;margin-top:6px"><div style="font-size:0.86rem;font-weight:600;color:#0A5A46;margin-bottom:6px">📦 包裝採購試算 (買 1 包/罐 N 公斤 NT$X 自動算單價)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.74rem">買幾包/罐</label><input id="fi-pkg-count" type="number" min="1" step="1" value="${ing.pkgCount||1}" placeholder="如 1" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">每包內容量</label><input id="fi-pkg-content" type="number" min="0" step="0.01" value="${ing.pkgContent||''}" placeholder="如 2" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">內容量單位</label>${window.buildSearchSelect({id:'fi-pkg-unit',options:(state.refs.units||[]).filter(function(u){var info=window.UNIT_DB?window.UNIT_DB[u]:null;return info&&(info.type==='weight'||info.type==='volume')}),value:ing.pkgUnit||'公斤',placeholder:'公斤/公升...'})}</div><div class="fg"><label style="font-size:0.74rem">總價</label><input id="fi-pkg-total" type="number" min="0" step="0.01" value="${ing.pkgTotal||''}" placeholder="如 440" oninput="updatePkgPrice()"></div></div><div class="form-row c2" style="margin-top:6px"><div class="fg"><label style="font-size:0.74rem;color:#9A6210">💰 上方總價是?</label><div style="display:flex;gap:14px;padding:8px 4px;background:#fff;border:1px solid #ddd;border-radius:6px"><label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer"><input type="radio" name="fi-pkg-incl" value="excl" ${(!ing.pkgIncl||ing.pkgIncl==='excl')?'checked':''} onchange="updatePkgPrice()"><span><b>未稅</b> (ERP 標準)</span></label><label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer"><input type="radio" name="fi-pkg-incl" value="incl" ${ing.pkgIncl==='incl'?'checked':''} onchange="updatePkgPrice()"><span><b>含稅</b> (發票價)</span></label></div></div><div class="fg"><label style="font-size:0.74rem;color:#9A6210">稅率</label><select id="fi-pkg-tax-rate" onchange="updatePkgPrice()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"><option value="0.05" ${(!ing.pkgTaxRate||ing.pkgTaxRate===0.05)?'selected':''}>應稅 5%</option><option value="0" ${ing.pkgTaxRate===0?'selected':''}>免稅 0%</option></select></div></div><div id="fi-pkg-result" style="font-size:0.82rem;color:#0A5A46;margin-top:6px;font-weight:700">💡 填入上方數值,自動計算「未稅進價/單位」</div><button type="button" onclick="applyPkgPrice()" class="btn btn-sm" style="background:#0A5A46;color:#fff;margin-top:6px;padding:4px 14px;font-size:0.78rem">📥 套用為食材主進價 (未稅)</button></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label>現有庫存</label><input id="fi-stock" type="number" min="0" step="0.01" value="${ing.stock||0}"></div><div class="fg"><label>安全庫存</label><input id="fi-safety" type="number" min="0" step="0.01" value="${ing.safety||0}"></div><div class="fg"><label>肉品來源 🔍</label>${window.buildSearchSelect({id:'fi-meat',options:state.refs.meatSrc||[],value:ing.meatSrc||'',placeholder:'點此搜尋或選擇...',sortField:'meatSrc'})}</div></div><div style="background:#FFF8ED;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📦 固形物重量（罐頭/醃漬品用）</div><div class="form-row c3"><div class="fg"><label>總重量(g)</label><input id="fi-tw" type="number" min="0" step="1" value="${ing.totalWeight||''}" placeholder="整罐/整包重量"></div><div class="fg"><label>固形物重量(g)</label><input id="fi-sw" type="number" min="0" step="1" value="${ing.solidWeight||''}" placeholder="瀝乾後實際重量"></div><div class="fg"><label>固形物比例 / 實際成本</label><div style="padding:8px 0;font-weight:700;color:#0A5A46">${ing.totalWeight&&ing.solidWeight?Math.round(ing.solidWeight/ing.totalWeight*100)+'% ｜ $'+((ing.price||0)/(ing.solidWeight/1000)).toFixed(1)+'/kg':'填入上方欄位自動計算'}</div></div></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🍽️ 可食率 / 備料良率 (Yield Rate)</div><div class="form-row c3"><div class="fg"><label>可食率 (%)</label><input id="fi-yield" type="number" min="1" max="100" step="1" value="${Math.round((ing.yieldRate||1)*100)}" oninput="updateYieldPreview()"><div style="font-size:0.74rem;color:#999;margin-top:3px">100% = 全部可食 (預設)</div></div><div class="fg"><label>真實單位成本 (含損耗)</label><input id="fi-real-cost" type="text" disabled value="—" style="background:#F3F1EB;color:#B82525;font-weight:700"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動 = 進價 ÷ 可食率</div></div><div class="fg"><label>備料損耗預估</label><input id="fi-yield-loss" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">每 1 單位進貨會損耗多少</div></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px;line-height:1.5">💡 範例:鳳梨整顆 60元/kg, 去皮去芯後可食 60% → 真實成本 100元/kg<br>計件類食材 (顆/包/盒) 通常維持 100% (除非有耗損)</div></div><div style="background:#E8F4EE;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="fi-cust-sell" ${ing.customerSell?'checked':''} onchange="toggleCustSellPrice()"><span>🛒 對外可賣 (B2B 客戶可訂購)</span></label></div><div id="fi-cust-sell-price" style="${ing.customerSell?'':'display:none;'}margin-top:8px"><div class="form-row c2"><div class="fg"><label>對外售價 (${CUR()}/單位)</label><input id="fi-sell-price" type="number" min="0" step="0.01" value="${ing.sellPrice||ing.price||0}" oninput="updateMargin()"><div style="font-size:0.74rem;color:#0A5A46;margin-top:3px">客戶下單預設售價,可在客戶資料設專屬價</div></div><div class="fg"><label>毛利率 (參考)</label><input id="fi-margin" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動依進價計算</div></div></div></div></div><div style="background:#F3F1EB;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🏷️ 每100g 營養值（以固形物為基準）</div><div class="form-row c5">${[['fi-kcal','熱量 kcal',ing.kcal||0],['fi-prot','蛋白質 g',ing.prot||0],['fi-fat','脂肪 g',ing.fat||0],['fi-carb','碳水 g',ing.carb||0],['fi-sodium','鈉 mg',ing.sodium||0]].map(([fid,lb,v])=>`<div class="fg"><label>${lb}</label><input id="${fid}" type="number" min="0" step="0.01" value="${v}"></div>`).join('')}</div></div><div style="background:#FFF4E6;border:1px solid #f5c98a;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#9A6210">⚠️ 過敏原標示 (8 大法定過敏原)</div><div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${['麩質','蛋','奶','花生','堅果','大豆','魚','甲殼類'].map(function(a){var checked=(ing.allergens||[]).indexOf(a)>=0;return '<label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer;padding:4px 6px;background:#fff;border-radius:4px"><input type="checkbox" name="fi-allergen" value="'+a+'"'+(checked?' checked':'')+'>'+a+'</label>'}).join('')}</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 依照「食品過敏原標示規定」設定,菜單會自動帶入過敏原警示</div></div><div style="background:#F0F9FF;border:1px solid #7dd3fc;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#0369a1">📋 ERP 進階資訊 (採購/庫存管控)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.78rem">條碼/SKU</label><input id="fi-barcode" type="text" value="${esc(ing.barcode||'')}" placeholder="如 4710..."></div><div class="fg"><label style="font-size:0.78rem">品牌</label><input id="fi-brand" type="text" value="${esc(ing.brand||'')}" placeholder="如 義美"></div><div class="fg"><label style="font-size:0.78rem">規格</label><input id="fi-spec" type="text" value="${esc(ing.spec||'')}" placeholder="如 500g x 24"></div><div class="fg"><label style="font-size:0.78rem">儲存位置</label><input id="fi-location" type="text" value="${esc(ing.location||'')}" placeholder="如 冷藏A1"></div></div><div class="form-row c4" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">最低訂購量(MOQ)</label><input id="fi-moq" type="number" min="0" step="1" value="${ing.minOrderQty||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">前置時間(天)</label><input id="fi-leadtime" type="number" min="0" step="1" value="${ing.leadTime||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">最高庫存量</label><input id="fi-maxstock" type="number" min="0" step="0.01" value="${ing.maxStock||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">儲存溫度</label>${window.buildSearchSelect({id:'fi-storage',options:['冷藏(0~7°C)','冷凍(-18°C↓)','常溫','陰涼乾燥處','避光保存'],value:ing.storageTemp||'',placeholder:'選擇儲存條件...',sortField:'storageTemp'})}</div></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">保存期限(天)</label><input id="fi-shelflife" type="number" min="0" step="1" value="${ing.shelfLife||0}" placeholder="如 30"></div><div class="fg"><label style="font-size:0.78rem">原產地</label><input id="fi-origin" type="text" value="${esc(ing.originCountry||'')}" placeholder="如 台灣/澳洲"></div><div class="fg"><label style="font-size:0.78rem">認證標章</label>${window.buildSearchSelect({id:'fi-cert',options:['無認證','HACCP','ISO22000','有機認證','產銷履歷','清真認證','其他'],value:ing.certification||'',placeholder:'選擇認證...',sortField:'certification'})}</div></div></div><div style="background:#F8F9FA;border:1px solid #d1d5db;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📝 餐飲業特化欄位</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">季節性</label>${window.buildSearchSelect({id:'fi-seasonal',options:['全年','春','夏','秋','冬','春夏','秋冬'],value:ing.seasonal||'全年',placeholder:'選擇季節...',sortField:'seasonal'})}</div><div class="fg"><label style="font-size:0.78rem">使用備註</label><input id="fi-usage" type="text" value="${esc(ing.usageNote||'')}" placeholder="例:解凍後使用、需先汆燙..."></div></div></div>${mF("saveIng('"+id+"')")}`);
 // modal 開啟後初始化進價對照顯示
 setTimeout(function(){if(typeof updatePriceConv==='function')updatePriceConv();if(typeof updateMargin==='function')updateMargin();if(typeof updateYieldPreview==='function')updateYieldPreview()},80);
 }
@@ -2373,67 +2434,83 @@ window.updatePkgPrice=function(){
   var pkgUnit=$('fi-pkg-unit')?.value||'';
   var total=+$('fi-pkg-total')?.value||0;
   var unit=$('fi-unit')?.value||'';  // 食材主單位
+  // 🆕 含稅/未稅切換
+  var inclEl=document.querySelector('input[name="fi-pkg-incl"]:checked');
+  var isIncl=inclEl?inclEl.value==='incl':false;
+  var taxRate=+$('fi-pkg-tax-rate')?.value||0;
   var resultEl=$('fi-pkg-result');
   if(!resultEl)return;
   
   if(!count||!content||!total){
-    resultEl.innerHTML='💡 填入上方數值,自動計算「進價/單位」';
+    resultEl.innerHTML='💡 填入上方數值,自動計算「未稅進價/單位」';
     resultEl.style.color='#999';
     return;
   }
   
-  var totalContent=count*content;  // 總內容量 (例:1 包 × 2 公斤 = 2 公斤)
-  var pricePerPkgUnit=total/totalContent;  // 每包裝單位的價格 (NT$/公斤)
+  // 🆕 計算未稅總價
+  var totalNet=isIncl?total/(1+taxRate):total;
+  var totalGross=isIncl?total:total*(1+taxRate);
+  var taxAmt=totalGross-totalNet;
+  
+  var totalContent=count*content;  // 總內容量
+  var pricePerPkgUnitNet=totalNet/totalContent;  // 未稅單價
   
   // 如果食材主單位 ≠ 包裝單位 → 還要換算
-  var pricePerMainUnit=pricePerPkgUnit;
+  var pricePerMainUnitNet=pricePerPkgUnitNet;
   var convNote='';
   if(unit&&unit!==pkgUnit&&typeof window.convertUnit==='function'){
-    // 換算 1 主單位 = ? 包裝單位
     var mainToPkg=window.convertUnit(1,unit,pkgUnit);
     if(mainToPkg!=null&&mainToPkg!==1){
-      pricePerMainUnit=pricePerPkgUnit*mainToPkg;
+      pricePerMainUnitNet=pricePerPkgUnitNet*mainToPkg;
       convNote=' (1 '+unit+' = '+mainToPkg.toFixed(3)+' '+pkgUnit+')';
     }
   }
   
   var html='✅ 計算結果:<br>';
-  html+='&nbsp;&nbsp;&nbsp;&nbsp;每 '+pkgUnit+' = <b style="color:#B82525">NT$ '+pricePerPkgUnit.toFixed(2)+'</b><br>';
-  if(unit&&unit!==pkgUnit){
-    html+='&nbsp;&nbsp;&nbsp;&nbsp;每 '+unit+' = <b style="color:#B82525">NT$ '+pricePerMainUnit.toFixed(2)+'</b>'+convNote+'<br>';
+  html+='&nbsp;&nbsp;&nbsp;&nbsp;<b style="color:#9A6210">輸入: '+(isIncl?'含稅':'未稅')+' NT$'+total.toFixed(2)+' (稅率 '+(taxRate*100)+'%)</b><br>';
+  if(taxRate>0){
+    html+='&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#666">→ 拆出: 未稅 NT$'+totalNet.toFixed(2)+' + 稅 NT$'+taxAmt.toFixed(2)+' = 含稅 NT$'+totalGross.toFixed(2)+'</span><br>';
   }
-  html+='&nbsp;&nbsp;&nbsp;&nbsp;總購買量: '+totalContent+' '+pkgUnit;
+  html+='&nbsp;&nbsp;&nbsp;&nbsp;<b style="color:#0A5A46">每 '+pkgUnit+' (未稅) = NT$ '+pricePerPkgUnitNet.toFixed(2)+'</b><br>';
+  if(unit&&unit!==pkgUnit){
+    html+='&nbsp;&nbsp;&nbsp;&nbsp;<b style="color:#B82525">每 '+unit+' (未稅) = NT$ '+pricePerMainUnitNet.toFixed(2)+'</b>'+convNote+'<br>';
+  }
+  html+='&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#666">總購買量: '+totalContent+' '+pkgUnit+'</span>';
   resultEl.innerHTML=html;
   resultEl.style.color='#0A5A46';
-  // 同時把計算的單價更新到主進價欄 (但不直接覆蓋,讓使用者按「套用」按鈕)
 };
 
-// 🆕 套用包裝試算為主進價
+// 🆕 套用包裝試算為主進價 (儲存未稅)
 window.applyPkgPrice=function(){
   var count=+$('fi-pkg-count')?.value||0;
   var content=+$('fi-pkg-content')?.value||0;
   var pkgUnit=$('fi-pkg-unit')?.value||'';
   var total=+$('fi-pkg-total')?.value||0;
   var unit=$('fi-unit')?.value||'';
+  var inclEl=document.querySelector('input[name="fi-pkg-incl"]:checked');
+  var isIncl=inclEl?inclEl.value==='incl':false;
+  var taxRate=+$('fi-pkg-tax-rate')?.value||0;
   
   if(!count||!content||!total){alert('請先填寫完整包裝資訊');return}
   
-  var totalContent=count*content;
-  var pricePerPkgUnit=total/totalContent;
-  var pricePerMainUnit=pricePerPkgUnit;
+  // 🆕 計算未稅總價
+  var totalNet=isIncl?total/(1+taxRate):total;
   
-  // 如果食材主單位跟包裝單位不同,要換算
+  var totalContent=count*content;
+  var pricePerPkgUnitNet=totalNet/totalContent;
+  var pricePerMainUnitNet=pricePerPkgUnitNet;
+  
   if(unit&&unit!==pkgUnit&&typeof window.convertUnit==='function'){
     var mainToPkg=window.convertUnit(1,unit,pkgUnit);
-    if(mainToPkg!=null)pricePerMainUnit=pricePerPkgUnit*mainToPkg;
+    if(mainToPkg!=null)pricePerMainUnitNet=pricePerPkgUnitNet*mainToPkg;
   }
   
   var priceEl=$('fi-price');
   if(priceEl){
-    priceEl.value=pricePerMainUnit.toFixed(2);
+    priceEl.value=pricePerMainUnitNet.toFixed(2);
     if(typeof window.updatePriceConv==='function')window.updatePriceConv();
     if(typeof window.updateYieldPreview==='function')window.updateYieldPreview();
-    toast('✅ 已套用 NT$'+pricePerMainUnit.toFixed(2)+'/'+(unit||pkgUnit)+' 為主進價');
+    toast('✅ 已套用 NT$'+pricePerMainUnitNet.toFixed(2)+'/'+(unit||pkgUnit)+' (未稅) 為主進價');
   }
 };
 
@@ -2489,6 +2566,9 @@ const obj={
   pkgContent:+$('fi-pkg-content')?.value||0,
   pkgUnit:$('fi-pkg-unit')?.value||'',
   pkgTotal:+$('fi-pkg-total')?.value||0,
+  // 🆕 包裝含稅/未稅 + 稅率
+  pkgIncl:document.querySelector('input[name="fi-pkg-incl"]:checked')?.value||'excl',
+  pkgTaxRate:+$('fi-pkg-tax-rate')?.value||0.05,
   // B2B
   customerSell:$('fi-cust-sell')?.checked||false,
   sellPrice:+$('fi-sell-price')?.value||0,
@@ -9133,29 +9213,64 @@ pushUndo(); // 初始快照
       const id = eid || document.getElementById('fi-id')?.value || nxtId(state.ings, 'I');
       const taxType = document.getElementById('fi-tax')?.value || 'taxable';
       const taxNote = document.getElementById('fi-taxnote')?.value || '';
+      // 🆕 搜尋式 fi-sup 的 value 是 'S001 德麥食品...',拆出 id
+      var supRaw = document.getElementById('fi-sup')?.value || '';
+      var supId = supRaw.split(' ')[0] || 'S001';
+      if(!state.sups.find(function(s){return s.id===supId})) supId = state.sups[0]?state.sups[0].id:'S001';
       const obj = {
         id, name,
         cat: document.getElementById('fi-cat')?.value || '其他',
         unit: document.getElementById('fi-unit')?.value || '公斤',
         form: document.getElementById('fi-form')?.value || '整顆/原形',
-        sup: document.getElementById('fi-sup')?.value || 'S001',
+        // 🆕 ERP 識別擴充
+        barcode: document.getElementById('fi-barcode')?.value || '',
+        brand: document.getElementById('fi-brand')?.value || '',
+        spec: document.getElementById('fi-spec')?.value || '',
+        // 採購
+        sup: supId,
         meatSrc: document.getElementById('fi-meat')?.value || '',
         price: +document.getElementById('fi-price')?.value || 0,
+        // 🆕 採購擴充
+        minOrderQty: +document.getElementById('fi-moq')?.value || 0,
+        leadTime: +document.getElementById('fi-leadtime')?.value || 0,
+        // 庫存
         stock: +document.getElementById('fi-stock')?.value || 0,
         safety: +document.getElementById('fi-safety')?.value || 0,
+        // 🆕 庫存擴充
+        maxStock: +document.getElementById('fi-maxstock')?.value || 0,
+        location: document.getElementById('fi-location')?.value || '',
+        storageTemp: document.getElementById('fi-storage')?.value || '',
+        // 🆕 品質管控
+        shelfLife: +document.getElementById('fi-shelflife')?.value || 0,
+        originCountry: document.getElementById('fi-origin')?.value || '',
+        certification: document.getElementById('fi-cert')?.value || '',
+        // 營養
         kcal: +document.getElementById('fi-kcal')?.value || 0,
         prot: +document.getElementById('fi-prot')?.value || 0,
         fat: +document.getElementById('fi-fat')?.value || 0,
         carb: +document.getElementById('fi-carb')?.value || 0,
         sodium: +document.getElementById('fi-sodium')?.value || 0,
+        // 🆕 過敏原
+        allergens: Array.from(document.querySelectorAll('input[name="fi-allergen"]:checked')).map(function(c){return c.value}),
+        // 加工
         totalWeight: +document.getElementById('fi-tw')?.value || 0,
         solidWeight: +document.getElementById('fi-sw')?.value || 0,
-        // ─── 可食率 (備料良率) ───
+        // 可食率 (備料良率)
         yieldRate: (function(){var yp=+document.getElementById('fi-yield')?.value;return (yp&&yp>0&&yp<=100)?yp/100:1})(),
-        // ─── M2A 客戶訂購欄位 (修補保留) ───
+        // 🆕 包裝採購資訊 (含稅/未稅,儲存未稅為主)
+        pkgCount: +document.getElementById('fi-pkg-count')?.value || 0,
+        pkgContent: +document.getElementById('fi-pkg-content')?.value || 0,
+        pkgUnit: document.getElementById('fi-pkg-unit')?.value || '',
+        pkgTotal: +document.getElementById('fi-pkg-total')?.value || 0,
+        pkgIncl: document.querySelector('input[name="fi-pkg-incl"]:checked')?.value || 'excl',
+        pkgTaxRate: +document.getElementById('fi-pkg-tax-rate')?.value || 0.05,
+        // M2A 客戶訂購欄位
         customerSell: document.getElementById('fi-cust-sell')?.checked || false,
         sellPrice: +document.getElementById('fi-sell-price')?.value || 0,
-        // ─── 稅務欄位 ───
+        // 🆕 餐飲特化
+        usageNote: document.getElementById('fi-usage')?.value || '',
+        seasonal: document.getElementById('fi-seasonal')?.value || '',
+        // 稅務欄位
         taxType,
         taxNote,
         taxConfirmed: true,  // 老闆手動儲存就視為已確認
