@@ -297,7 +297,8 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
 (function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
 
 // 🔧 migrate: 補舊資料缺少的新欄位 (v2.1.0+)
-(function migrateData(){
+// ⚠️ 抽為 window.runMigrations 給 firebaseLoad / jsonbinLoad 重複呼叫
+window.runMigrations=function(){
   // 食材補 yieldRate (可食率) 預設 1.0
   if(state.ings&&state.ings.length){
     state.ings.forEach(function(i){
@@ -324,7 +325,6 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
     });
     if(changed){
       console.log('[Migrate] refs.units 已補入 '+newUnits.length+' 個新單位');
-      try{saveState&&saveState()}catch(e){}
     }
   }
   // 🆕 refs.forms 自動補新型態 (餐飲業常見處理)
@@ -342,9 +342,15 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
     });
     if(changed2){
       console.log('[Migrate] refs.forms 已補入新型態');
-      try{saveState&&saveState()}catch(e){}
     }
   }
+  return true;  // 表示 migrate 完成
+};
+
+// 啟動時跑一次
+(function(){
+  window.runMigrations();
+  try{saveState&&saveState()}catch(e){}
 })();
 
 // 強制寫入 Firebase 設定（不被舊 localStorage 覆蓋）
@@ -858,7 +864,10 @@ function sopBox(pageId){const cfg=SOP_DATA[pageId];if(!cfg)return null;const wra
 
 // Navigation
 function setPage(p){state.page=p;$$('[data-cp]').forEach(b=>b.classList.toggle('active',b.dataset.cp===p));renderPage()}
-function renderPage(){const c=$('cost-content');if(!c)return;c.innerHTML='';const renders={dash:renderDash,ing:renderIng,recipe:renderRecipe,menu:renderMenuPage,waste:renderWaste,sup:renderSup,buy:renderBuy,order:renderOrder,ref:renderRef,'store-inv':renderStoreInv,transfer:renderTransfer,po:renderPO,ap:renderAP,batch:renderBatch,prod:renderProd,allergen:renderAllergen,contract:renderContract,users:renderUsers,label:renderLabel,qc:renderQC,trace:renderTrace,schedule:renderSchedule,equip:renderEquip,budget:renderBudget,'alert-center':renderAlertCenter,ar:renderAR,count:renderCount,rtn:renderReturn,tax:renderTax,'cost-analysis':renderCostAnalysis,wo:renderWorkOrder,customer:renderCustomer,asset:renderAssets,sales:renderSales,internal:renderInternalSales,cloud:renderCloud};const fn=renders[state.page];if(fn){const r=fn();if(r)c.appendChild(r)}else{c.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'此模組開發中...'))}}
+function renderPage(){const c=$('cost-content');if(!c)return;c.innerHTML='';
+// 🆕 每次 render 前確認 refs 都有最新單位/型態 (防 cloudLoad 覆蓋)
+if(typeof window.runMigrations==='function')try{window.runMigrations()}catch(e){}
+const renders={dash:renderDash,ing:renderIng,recipe:renderRecipe,menu:renderMenuPage,waste:renderWaste,sup:renderSup,buy:renderBuy,order:renderOrder,ref:renderRef,'store-inv':renderStoreInv,transfer:renderTransfer,po:renderPO,ap:renderAP,batch:renderBatch,prod:renderProd,allergen:renderAllergen,contract:renderContract,users:renderUsers,label:renderLabel,qc:renderQC,trace:renderTrace,schedule:renderSchedule,equip:renderEquip,budget:renderBudget,'alert-center':renderAlertCenter,ar:renderAR,count:renderCount,rtn:renderReturn,tax:renderTax,'cost-analysis':renderCostAnalysis,wo:renderWorkOrder,customer:renderCustomer,asset:renderAssets,sales:renderSales,internal:renderInternalSales,cloud:renderCloud};const fn=renders[state.page];if(fn){const r=fn();if(r)c.appendChild(r)}else{c.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},'此模組開發中...'))}}
 
 
 // ══════════════════════════════════════════════════════
@@ -5191,6 +5200,10 @@ window.firebaseLoad=function(silent){
       var saved=JSON.parse(JSON.stringify(state.cloudConfig));
       Object.keys(res.data).forEach(function(k){if(k!=='cloudConfig'&&k!=='page')state[k]=res.data[k]});
       state.cloudConfig=saved;state.cloudConfig.lastSync=new Date().toISOString();
+      // 🆕 雲端載入後自動跑 migrate (補新單位/型態)
+      if(typeof window.runMigrations==='function'){
+        try{window.runMigrations()}catch(e){console.warn('migrate 失敗',e)}
+      }
       saveState();if(!silent)toast('✅ 已從 Firestore 載入');renderPage();
     }).catch(function(e){if(!silent)toast('❌ Firestore 載入失敗：'+e.message,'err')});
 };
@@ -5221,6 +5234,10 @@ window.jsonbinLoad=function(silent){
       var saved=JSON.parse(JSON.stringify(state.cloudConfig));
       Object.keys(d.data).forEach(function(k){if(k!=='cloudConfig'&&k!=='page')state[k]=d.data[k]});
       state.cloudConfig=saved;state.cloudConfig.lastSync=new Date().toISOString();
+      // 🆕 雲端載入後自動跑 migrate
+      if(typeof window.runMigrations==='function'){
+        try{window.runMigrations()}catch(e){console.warn('migrate 失敗',e)}
+      }
       saveState();if(!silent)toast('✅ 已從 JSONBin 載入');renderPage();
     }).catch(function(e){if(!silent)toast('❌ JSONBin 連線失敗','err')});
 };
