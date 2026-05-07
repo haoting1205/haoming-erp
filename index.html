@@ -2391,7 +2391,7 @@ function renderIng(){const pg=dv({});const sw=sopBox('ing');if(sw)pg.appendChild
 if(!state._ingSearch)state._ingSearch={q:'',cat:'',status:'all'};
 var allCats=Array.from(new Set((state.ings||[]).map(function(i){return i.cat}))).filter(Boolean);
 var searchCard=dv({cls:'card',style:'padding:12px 16px;margin-bottom:12px;background:#fff'});
-searchCard.innerHTML='<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end"><div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">🔍 搜尋食材</label><input id="ing-search-q" type="text" value="'+esc(state._ingSearch.q||'')+'" placeholder="輸入名稱、編號、類別..." style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem" oninput="ingFilter()"></div><div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">類別篩選</label><select id="ing-search-cat" onchange="ingFilter()" style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"><option value="">全部類別</option>'+allCats.map(function(c){return '<option value="'+esc(c)+'"'+(state._ingSearch.cat===c?' selected':'')+'>'+esc(c)+'</option>'}).join('')+'</select></div><div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">庫存狀態</label><select id="ing-search-status" onchange="ingFilter()" style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"><option value="all">全部</option><option value="low"'+(state._ingSearch.status==='low'?' selected':'')+'>⚠️ 低庫存</option><option value="out"'+(state._ingSearch.status==='out'?' selected':'')+'>❌ 缺貨</option><option value="full"'+(state._ingSearch.status==='full'?' selected':'')+'>✅ 充足</option></select></div><button class="btn btn-sm btn-outline" onclick="ingFilterReset()" style="height:36px">↻ 重設</button></div><div id="ing-search-stats" style="font-size:0.78rem;color:#706E68;margin-top:6px"></div>';
+searchCard.innerHTML='<div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end"><div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">🔍 搜尋食材</label><input id="ing-search-q" type="text" value="'+esc(state._ingSearch.q||'')+'" placeholder="輸入名稱、編號、類別..." style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem" oncompositionstart="window._imeStart(this)" oncompositionend="window._imeEnd(this,\'ing\')" oninput="window._safeSearch(this,\'ing\')"></div><div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">類別篩選</label><select id="ing-search-cat" onchange="ingFilter()" style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"><option value="">全部類別</option>'+allCats.map(function(c){return '<option value="'+esc(c)+'"'+(state._ingSearch.cat===c?' selected':'')+'>'+esc(c)+'</option>'}).join('')+'</select></div><div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">庫存狀態</label><select id="ing-search-status" onchange="ingFilter()" style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"><option value="all">全部</option><option value="low"'+(state._ingSearch.status==='low'?' selected':'')+'>⚠️ 低庫存</option><option value="out"'+(state._ingSearch.status==='out'?' selected':'')+'>❌ 缺貨</option><option value="full"'+(state._ingSearch.status==='full'?' selected':'')+'>✅ 充足</option></select></div><button class="btn btn-sm btn-outline" onclick="ingFilterReset()" style="height:36px">↻ 重設</button></div><div id="ing-search-stats" style="font-size:0.78rem;color:#706E68;margin-top:6px"></div>';
 pg.appendChild(searchCard);
 
 // 篩選食材
@@ -2562,6 +2562,47 @@ window.buildIngDetailRow=function(i){
 };
 
 // 🆕 食材搜尋過濾
+// ══════════════════════════════════════════════════════
+// 🆕 IME-safe + debounce 搜尋輔助 (修中文輸入法注音卡頓問題)
+// 用法: oninput="window._safeSearch(this,'ing')" + oncompositionstart/end
+// ══════════════════════════════════════════════════════
+window._searchTimers={};
+window._searchHandlers={
+  ing:function(){if(typeof window.ingFilter==='function')window.ingFilter()},
+  prod:function(){if(typeof window.prodFilter==='function')window.prodFilter()},
+  si:function(){if(typeof window.renderSITable==='function')window.renderSITable()},
+  inv:function(el){if(typeof window._filterInvoices==='function'&&el)window._filterInvoices(el.value)}
+};
+
+window._safeSearch=function(el,type,delayMs){
+  // 若正在 IME 注音/拼音輸入中,完全不觸發
+  if(el&&el._imeComposing)return;
+  
+  var delay=delayMs||250;
+  if(window._searchTimers[type])clearTimeout(window._searchTimers[type]);
+  
+  window._searchTimers[type]=setTimeout(function(){
+    var handler=window._searchHandlers[type];
+    if(handler)handler(el);
+  },delay);
+};
+
+// IME 開始 (中文輸入法開始拼字)
+window._imeStart=function(el){
+  if(el)el._imeComposing=true;
+};
+
+// IME 結束 (使用者選完字或取消)
+window._imeEnd=function(el,type){
+  if(el)el._imeComposing=false;
+  // 結束後立刻執行一次搜尋(不要等 debounce)
+  if(type){
+    if(window._searchTimers[type])clearTimeout(window._searchTimers[type]);
+    var handler=window._searchHandlers[type];
+    if(handler)setTimeout(function(){handler(el)},0);
+  }
+};
+
 window.ingFilter=function(){
   var q=document.getElementById('ing-search-q')?.value||'';
   var cat=document.getElementById('ing-search-cat')?.value||'';
@@ -4729,7 +4770,7 @@ fh+='<select id="sif-store" onchange="renderSITable()" style="border:1.5px solid
 fh+='<select id="sif-cat" onchange="renderSITable()" style="border:1.5px solid #C8C6BE;border-radius:7px;padding:7px 12px;font-size:0.9rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C;font-weight:600"><option value="">全部類別</option><option value="食材">🥬 食材</option><option value="包材">📦 包材</option></select>';
 fh+='<select id="sif-src" onchange="renderSITable()" style="border:1.5px solid #C8C6BE;border-radius:7px;padding:7px 12px;font-size:0.9rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C;font-weight:600"><option value="">全部來源</option><option value="批發">批發</option><option value="零售">零售</option></select>';
 fh+='<select id="sif-st" onchange="renderSITable()" style="border:1.5px solid #C8C6BE;border-radius:7px;padding:7px 12px;font-size:0.9rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C;font-weight:600"><option value="">全部狀態</option><option value="ok">✅ 充足</option><option value="low">⚠️ 低庫存</option><option value="out">❌ 缺貨</option></select>';
-fh+='<input id="sif-q" type="text" placeholder="🔍 搜尋品名..." oninput="renderSITable()" style="border:1.5px solid #C8C6BE;border-radius:7px;padding:7px 12px;font-size:0.9rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C;max-width:180px">';
+fh+='<input id="sif-q" type="text" placeholder="🔍 搜尋品名..." oncompositionstart="window._imeStart(this)" oncompositionend="window._imeEnd(this,\'si\')" oninput="window._safeSearch(this,\'si\')" style="border:1.5px solid #C8C6BE;border-radius:7px;padding:7px 12px;font-size:0.9rem;font-family:inherit;background:#FAFAF8;color:#1E1E1C;max-width:180px">';
 fh+='<span id="si-cnt" style="font-size:0.86rem;color:#555350;font-weight:600"></span></div>';
 pg.appendChild(dv({html:fh}));
 pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',id:'si-tw'}));
@@ -4998,7 +5039,7 @@ pg.appendChild(dv({cls:'grid4',style:'margin-bottom:16px'},
 if(!state._prodSearch)state._prodSearch={q:'',source:'all',dateFrom:'',dateTo:''};
 var searchCard=dv({cls:'card',style:'padding:12px 16px;margin-bottom:12px'});
 searchCard.innerHTML='<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:10px;align-items:end">'+
-  '<div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">🔍 搜尋</label><input id="prod-q" type="text" value="'+esc(state._prodSearch.q||'')+'" placeholder="配方/批號/負責人..." style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem" oninput="prodFilter()"></div>'+
+  '<div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">🔍 搜尋</label><input id="prod-q" type="text" value="'+esc(state._prodSearch.q||'')+'" placeholder="配方/批號/負責人..." style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem" oncompositionstart="window._imeStart(this)" oncompositionend="window._imeEnd(this,\'prod\')" oninput="window._safeSearch(this,\'prod\')"></div>'+
   '<div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">來源</label><select id="prod-source" onchange="prodFilter()" style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"><option value="all">全部</option><option value="app_report"'+(state._prodSearch.source==='app_report'?' selected':'')+'>📱 APP 回報</option><option value="schedule"'+(state._prodSearch.source==='schedule'?' selected':'')+'>📅 排程</option><option value="manual"'+(state._prodSearch.source==='manual'?' selected':'')+'>✏️ 手動</option></select></div>'+
   '<div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">起始日期</label><input id="prod-from" type="date" value="'+esc(state._prodSearch.dateFrom||'')+'" onchange="prodFilter()" style="width:100%;padding:7px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"></div>'+
   '<div><label style="font-size:0.78rem;color:#706E68;font-weight:600;display:block;margin-bottom:4px">結束日期</label><input id="prod-to" type="date" value="'+esc(state._prodSearch.dateTo||'')+'" onchange="prodFilter()" style="width:100%;padding:7px 10px;border:1px solid #ccc;border-radius:6px;font-size:0.9rem"></div>'+
@@ -8817,7 +8858,7 @@ function _renderCustInvoicesPage(){
   }
   
   // Search filter
-  var qInput=dv({cls:'card',style:'padding:12px;margin-bottom:14px',html:'<input id="inv-search" type="text" placeholder="🔍 搜尋發票號碼或客戶名稱..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-family:inherit" oninput="_filterInvoices(this.value)">'});
+  var qInput=dv({cls:'card',style:'padding:12px;margin-bottom:14px',html:'<input id="inv-search" type="text" placeholder="🔍 搜尋發票號碼或客戶名稱..." style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-family:inherit" oncompositionstart="window._imeStart(this)" oncompositionend="window._imeEnd(this,\'inv\')" oninput="window._safeSearch(this,\'inv\')">'});
   wrap.appendChild(qInput);
   
   var statusLabel={invoiced:'🧾 已開發票',paid:'💰 已付款',completed:'✔ 已完成',returned:'↩️ 退貨中',refunded:'💸 已退款'};
