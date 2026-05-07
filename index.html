@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>好洺餐飲事業有限公司 — 生產管理系統 v2.1.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
@@ -5913,6 +5916,95 @@ window.cancelSchedule=function(id){if(!confirm('確定取消?'))return;var s=sta
 window._prodReportsLoaded=false;
 window._prodReportsLoading=false;
 
+// 🆕 員工 APP 資料結構適配層
+// 員工 APP 寫入格式 (巢狀物件):
+//   {data: {scheduleId: {empId: {batch, actual, extraG, extraUnit, unit, name, time, date, recipeName}}}}
+// ERP 期待格式 (陣列):
+//   {data: [{id, scheduleId, batchNo, actualQty, unit, reporterName, reporterId, reportedAt, recipeName, ...}]}
+// 此函式自動偵測並轉換,相容兩種格式
+window.normalizeProdReports=function(rawData){
+  if(!rawData)return [];
+  
+  // 已經是陣列 → 直接返回 (相容舊格式或將來統一格式)
+  if(Array.isArray(rawData))return rawData;
+  
+  // 巢狀物件 (員工 APP 格式) → 攤平成陣列
+  if(typeof rawData==='object'){
+    var result=[];
+    Object.keys(rawData).forEach(function(scheduleId){
+      var byEmp=rawData[scheduleId];
+      if(!byEmp||typeof byEmp!=='object')return;
+      Object.keys(byEmp).forEach(function(empId){
+        var rpt=byEmp[empId];
+        if(!rpt||typeof rpt!=='object')return;
+        
+        // 處理時間:員工 APP 是 ISO 字串
+        var reportedAt=rpt.date||rpt.time||'';
+        // 如果只有 time (HH:MM) 沒 date,組合今天
+        if(reportedAt&&reportedAt.length<=5){
+          reportedAt=new Date().toISOString().substring(0,10)+'T'+reportedAt+':00.000Z';
+        }
+        
+        // 計算實際數量 (主數量 + 額外數量, 額外換算需注意單位)
+        var actualQty=+rpt.actual||0;
+        var extraQty=+rpt.extraG||0;
+        // 若 extraUnit 是 g 且主單位也是 g/公克 → 直接相加
+        // 否則保留主數量 (額外當作額外不加總)
+        var totalQty=actualQty;
+        if(extraQty>0){
+          var mainUnit=(rpt.unit||'').toLowerCase();
+          var extUnit=(rpt.extraUnit||'').toLowerCase();
+          if(mainUnit===extUnit||
+             (mainUnit==='g'&&extUnit==='g')||
+             (mainUnit==='公克'&&extUnit==='g')||
+             (mainUnit==='g'&&extUnit==='公克')||
+             (mainUnit==='公克'&&extUnit==='公克')){
+            totalQty=actualQty+extraQty;
+          }
+          // 不同單位不加總,保留 actualQty
+        }
+        
+        // 構造備註 (含額外數量資訊)
+        var note='';
+        if(extraQty>0){
+          note='+'+extraQty+(rpt.extraUnit||'g');
+        }
+        
+        result.push({
+          id:'PR_'+scheduleId+'_'+empId,
+          scheduleId:scheduleId,
+          recipeName:rpt.recipeName||'',
+          batchNo:rpt.batch||'',
+          actualQty:totalQty,
+          plannedQty:0,  // 從 schedule 取
+          unit:rpt.unit||'',
+          reporterName:rpt.name||'',
+          reporterId:empId,
+          reportedAt:reportedAt,
+          note:note,
+          store:rpt.store||'',
+          // 保留原始資料,以便除錯
+          _raw:{
+            actual:rpt.actual,
+            extraG:rpt.extraG,
+            extraUnit:rpt.extraUnit,
+            time:rpt.time
+          }
+        });
+      });
+    });
+    
+    // 依時間倒序排列 (新的在前)
+    result.sort(function(a,b){
+      return (b.reportedAt||'').localeCompare(a.reportedAt||'');
+    });
+    
+    return result;
+  }
+  
+  return [];
+};
+
 window.loadProdReports=function(forceReload){
   if(window._prodReportsLoading)return;
   if(window._prodReportsLoaded&&!forceReload)return;  // 避免重複載入
@@ -5924,7 +6016,9 @@ window.loadProdReports=function(forceReload){
     .then(function(doc){
       if(doc.exists&&doc.data()){
         var d=doc.data();
-        var reports=Array.isArray(d.data)?d.data:(Array.isArray(d.records)?d.records:[]);
+        // 🆕 兼容兩種格式:員工 APP 巢狀物件 / ERP 陣列
+        var rawData=d.data!==undefined?d.data:(d.records!==undefined?d.records:[]);
+        var reports=window.normalizeProdReports(rawData);
         state._prodReports=reports;
         // 🆕 同步到 ERP localStorage 永久保存
         state.prodReports=reports.slice();  // 深拷貝
