@@ -1212,6 +1212,25 @@ window.detectIngAnomalies=function(ing,invItem,subtotal,totalCost){
   var anomalies=[];
   var qty=+ing.qty||0;
   var unit=ing.unit||'';
+  var invUnit=(invItem&&invItem.unit)||'';
+  
+  // 🆕 優先檢查:單位是否類型相容 (重量/體積/計件)
+  // 若不相容,計算結果失真,只報「單位不匹配」,不再判用量異常
+  if(unit&&invUnit&&unit!==invUnit&&typeof window.UNIT_DB==='object'){
+    var unitType=window.UNIT_DB[unit]&&window.UNIT_DB[unit].type;
+    var invUnitType=window.UNIT_DB[invUnit]&&window.UNIT_DB[invUnit].type;
+    
+    if(unitType&&invUnitType&&unitType!==invUnitType){
+      // 計件 vs 重量、計件 vs 體積、重量 vs 計件 → 都算嚴重不匹配
+      var hasCount=unitType==='count'||invUnitType==='count';
+      if(hasCount){
+        anomalies.push({level:'mid',msg:'單位不匹配 (食材設「'+invUnit+'」,配方用「'+unit+'」),計算可能失真,請統一單位'});
+        return anomalies;  // 計件類不匹配直接退出,不執行用量檢查
+      }
+      // 重量 vs 體積 — 系統會嘗試用密度換算,先警告但繼續檢查
+      anomalies.push({level:'mid',msg:'食材「'+invUnit+'」配方用「'+unit+'」,以密度換算 (建議統一)'});
+    }
+  }
   
   // 用量過大判斷 (含批次倍數前的「每倍」用量)
   if(unit==='公斤'||unit==='kg'){
@@ -1225,17 +1244,19 @@ window.detectIngAnomalies=function(ing,invItem,subtotal,totalCost){
     if(qty>=1000)anomalies.push({level:'mid',msg:'用量 '+qty+' '+unit+' 數量異常'});
   }
   
-  // 比例異常 (此食材佔總成本 > 90%)
+  // 比例異常 (此食材佔總成本 > 95%)
+  // 🆕 提高門檻:有些醬料主成分 (如奶油/起司) 本來就佔大宗,放寬到 99%
   if(subtotal>0&&totalCost>0){
     var pct=subtotal/totalCost;
-    if(pct>0.95&&totalCost>1000){
+    if(pct>0.99&&totalCost>5000){
       anomalies.push({level:'high',msg:'此食材佔總成本 '+(pct*100).toFixed(1)+'%,可能其他食材用量設錯或缺料'});
     }
   }
   
   // 小計金額異常
-  if(subtotal>50000){
-    anomalies.push({level:'high',msg:'小計金額 '+CUR()+Math.round(subtotal).toLocaleString()+' 過大'});
+  // 🆕 提高門檻:中央廚房單批用料金額本來就大,從 50000 改 500000
+  if(subtotal>500000){
+    anomalies.push({level:'high',msg:'小計金額 '+CUR()+Math.round(subtotal).toLocaleString()+' 過大,請檢查用量'});
   }
   
   return anomalies;
@@ -5846,14 +5867,64 @@ if(state._scheduleView==='calendar'){
 }
 
 // 清單視圖 (預設)
-pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>時段</th><th>配方</th><th>倍數</th><th>預計產出</th><th>負責人</th><th>狀態</th><th style="min-width:160px">📱 APP 回報</th><th>操作</th></tr></thead><tbody>'+list.slice().reverse().map(function(s){var stMap={'待生產':'badge-warn','生產中':'badge-blue','已完成':'badge-green','已取消':'badge-red'};var reportCell=window.buildReportCell?window.buildReportCell(s.id,reportLookup[s.id]||[]):'—';return'<tr><td style="font-weight:600">'+esc(s.date)+'</td><td>'+esc(s.timeSlot||'—')+'</td><td style="font-weight:700">'+esc(s.recipeName)+'</td><td>x'+fmt(s.multiplier,1)+'</td><td style="color:#7A4D0B;font-weight:700">'+fmt(s.output,1)+' '+esc(s.unit)+'</td><td>'+esc(s.assignee||'—')+'</td><td><span class="badge '+(stMap[s.status]||'badge-gray')+'">'+esc(s.status)+'</span>'+(s.deductedAt?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">✓ 已扣料</div>':'')+'</td><td>'+reportCell+'</td><td><div style="display:flex;gap:4px;flex-wrap:wrap">'+(s.status==='待生產'?'<button class="btn btn-sm btn-success" onclick="execSchedule(\''+s.id+'\')">▶️ 開始+扣料</button><button class="btn btn-sm btn-danger" onclick="cancelSchedule(\''+s.id+'\')">取消</button>':'')+(s.status==='生產中'?'<button class="btn btn-sm btn-primary" onclick="completeSchedule(\''+s.id+'\')">✓ 完成</button>':'')+(s.status==='已完成'||s.status==='已取消'?'—':'')+'</div></td></tr>'}).join('')+'</tbody></table></div>'}));return pg}
+pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>時段</th><th>配方</th><th>倍數</th><th>預計產出</th><th>負責人</th><th>狀態</th><th style="min-width:160px">📱 APP 回報</th><th>操作</th></tr></thead><tbody>'+list.slice().reverse().map(function(s){var stMap={'待生產':'badge-warn','生產中':'badge-blue','已完成':'badge-green','已取消':'badge-red'};var reportCell=window.buildReportCell?window.buildReportCell(s.id,reportLookup[s.id]||[]):'—';return'<tr><td style="font-weight:600">'+esc(s.date)+'</td><td>'+esc(s.timeSlot||'—')+'</td><td style="font-weight:700">'+esc(s.recipeName)+'</td><td>x'+fmt(s.multiplier,1)+'</td><td style="color:#7A4D0B;font-weight:700">'+fmt(s.output,1)+' '+esc(s.unit)+'</td><td>'+esc(s.assignee||'—')+'</td><td><span class="badge '+(stMap[s.status]||'badge-gray')+'">'+esc(s.status)+'</span>'+(s.deductedAt?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">✓ 已扣料</div>':'')+'</td><td>'+reportCell+'</td><td><div style="display:flex;gap:4px;flex-wrap:wrap">'+(s.status==='待生產'?'<button class="btn btn-sm btn-success" onclick="execSchedule(\''+s.id+'\')">▶️ 開始+扣料</button><button class="btn btn-sm btn-outline" onclick="editSchedule(\''+s.id+'\')">✏️ 編輯</button><button class="btn btn-sm btn-danger" onclick="cancelSchedule(\''+s.id+'\')">取消</button>':'')+(s.status==='生產中'?'<button class="btn btn-sm btn-primary" onclick="completeSchedule(\''+s.id+'\')">✓ 完成</button>':'')+(s.status==='已取消'?'<button class="btn btn-sm btn-outline" onclick="editSchedule(\''+s.id+'\')">✏️ 編輯</button>':'')+'<button class="btn btn-sm btn-danger" onclick="deleteSchedule(\''+s.id+'\')" title="永久刪除">🗑️</button></div></td></tr>'}).join('')+'</tbody></table></div>'}));return pg}
 
-window.openScheduleModal=function(){var recs=state.recipes||[];
-modal(mH('新增生產排程')+'<div class="form-row c3"><div class="fg"><label>生產日期</label><input id="sc-date" type="date" value="'+toDay()+'"></div><div class="fg"><label>時段</label><select id="sc-time"><option>06:00-09:00 早班</option><option>09:00-12:00 上午</option><option>13:00-17:00 下午</option><option>17:00-21:00 晚班</option></select></div><div class="fg"><label>負責人</label><input id="sc-who" placeholder="姓名"></div></div><div class="form-row c3"><div class="fg"><label>配方</label><select id="sc-rec">'+recs.map(function(r){return'<option value="'+r.id+'" data-name="'+esc(r.name)+'" data-batch="'+r.perBatch+'" data-unit="'+esc(r.unit)+'">'+esc(r.name)+'</option>'}).join('')+'</select></div><div class="fg"><label>倍數</label><input id="sc-mult" type="number" min="0.1" step="0.5" value="1"></div><div class="fg"><label>備註</label><input id="sc-note" placeholder="特殊要求..."></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-top:6px;font-size:0.82rem;color:#9A6210">💡 點「▶️ 開始+扣料」會自動從庫存扣料,點「✓ 完成」會標記完成</div>'+mF('saveSchedule()'))};
+window.openScheduleModal=function(editId){var recs=state.recipes||[];
+var existing=editId?(state.prodSchedule||[]).find(function(x){return x.id===editId}):null;
+var title=existing?'編輯生產排程':'新增生產排程';
+var dDate=existing?existing.date:toDay();
+var dTime=existing?(existing.timeSlot||'06:00-09:00 早班'):'06:00-09:00 早班';
+var dWho=existing?(existing.assignee||''):'';
+var dRec=existing?existing.recipeId:(recs[0]?recs[0].id:'');
+var dMult=existing?existing.multiplier:1;
+var dNote=existing?(existing.note||''):'';
+modal(mH(title)+'<div class="form-row c3"><div class="fg"><label>生產日期</label><input id="sc-date" type="date" value="'+dDate+'"></div><div class="fg"><label>時段</label><select id="sc-time">'+['06:00-09:00 早班','09:00-12:00 上午','13:00-17:00 下午','17:00-21:00 晚班'].map(function(t){return'<option'+(t===dTime?' selected':'')+'>'+t+'</option>'}).join('')+'</select></div><div class="fg"><label>負責人</label><input id="sc-who" value="'+esc(dWho)+'" placeholder="姓名"></div></div><div class="form-row c3"><div class="fg"><label>配方</label><select id="sc-rec">'+recs.map(function(r){return'<option value="'+r.id+'"'+(r.id===dRec?' selected':'')+' data-name="'+esc(r.name)+'" data-batch="'+r.perBatch+'" data-unit="'+esc(r.unit)+'">'+esc(r.name)+'</option>'}).join('')+'</select></div><div class="fg"><label>倍數</label><input id="sc-mult" type="number" min="0.1" step="0.5" value="'+dMult+'"></div><div class="fg"><label>備註</label><input id="sc-note" value="'+esc(dNote)+'" placeholder="特殊要求..."></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-top:6px;font-size:0.82rem;color:#9A6210">💡 點「▶️ 開始+扣料」會自動從庫存扣料,點「✓ 完成」會標記完成</div>'+mF("saveSchedule("+(editId?"'"+editId+"'":"")+")"))};
 
-window.saveSchedule=function(){var sel=$('sc-rec');var rec=(state.recipes||[]).find(function(r){return r.id===(sel?sel.value:'')});if(!rec){alert('請選擇配方');return}var mult=+($('sc-mult')?$('sc-mult').value:1)||1;
+window.saveSchedule=function(editId){var sel=$('sc-rec');var rec=(state.recipes||[]).find(function(r){return r.id===(sel?sel.value:'')});if(!rec){alert('請選擇配方');return}var mult=+($('sc-mult')?$('sc-mult').value:1)||1;
+if(editId){
+  var s=(state.prodSchedule||[]).find(function(x){return x.id===editId});
+  if(!s){alert('找不到此排程');return}
+  if(s.status==='生產中'||s.status==='已完成'){alert('此排程已'+s.status+',不可修改\n如需調整請取消後重建');return}
+  s.date=$('sc-date')?$('sc-date').value:s.date;
+  s.timeSlot=$('sc-time')?$('sc-time').value:s.timeSlot;
+  s.recipeId=rec.id;
+  s.recipeName=rec.name;
+  s.multiplier=mult;
+  s.output=mult*rec.perBatch;
+  s.unit=rec.unit;
+  s.assignee=$('sc-who')?$('sc-who').value:'';
+  s.note=$('sc-note')?$('sc-note').value:'';
+  addAudit('修改排程',rec.name+' x'+mult);
+  saveState();closeModal();renderPage();toast('✅ 排程已更新');
+  return;
+}
 var obj={id:'SC'+Date.now(),date:$('sc-date')?$('sc-date').value:toDay(),timeSlot:$('sc-time')?$('sc-time').value:'',recipeId:rec.id,recipeName:rec.name,multiplier:mult,output:mult*rec.perBatch,unit:rec.unit,assignee:$('sc-who')?$('sc-who').value:'',status:'待生產',note:$('sc-note')?$('sc-note').value:''};
 if(!state.prodSchedule)state.prodSchedule=[];state.prodSchedule.push(obj);addAudit('新增排程',rec.name+' x'+mult);saveState();closeModal();renderPage();toast('✅ 排程已建立')};
+
+// 🆕 編輯排程
+window.editSchedule=function(id){
+  var s=(state.prodSchedule||[]).find(function(x){return x.id===id});
+  if(!s){alert('找不到此排程');return}
+  if(s.status==='生產中'){alert('「生產中」不可編輯,請先「✓ 完成」');return}
+  if(s.status==='已完成'){alert('「已完成」不可編輯,請新增排程');return}
+  window.openScheduleModal(id);
+};
+
+// 🆕 刪除排程
+window.deleteSchedule=function(id){
+  var s=(state.prodSchedule||[]).find(function(x){return x.id===id});
+  if(!s){alert('找不到此排程');return}
+  var msg='確定刪除此排程?\n\n'+s.date+' '+(s.timeSlot||'')+' '+s.recipeName+' x'+s.multiplier;
+  if(s.status==='生產中'){
+    msg='⚠️ 此排程「生產中」且已扣料\n\n刪除後庫存「不會自動還原」!\n若食材已實際使用,刪除後須手動盤點。\n\n確定刪除?';
+  }else if(s.status==='已完成'){
+    msg='⚠️ 此排程「已完成」屬於歷史紀錄\n\n刪除會影響成本分析/毛利計算的歷史數據。\n建議保留。\n\n仍要刪除?';
+  }
+  if(!confirm(msg))return;
+  state.prodSchedule=(state.prodSchedule||[]).filter(function(x){return x.id!==id});
+  addAudit('刪除排程',s.recipeName+' '+s.date+' ('+s.status+')');
+  saveState();renderPage();toast('✅ 排程已刪除');
+};
 
 // 🆕 開始生產 = 自動從庫存扣料 (連動 prod)
 window.execSchedule=function(id){
