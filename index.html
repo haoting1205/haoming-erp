@@ -3058,7 +3058,32 @@ window.executeMissingImport=function(){
 // 取得食材庫所有「包材」類別的食材
 // ══════════════════════════════════════════════════════
 window.getPackagingItems=function(){
-  return (state.ings||[]).filter(function(i){return i.cat==='包材'});
+  // 1. 食材庫中 cat='包材' 的
+  var fromIngs=(state.ings||[]).filter(function(i){return i.cat==='包材'});
+  
+  // 2. 🆕 轉售品項中「名稱含包材關鍵字」的 (Tim 把真空袋放在轉售品項)
+  var packKeywords=['袋','盒','箱','瓶','罐','標籤','貼紙','紙箱','包裝','膜','蓋','杯','吸管','餐具','蓋子','封口','膠帶','打包'];
+  var fromInternal=(state.internalProducts||[]).filter(function(p){
+    var n=p.name||'';
+    return packKeywords.some(function(k){return n.indexOf(k)>=0});
+  }).map(function(p){
+    return {
+      id:'IP_'+(p.id||p.name),
+      name:p.name,
+      unit:p.unit||'個',
+      price:+p.cost||+p.sellPrice||0,  // 優先用成本,沒有就用售價
+      cat:'包材',
+      _fromInternal:true  // 標記來自轉售
+    };
+  });
+  
+  // 3. 合併去重 (食材庫優先,同名不重複加)
+  var seen={};
+  var result=[];
+  fromIngs.forEach(function(p){seen[p.name]=true;result.push(p)});
+  fromInternal.forEach(function(p){if(!seen[p.name])result.push(p)});
+  
+  return result;
 };
 
 // 建立配方 modal 的「包材組合」區塊 HTML
@@ -3068,23 +3093,26 @@ window.buildPackagingPicker=function(rec){
     return '<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:8px;padding:10px 12px;margin:6px 0;font-size:0.84rem;color:#9A6210">💡 食材庫尚無「包材」類別食材。<button class="btn btn-sm" style="background:#9A6210;color:#fff;margin-left:8px" onclick="closeModal();setTimeout(function(){importPackagingFromSheets()},100)">📦 匯入包材</button></div>';
   }
   
-  // 找已選的包材 (從 rec.ings 中提取 cat='包材' 的)
+  // 找已選的包材 (從 rec.ings 中提取 cat='包材' 的,或名稱在包材列表中的)
+  var packNames={};
+  packs.forEach(function(p){packNames[p.name]=true});
   var selectedNames={};
   (rec.ings||[]).forEach(function(ing){
     var inv=(state.ings||[]).find(function(x){return x.name===ing.name});
-    if(inv&&inv.cat==='包材')selectedNames[ing.name]=ing.qty||1;
+    if((inv&&inv.cat==='包材')||packNames[ing.name])selectedNames[ing.name]=ing.qty||1;
   });
   
-  var html='<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>📦 包材組合 (從食材庫包材類別,可多選)</span><span style="font-size:0.74rem;font-weight:400">已選 <b id="pack-picked-count">'+Object.keys(selectedNames).length+'</b> 項</span></div>';
+  var html='<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>📦 包材組合 (食材庫包材 + 轉售品項可選)</span><span style="font-size:0.74rem;font-weight:400">已選 <b id="pack-picked-count">'+Object.keys(selectedNames).length+'</b> 項</span></div>';
   html+='<div style="max-height:200px;overflow-y:auto;border:1px solid #f5d8b7;border-radius:6px;padding:6px;background:#fff">';
   
   packs.forEach(function(p){
     var checked=selectedNames[p.name]!=null;
     var qty=selectedNames[p.name]||1;
-    html+='<div style="display:flex;align-items:center;gap:8px;padding:4px;border-bottom:1px solid #f5f0e0"><input type="checkbox" class="pack-pick" data-name="'+esc(p.name).replace(/"/g,'&quot;')+'" data-unit="'+esc(p.unit)+'"'+(checked?' checked':'')+' onchange="updatePackPickCount()" style="cursor:pointer"><span style="flex:1;font-size:0.82rem">'+esc(p.name)+' <span style="color:#999;font-size:0.74rem">'+CUR()+(p.price||0)+'/'+esc(p.unit)+'</span></span><input type="number" class="pack-qty" data-name="'+esc(p.name).replace(/"/g,'&quot;')+'" min="0" step="0.01" value="'+qty+'" style="width:60px;padding:2px 6px;font-size:0.82rem"><span style="font-size:0.74rem;color:#666;min-width:24px">'+esc(p.unit)+'</span></div>';
+    var srcBadge=p._fromInternal?'<span style="background:#dbeafe;color:#1455A0;font-size:0.68rem;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px">轉售</span>':'';
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:4px;border-bottom:1px solid #f5f0e0"><input type="checkbox" class="pack-pick" data-name="'+esc(p.name).replace(/"/g,'&quot;')+'" data-unit="'+esc(p.unit)+'" data-from-internal="'+(p._fromInternal?'1':'0')+'" data-price="'+(p.price||0)+'"'+(checked?' checked':'')+' onchange="updatePackPickCount()" style="cursor:pointer"><span style="flex:1;font-size:0.82rem">'+esc(p.name)+srcBadge+' <span style="color:#999;font-size:0.74rem">'+CUR()+(p.price||0)+'/'+esc(p.unit)+'</span></span><input type="number" class="pack-qty" data-name="'+esc(p.name).replace(/"/g,'&quot;')+'" min="0" step="0.01" value="'+qty+'" style="width:60px;padding:2px 6px;font-size:0.82rem"><span style="font-size:0.74rem;color:#666;min-width:24px">'+esc(p.unit)+'</span></div>';
   });
   
-  html+='</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 勾選包材+設數量,儲存配方時會自動加入食材明細</div></div>';
+  html+='</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 勾「轉售」標記者,儲存時自動同步到食材庫(cat=包材)以便成本計算</div></div>';
   return html;
 };
 
@@ -3095,17 +3123,49 @@ window.updatePackPickCount=function(){
 };
 
 // 收集 modal 中已選的包材 (saveRecipe 用)
+// 🆕 若勾選來自「轉售品項」,自動複製到 state.ings (cat='包材')
 window.collectSelectedPackaging=function(){
   var selected=[];
+  var newIngsToAdd=[];
+  
   document.querySelectorAll('.pack-pick:checked').forEach(function(cb){
     var name=cb.dataset.name;
     var unit=cb.dataset.unit;
+    var fromInternal=cb.dataset.fromInternal==='1';
+    var price=+cb.dataset.price||0;
     var qtyEl=document.querySelector('.pack-qty[data-name="'+name.replace(/"/g,'&quot;')+'"]');
     var qty=qtyEl?+qtyEl.value:1;
-    if(qty>0){
-      selected.push({name:name,qty:qty,unit:unit,form:'整顆/原形'});
+    if(qty<=0)return;
+    
+    // 若來自轉售品項且食材庫沒有 → 自動複製到食材庫
+    if(fromInternal){
+      var existing=(state.ings||[]).find(function(x){return x.name===name});
+      if(!existing){
+        newIngsToAdd.push({
+          id:'I'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
+          name:name,
+          cat:'包材',
+          unit:unit,
+          price:price,
+          stock:0,
+          safety:0,
+          yieldRate:1,
+          note:'從轉售品項自動同步',
+          _syncedFromInternal:true
+        });
+      }
     }
+    
+    selected.push({name:name,qty:qty,unit:unit,form:'整顆/原形'});
   });
+  
+  // 把新食材加進 state.ings
+  if(newIngsToAdd.length>0){
+    if(!state.ings)state.ings=[];
+    newIngsToAdd.forEach(function(i){state.ings.push(i)});
+    if(typeof addAudit==='function')addAudit('自動同步轉售品項到包材',newIngsToAdd.map(function(i){return i.name}).join(','));
+  }
+  
   return selected;
 };
 
@@ -11081,11 +11141,36 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.1.0';
-      window.BUILD_NUMBER = '20260425-tax';
+      window.SYSTEM_VERSION = '2.2.0';
+      window.BUILD_NUMBER = '20260508-pcs';
     } catch(e){}
 
     if(typeof VERSION_HISTORY !== 'undefined' && Array.isArray(VERSION_HISTORY)){
+      // v2.2.0 (本次更新)
+      VERSION_HISTORY.unshift({
+        ver: '2.2.0',
+        build: '20260508-pcs',
+        date: '2026-05-08',
+        changes: [
+          '💰 完整毛利分析中心 — 配方/客戶/月度趨勢三維度',
+          '⚙️ 中央廚房成本設定 — 月度人事/店租/水電/雜支',
+          '🧮 全成本計算引擎 — 食材+人事+店租+水電+雜支',
+          '📐 配方加「對外售價」欄位 (自動算毛利+淨利)',
+          '🚨 儀表板「本月虧錢配方」紅色警示',
+          '📱 員工 APP 生產回報串接 (prod_hrdata 路徑)',
+          '🔄 ERP 排程頁顯示「APP 回報」欄 (含批號/實際/員工)',
+          '✏️ 排程編輯功能 (待生產/已取消可改)',
+          '🗑️ 排程刪除功能 (含狀態保護警告)',
+          '🔥 全系統加防快取 meta (員工不用 Ctrl+Shift+R)',
+          '🇹🇼 修中文注音輸入卡頓 (4 個搜尋框)',
+          '⚡ 搜尋加 250ms debounce (減少卡頓)',
+          '🔧 單位換算大幅修正 — 補齊台斤/台兩/磅/盎司/加侖等',
+          '🎯 異常偵測優化 — 拿掉重量↔體積誤警告',
+          '📊 異常閾值放寬到中央廚房規模'
+        ]
+      });
+      
+      // v2.1.0 (上次)
       VERSION_HISTORY.unshift({
         ver: '2.1.0',
         build: '20260425-tax',
