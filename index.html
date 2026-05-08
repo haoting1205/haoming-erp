@@ -1131,50 +1131,45 @@ function calcIngCost(inv, qty, useUnit, opts){
     return unitPrice * qty;
   }
   
-  // 重量類單位
-  var weightUnits = ['公斤','台斤','公克','g','kg'];
-  // 容量類單位
-  var volumeUnits = ['公升','毫升','ml','L'];
-  // 全部可換算單位
-  var allUnits = weightUnits.concat(volumeUnits);
+  // 🆕 用 UNIT_DB 判斷類型 (不再用硬編碼陣列,避免漏斤/台兩/磅/盎司等)
+  var invInfo = (window.UNIT_DB&&window.UNIT_DB[invUnit])||null;
+  var useInfo = (window.UNIT_DB&&window.UNIT_DB[useUnit])||null;
+  var invType = invInfo&&invInfo.type;
+  var useType = useInfo&&useInfo.type;
   
-  var invIsWeight=weightUnits.indexOf(invUnit)>=0;
-  var invIsVolume=volumeUnits.indexOf(invUnit)>=0;
-  var useIsWeight=weightUnits.indexOf(useUnit)>=0;
-  var useIsVolume=volumeUnits.indexOf(useUnit)>=0;
-  
-  // 同類別換算 (重量↔重量, 容量↔容量)
-  if((invIsWeight&&useIsWeight)||(invIsVolume&&useIsVolume)){
-    var invPerBaseUnit = unitPrice / unitToG(1, invUnit);  // 每 g 或每 ml 的價格
-    var qtyInBase = unitToG(qty, useUnit);
-    return invPerBaseUnit * qtyInBase;
+  // 同類別換算 (重量↔重量, 容量↔容量) — 透過 unitToG 統一基底
+  if(invType&&useType&&invType===useType&&(invType==='weight'||invType==='volume')){
+    var invInBase = unitToG(1, invUnit);  // 食材 1 單位 = 多少 g 或 ml
+    if(!invInBase||invInBase<=0)return unitPrice * qty;  // 防呆
+    var pricePerBase = unitPrice / invInBase;  // 每 g 或每 ml 價格
+    var qtyInBase = unitToG(qty, useUnit);  // 配方數量換算成基底
+    return pricePerBase * qtyInBase;
   }
   
-  // 🆕 跨類別換算 (容量↔重量) — 套用密度
-  if((invIsWeight&&useIsVolume)||(invIsVolume&&useIsWeight)){
-    var density = window.getDensity(inv.name);
+  // 跨類別換算 (容量↔重量) — 套用密度
+  if(invType&&useType&&((invType==='weight'&&useType==='volume')||(invType==='volume'&&useType==='weight'))){
+    var density = window.getDensity?window.getDensity(inv.name):null;
     if(density==null){
       density=1.0;
       if(typeof console!=='undefined')console.warn('[calcIngCost] 食材「'+inv.name+'」無密度資料,跨類別換算用預設 1.0,可能不準確');
     }
     
-    if(invIsVolume&&useIsWeight){
-      // 食材公升、配方公克
-      // 1 ml 重 density g → 1 g = 1/density ml
+    if(invType==='volume'&&useType==='weight'){
+      // 食材是體積 (ml/L),配方用重量 (g/kg)
       var pricePerMl = unitPrice / unitToG(1, invUnit);  // 每 ml 價格
       var qtyInG = unitToG(qty, useUnit);  // 配方換算成 g
-      var qtyInMl = qtyInG / density;  // g → ml
+      var qtyInMl = qtyInG / density;  // g → ml (透過密度)
       return pricePerMl * qtyInMl;
     }else{
-      // 食材公斤、配方毫升
+      // 食材是重量 (g/kg),配方用體積 (ml/L)
       var pricePerG = unitPrice / unitToG(1, invUnit);  // 每 g 價格
       var qtyInMl2 = unitToG(qty, useUnit);  // 配方換算成 ml
-      var qtyInG2 = qtyInMl2 * density;  // ml → g
+      var qtyInG2 = qtyInMl2 * density;  // ml → g (透過密度)
       return pricePerG * qtyInG2;
     }
   }
   
-  // 計件類 (顆/個/包/盒/瓶/罐/張/份) — 單位不匹配
+  // 計件類 ↔ 重量/體積 — 真的不匹配,直接相乘 (會算錯,但 detectIngAnomalies 會警告)
   if(typeof console!=='undefined')console.warn('[calcIngCost] 食材「'+inv.name+'」單位不匹配:食材='+invUnit+' 配方='+useUnit+',直接相乘可能不準確');
   return unitPrice * qty;
 }
@@ -1214,25 +1209,24 @@ window.detectIngAnomalies=function(ing,invItem,subtotal,totalCost){
   var unit=ing.unit||'';
   var invUnit=(invItem&&invItem.unit)||'';
   
-  // 🆕 優先檢查:單位是否類型相容 (重量/體積/計件)
-  // 若不相容,計算結果失真,只報「單位不匹配」,不再判用量異常
+  // 🆕 優先檢查:單位類型嚴重不匹配 (計件 vs 重量/體積) — 計算結果一定錯
+  // 重量↔體積由 calcIngCost 用密度自動換算,不視為異常
   if(unit&&invUnit&&unit!==invUnit&&typeof window.UNIT_DB==='object'){
     var unitType=window.UNIT_DB[unit]&&window.UNIT_DB[unit].type;
     var invUnitType=window.UNIT_DB[invUnit]&&window.UNIT_DB[invUnit].type;
     
     if(unitType&&invUnitType&&unitType!==invUnitType){
-      // 計件 vs 重量、計件 vs 體積、重量 vs 計件 → 都算嚴重不匹配
       var hasCount=unitType==='count'||invUnitType==='count';
       if(hasCount){
+        // 計件類無法跟重量/體積換算 — 真的會算錯
         anomalies.push({level:'mid',msg:'單位不匹配 (食材設「'+invUnit+'」,配方用「'+unit+'」),計算可能失真,請統一單位'});
-        return anomalies;  // 計件類不匹配直接退出,不執行用量檢查
+        return anomalies;
       }
-      // 重量 vs 體積 — 系統會嘗試用密度換算,先警告但繼續檢查
-      anomalies.push({level:'mid',msg:'食材「'+invUnit+'」配方用「'+unit+'」,以密度換算 (建議統一)'});
+      // 重量↔體積:calcIngCost 會用密度自動換算,不警告
     }
   }
   
-  // 用量過大判斷 (含批次倍數前的「每倍」用量)
+  // 用量過大判斷
   if(unit==='公斤'||unit==='kg'){
     if(qty>=1000)anomalies.push({level:'high',msg:'用量 '+qty+' 公斤 = '+qty+' 公噸,單位可能選錯應為「g」'});
     else if(qty>=200)anomalies.push({level:'mid',msg:'用量 '+qty+' 公斤偏大,請確認單位'});
@@ -1244,8 +1238,7 @@ window.detectIngAnomalies=function(ing,invItem,subtotal,totalCost){
     if(qty>=1000)anomalies.push({level:'mid',msg:'用量 '+qty+' '+unit+' 數量異常'});
   }
   
-  // 比例異常 (此食材佔總成本 > 95%)
-  // 🆕 提高門檻:有些醬料主成分 (如奶油/起司) 本來就佔大宗,放寬到 99%
+  // 比例異常 (放寬到 99%)
   if(subtotal>0&&totalCost>0){
     var pct=subtotal/totalCost;
     if(pct>0.99&&totalCost>5000){
@@ -1253,8 +1246,7 @@ window.detectIngAnomalies=function(ing,invItem,subtotal,totalCost){
     }
   }
   
-  // 小計金額異常
-  // 🆕 提高門檻:中央廚房單批用料金額本來就大,從 50000 改 500000
+  // 小計金額異常 (門檻 500000)
   if(subtotal>500000){
     anomalies.push({level:'high',msg:'小計金額 '+CUR()+Math.round(subtotal).toLocaleString()+' 過大,請檢查用量'});
   }
@@ -1266,8 +1258,9 @@ window.detectIngAnomalies=function(ing,invItem,subtotal,totalCost){
 window.detectRecipeAnomalies=function(r){
   var rc=calcCost(r);
   var anomalies=[];
-  if(rc.per>5000)anomalies.push({level:'high',msg:'每'+(r.unit||'單位')+'成本 '+CUR()+Math.round(rc.per).toLocaleString()+' 異常高',type:'unit'});
-  if(rc.total>500000)anomalies.push({level:'high',msg:'批次總成本 '+CUR()+Math.round(rc.total).toLocaleString()+' 異常高',type:'total'});
+  // 🆕 放寬閾值到合理範圍 (中央廚房規模)
+  if(rc.per>50000)anomalies.push({level:'high',msg:'每'+(r.unit||'單位')+'成本 '+CUR()+Math.round(rc.per).toLocaleString()+' 異常高',type:'unit'});
+  if(rc.total>5000000)anomalies.push({level:'high',msg:'批次總成本 '+CUR()+Math.round(rc.total).toLocaleString()+' 異常高',type:'total'});
   // 檢查每食材
   var im=imap();
   (r.ings||[]).forEach(function(ing){
