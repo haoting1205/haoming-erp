@@ -600,34 +600,56 @@ function modal(html,wide){let ov=$('modal-ov');if(!ov){ov=dv({id:'modal-ov',styl
   },50);
 }
 
-// 🆕 modal 內按 Enter 自動觸發儲存按鈕
+// 🆕 modal 內按 Enter 自動觸發儲存按鈕 (全域監聽,不依賴焦點)
 function _bindModalEnterToSave(ov){
-  if(!ov||ov._enterBound)return;
-  ov._enterBound=true;
-  ov.addEventListener('keydown',function(e){
+  if(window._modalEnterBound)return;
+  window._modalEnterBound=true;
+  
+  document.addEventListener('keydown',function(e){
     if(e.key!=='Enter')return;
-    if(e.shiftKey||e.ctrlKey||e.metaKey||e.altKey)return;  // 修飾鍵組合不觸發
-    var tag=(e.target.tagName||'').toLowerCase();
-    if(tag==='textarea')return;  // textarea Enter 是換行
-    if(tag==='select')return;    // select Enter 是選擇
-    if(e.target.contentEditable==='true')return;
-    if(e.target.classList&&e.target.classList.contains('smart-search-input'))return;  // 智慧搜尋輸入中
+    if(e.shiftKey||e.ctrlKey||e.metaKey||e.altKey)return;
     
-    // 找儲存按鈕:onclick 含 save / 確定 / 提交 / 送出 / 確認
-    var btns=ov.querySelectorAll('button');
+    // modal 是否開啟
+    var mov=document.getElementById('modal-ov');
+    if(!mov||mov.style.display==='none')return;
+    
+    // 焦點在哪個元素
+    var t=e.target;
+    var tag=(t&&t.tagName||'').toLowerCase();
+    if(tag==='textarea')return;  // textarea Enter 是換行
+    if(t&&t.contentEditable==='true')return;
+    
+    // 智慧搜尋下拉框內 (避免衝突)
+    if(t&&t.classList){
+      if(t.classList.contains('smart-search-input'))return;
+      if(t.classList.contains('ss-input'))return;
+      // 父層含 smart-select 的也擋
+      var p=t.parentElement;
+      while(p&&p!==mov){
+        if(p.classList&&(p.classList.contains('smart-select')||p.classList.contains('ss-dropdown')))return;
+        p=p.parentElement;
+      }
+    }
+    
+    // select 開啟下拉時 Enter 是選擇,不要搶
+    if(tag==='select')return;
+    
+    // 找儲存按鈕 (modal 內)
+    var btns=mov.querySelectorAll('button');
     var saveBtn=null;
     for(var i=0;i<btns.length;i++){
       var b=btns[i];
       var oc=b.getAttribute('onclick')||'';
       var txt=(b.textContent||'').trim();
-      if(/save|submit|confirm/i.test(oc)||
-         /^(💾|✅|✓|📤|📥|送出|儲存|確定|確認|提交|新增|建立)/.test(txt)){
-        saveBtn=b;break;
-      }
+      // onclick 含 save/submit/confirm
+      if(/save|submit|confirm/i.test(oc)){saveBtn=b;break}
+      // 文字含儲存關鍵字 (✔ ✓ ✅ 💾 都涵蓋)
+      if(/儲存|確定|確認|提交|送出|新增|建立|✔|✓|✅|💾|📤|📥/.test(txt)){saveBtn=b;break}
     }
-    // Fallback: 取第一個 btn-primary
+    // Fallback: 最後一個 .btn-primary 通常是主動作
     if(!saveBtn){
-      saveBtn=ov.querySelector('.btn-primary')||ov.querySelector('.btn-success');
+      var primaries=mov.querySelectorAll('.btn-primary,.btn-success');
+      if(primaries.length>0)saveBtn=primaries[primaries.length-1];
     }
     
     if(saveBtn){
@@ -10294,58 +10316,119 @@ function goPage(id){const iC=COST_IDS.includes(id),iO=id==='order';$('cost-secti
 window.scrollNav=function(dx){var nb=document.getElementById('nav-bar');if(nb)nb.scrollBy({left:dx,behavior:'smooth'})};
 
 // ══════════════════════════════════════════════════════
-// 🆕 nav-bar 拖曳排序
+// 🆕 nav-bar 長按 600ms 進入拖曳排序 (取代「🔧 編輯選單」按鈕)
 // ══════════════════════════════════════════════════════
 window._navEditMode=false;
 
-window.toggleNavEdit=function(){
-  window._navEditMode=!window._navEditMode;
+window.toggleNavEdit=function(force){
+  var newMode=force!==undefined?force:!window._navEditMode;
+  window._navEditMode=newMode;
   var nb=document.getElementById('nav-bar');
   if(!nb)return;
   
   var btns=nb.querySelectorAll('.nav-btn');
   btns.forEach(function(b){
-    if(window._navEditMode){
+    if(newMode){
       b.draggable=true;
       b.style.cursor='move';
       b.style.opacity='0.85';
-      b.style.border='2px dashed #9A6210';
-      // 編輯模式下,點擊不切頁,而是準備拖曳
-      b._origOnclick=b.onclick;
+      b.style.outline='2px dashed #9A6210';
+      b.style.outlineOffset='2px';
+      // 編輯模式下,點擊不切頁
+      if(!b._origOnclick)b._origOnclick=b.onclick;
       b.onclick=function(e){e.preventDefault();e.stopPropagation();return false};
     }else{
       b.draggable=false;
       b.style.cursor='';
       b.style.opacity='';
-      b.style.border='';
+      b.style.outline='';
+      b.style.outlineOffset='';
       if(b._origOnclick){b.onclick=b._origOnclick}
     }
   });
   
-  // 顯示提示
+  // 提示條
   var tipEl=document.getElementById('nav-edit-tip');
-  if(window._navEditMode){
+  if(newMode){
     if(!tipEl){
       tipEl=document.createElement('div');
       tipEl.id='nav-edit-tip';
-      tipEl.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#9A6210;color:#fff;padding:8px 16px;border-radius:8px;font-size:0.86rem;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+      tipEl.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#9A6210;color:#fff;padding:8px 16px;border-radius:8px;font-size:0.86rem;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2);display:flex;align-items:center;gap:10px';
       document.body.appendChild(tipEl);
     }
-    tipEl.innerHTML='✏️ 編輯模式:拖曳按鈕調整順序 <button onclick="toggleNavEdit()" style="margin-left:12px;padding:3px 10px;background:#fff;color:#9A6210;border:none;border-radius:4px;font-weight:700;cursor:pointer">完成</button> <button onclick="resetNavOrder()" style="margin-left:6px;padding:3px 10px;background:#fff;color:#B82525;border:none;border-radius:4px;font-weight:700;cursor:pointer">↩ 還原預設</button>';
+    tipEl.innerHTML='✏️ 拖曳調整選單順序 <button onclick="toggleNavEdit(false)" style="padding:3px 10px;background:#fff;color:#9A6210;border:none;border-radius:4px;font-weight:700;cursor:pointer">完成</button> <button onclick="resetNavOrder()" style="padding:3px 10px;background:#fff;color:#B82525;border:none;border-radius:4px;font-weight:700;cursor:pointer">↩ 還原預設</button>';
   }else{
     if(tipEl)tipEl.remove();
-    toast('✅ 順序已儲存');
+    if(window._navOrderChanged){
+      window._navOrderChanged=false;
+      toast('✅ 順序已儲存');
+    }
   }
 };
 
-// 拖曳事件監聽 (一次性綁定)
+// 拖曳事件 + 長按事件 (一次性綁定)
 window._initNavDrag=function(){
   var nb=document.getElementById('nav-bar');
   if(!nb||nb._dragInited)return;
   nb._dragInited=true;
   
   var dragSrc=null;
+  var longPressTimer=null;
+  var pressedBtn=null;
+  var startX=0,startY=0;
   
+  // ─── 長按偵測 (mouse + touch) ───
+  function startLongPress(target,x,y){
+    if(window._navEditMode)return;  // 已經在編輯模式
+    if(!target||!target.classList.contains('nav-btn'))return;
+    pressedBtn=target;
+    startX=x;startY=y;
+    longPressTimer=setTimeout(function(){
+      // 觸發進入編輯模式
+      window.toggleNavEdit(true);
+      // 震動 (手機)
+      if(navigator.vibrate)try{navigator.vibrate(50)}catch(e){}
+      longPressTimer=null;
+    },600);
+  }
+  function cancelLongPress(){
+    if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null}
+    pressedBtn=null;
+  }
+  
+  nb.addEventListener('mousedown',function(e){
+    var t=e.target.closest('.nav-btn');
+    if(!t)return;
+    startLongPress(t,e.clientX,e.clientY);
+  });
+  nb.addEventListener('mouseup',cancelLongPress);
+  nb.addEventListener('mouseleave',cancelLongPress);
+  nb.addEventListener('mousemove',function(e){
+    // 移動超過 8px 就取消長按 (避免拖頁面誤觸發)
+    if(longPressTimer&&(Math.abs(e.clientX-startX)>8||Math.abs(e.clientY-startY)>8)){
+      cancelLongPress();
+    }
+  });
+  
+  // Touch 事件 (手機)
+  nb.addEventListener('touchstart',function(e){
+    var t=e.target.closest('.nav-btn');
+    if(!t)return;
+    var touch=e.touches[0];
+    startLongPress(t,touch.clientX,touch.clientY);
+  },{passive:true});
+  nb.addEventListener('touchend',cancelLongPress);
+  nb.addEventListener('touchcancel',cancelLongPress);
+  nb.addEventListener('touchmove',function(e){
+    if(longPressTimer&&e.touches[0]){
+      var touch=e.touches[0];
+      if(Math.abs(touch.clientX-startX)>8||Math.abs(touch.clientY-startY)>8){
+        cancelLongPress();
+      }
+    }
+  },{passive:true});
+  
+  // ─── 拖曳事件 ───
   nb.addEventListener('dragstart',function(e){
     if(!window._navEditMode)return;
     var t=e.target.closest('.nav-btn');
@@ -10353,7 +10436,7 @@ window._initNavDrag=function(){
     dragSrc=t;
     t.style.opacity='0.4';
     e.dataTransfer.effectAllowed='move';
-    e.dataTransfer.setData('text/plain',t.getAttribute('data-cp'));
+    e.dataTransfer.setData('text/plain',t.getAttribute('data-cp')||'');
   });
   
   nb.addEventListener('dragend',function(e){
@@ -10365,10 +10448,8 @@ window._initNavDrag=function(){
     if(!window._navEditMode||!dragSrc)return;
     e.preventDefault();
     e.dataTransfer.dropEffect='move';
-    
     var t=e.target.closest('.nav-btn');
     if(!t||t===dragSrc)return;
-    
     var rect=t.getBoundingClientRect();
     var midX=rect.left+rect.width/2;
     if(e.clientX<midX){
@@ -10381,13 +10462,13 @@ window._initNavDrag=function(){
   nb.addEventListener('drop',function(e){
     if(!window._navEditMode)return;
     e.preventDefault();
-    // 儲存新順序
     var btns=nb.querySelectorAll('.nav-btn');
     var order=[];
     btns.forEach(function(b){order.push(b.getAttribute('data-cp'))});
     if(!state.meta)state.meta={};
     state.meta.navOrder=order;
     saveState();
+    window._navOrderChanged=true;
   });
 };
 
@@ -10402,10 +10483,6 @@ window._applyNavOrder=function(){
     byKey[b.getAttribute('data-cp')]=b;
   });
   
-  // 暫存 dividers (保留分隔線)
-  var dividers=Array.from(nb.querySelectorAll('.nav-divider'));
-  
-  // 依儲存的順序重建 (先按 navOrder,沒在 navOrder 的接在後面,以防新增按鈕被漏掉)
   var seen={};
   var newChildren=[];
   state.meta.navOrder.forEach(function(k){
@@ -10414,12 +10491,10 @@ window._applyNavOrder=function(){
       seen[k]=true;
     }
   });
-  // 補上沒在 navOrder 的 (新版加的按鈕)
   Object.keys(byKey).forEach(function(k){
     if(!seen[k])newChildren.push(byKey[k]);
   });
   
-  // 清空 nav-bar (保留 dividers 之後再插入)
   nb.innerHTML='';
   newChildren.forEach(function(b){nb.appendChild(b)});
 };
@@ -10429,29 +10504,17 @@ window.resetNavOrder=function(){
   if(!confirm('還原成預設順序?\n\n您自訂的順序會被清除'))return;
   if(state.meta&&state.meta.navOrder)delete state.meta.navOrder;
   saveState();
-  // 重新整理頁面 (重新載入原始 HTML 順序)
   location.reload();
 };
 
-// 在「⚙️ 設定」按鈕旁加「🔧 編輯選單」按鈕 + 套用儲存的順序
+// 初始化 (套用順序 + 綁長按/拖曳)
 setTimeout(function(){
   try{
     window._applyNavOrder();
     window._initNavDrag();
-    
-    // 加「編輯選單」按鈕 (放在 nav-bar 結尾)
-    var nb=document.getElementById('nav-bar');
-    if(nb&&!document.getElementById('nav-edit-btn')){
-      var editBtn=document.createElement('button');
-      editBtn.id='nav-edit-btn';
-      editBtn.className='nav-btn';
-      editBtn.innerHTML='🔧 編輯選單';
-      editBtn.style.cssText='background:#9A6210;color:#fff';
-      editBtn.title='拖曳調整選單順序';
-      editBtn.onclick=function(){window.toggleNavEdit()};
-      editBtn.setAttribute('data-cp','_edit');
-      nb.appendChild(editBtn);
-    }
+    // 移除舊的「🔧 編輯選單」按鈕 (如果存在)
+    var oldBtn=document.getElementById('nav-edit-btn');
+    if(oldBtn)oldBtn.remove();
   }catch(e){console.warn('nav drag init failed',e)}
 },800);
 
