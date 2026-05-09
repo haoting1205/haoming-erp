@@ -591,11 +591,50 @@ function _isModalDirty(){
   return dirty;
 }
 function modal(html,wide){let ov=$('modal-ov');if(!ov){ov=dv({id:'modal-ov',style:'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:2000;backdrop-filter:blur(2px);display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto'});ov.addEventListener('click',e=>{if(e.target===ov)closeModal()});document.body.appendChild(ov)}ov.innerHTML=`<div style="background:#fff;border-radius:14px;padding:24px 28px;width:100%;max-width:${wide?960:660}px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.25)">${html}</div>`;ov.style.display='flex';ov.scrollTop=0;
-  // 等 DOM 穩定後:1) 升級 select 為智慧搜尋 2) 快照初始值
+  // 等 DOM 穩定後:1) 升級 select 為智慧搜尋 2) 快照初始值 3) 綁 Enter 儲存
   setTimeout(function(){
     try{autoUpgradeSelects()}catch(e){console.warn('SmartSelect 升級失敗',e)}
     window._modalSnapshot=_snapshotModalForm();
+    // 🆕 Enter 直接儲存 (textarea/select 不觸發)
+    try{_bindModalEnterToSave(ov)}catch(e){}
   },50);
+}
+
+// 🆕 modal 內按 Enter 自動觸發儲存按鈕
+function _bindModalEnterToSave(ov){
+  if(!ov||ov._enterBound)return;
+  ov._enterBound=true;
+  ov.addEventListener('keydown',function(e){
+    if(e.key!=='Enter')return;
+    if(e.shiftKey||e.ctrlKey||e.metaKey||e.altKey)return;  // 修飾鍵組合不觸發
+    var tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='textarea')return;  // textarea Enter 是換行
+    if(tag==='select')return;    // select Enter 是選擇
+    if(e.target.contentEditable==='true')return;
+    if(e.target.classList&&e.target.classList.contains('smart-search-input'))return;  // 智慧搜尋輸入中
+    
+    // 找儲存按鈕:onclick 含 save / 確定 / 提交 / 送出 / 確認
+    var btns=ov.querySelectorAll('button');
+    var saveBtn=null;
+    for(var i=0;i<btns.length;i++){
+      var b=btns[i];
+      var oc=b.getAttribute('onclick')||'';
+      var txt=(b.textContent||'').trim();
+      if(/save|submit|confirm/i.test(oc)||
+         /^(💾|✅|✓|📤|📥|送出|儲存|確定|確認|提交|新增|建立)/.test(txt)){
+        saveBtn=b;break;
+      }
+    }
+    // Fallback: 取第一個 btn-primary
+    if(!saveBtn){
+      saveBtn=ov.querySelector('.btn-primary')||ov.querySelector('.btn-success');
+    }
+    
+    if(saveBtn){
+      e.preventDefault();
+      saveBtn.click();
+    }
+  });
 }
 function closeModal(force){const o=$('modal-ov');if(!o||o.style.display==='none')return;
   if(force!==true&&_isModalDirty()){
@@ -10253,6 +10292,168 @@ function goPage(id){const iC=COST_IDS.includes(id),iO=id==='order';$('cost-secti
 // Init
 
 window.scrollNav=function(dx){var nb=document.getElementById('nav-bar');if(nb)nb.scrollBy({left:dx,behavior:'smooth'})};
+
+// ══════════════════════════════════════════════════════
+// 🆕 nav-bar 拖曳排序
+// ══════════════════════════════════════════════════════
+window._navEditMode=false;
+
+window.toggleNavEdit=function(){
+  window._navEditMode=!window._navEditMode;
+  var nb=document.getElementById('nav-bar');
+  if(!nb)return;
+  
+  var btns=nb.querySelectorAll('.nav-btn');
+  btns.forEach(function(b){
+    if(window._navEditMode){
+      b.draggable=true;
+      b.style.cursor='move';
+      b.style.opacity='0.85';
+      b.style.border='2px dashed #9A6210';
+      // 編輯模式下,點擊不切頁,而是準備拖曳
+      b._origOnclick=b.onclick;
+      b.onclick=function(e){e.preventDefault();e.stopPropagation();return false};
+    }else{
+      b.draggable=false;
+      b.style.cursor='';
+      b.style.opacity='';
+      b.style.border='';
+      if(b._origOnclick){b.onclick=b._origOnclick}
+    }
+  });
+  
+  // 顯示提示
+  var tipEl=document.getElementById('nav-edit-tip');
+  if(window._navEditMode){
+    if(!tipEl){
+      tipEl=document.createElement('div');
+      tipEl.id='nav-edit-tip';
+      tipEl.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#9A6210;color:#fff;padding:8px 16px;border-radius:8px;font-size:0.86rem;font-weight:700;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.2)';
+      document.body.appendChild(tipEl);
+    }
+    tipEl.innerHTML='✏️ 編輯模式:拖曳按鈕調整順序 <button onclick="toggleNavEdit()" style="margin-left:12px;padding:3px 10px;background:#fff;color:#9A6210;border:none;border-radius:4px;font-weight:700;cursor:pointer">完成</button> <button onclick="resetNavOrder()" style="margin-left:6px;padding:3px 10px;background:#fff;color:#B82525;border:none;border-radius:4px;font-weight:700;cursor:pointer">↩ 還原預設</button>';
+  }else{
+    if(tipEl)tipEl.remove();
+    toast('✅ 順序已儲存');
+  }
+};
+
+// 拖曳事件監聽 (一次性綁定)
+window._initNavDrag=function(){
+  var nb=document.getElementById('nav-bar');
+  if(!nb||nb._dragInited)return;
+  nb._dragInited=true;
+  
+  var dragSrc=null;
+  
+  nb.addEventListener('dragstart',function(e){
+    if(!window._navEditMode)return;
+    var t=e.target.closest('.nav-btn');
+    if(!t)return;
+    dragSrc=t;
+    t.style.opacity='0.4';
+    e.dataTransfer.effectAllowed='move';
+    e.dataTransfer.setData('text/plain',t.getAttribute('data-cp'));
+  });
+  
+  nb.addEventListener('dragend',function(e){
+    if(dragSrc){dragSrc.style.opacity='0.85'}
+    dragSrc=null;
+  });
+  
+  nb.addEventListener('dragover',function(e){
+    if(!window._navEditMode||!dragSrc)return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect='move';
+    
+    var t=e.target.closest('.nav-btn');
+    if(!t||t===dragSrc)return;
+    
+    var rect=t.getBoundingClientRect();
+    var midX=rect.left+rect.width/2;
+    if(e.clientX<midX){
+      t.parentNode.insertBefore(dragSrc,t);
+    }else{
+      t.parentNode.insertBefore(dragSrc,t.nextSibling);
+    }
+  });
+  
+  nb.addEventListener('drop',function(e){
+    if(!window._navEditMode)return;
+    e.preventDefault();
+    // 儲存新順序
+    var btns=nb.querySelectorAll('.nav-btn');
+    var order=[];
+    btns.forEach(function(b){order.push(b.getAttribute('data-cp'))});
+    if(!state.meta)state.meta={};
+    state.meta.navOrder=order;
+    saveState();
+  });
+};
+
+// 套用儲存的順序 (頁面載入時)
+window._applyNavOrder=function(){
+  if(!state.meta||!state.meta.navOrder||!state.meta.navOrder.length)return;
+  var nb=document.getElementById('nav-bar');
+  if(!nb)return;
+  
+  var byKey={};
+  nb.querySelectorAll('.nav-btn').forEach(function(b){
+    byKey[b.getAttribute('data-cp')]=b;
+  });
+  
+  // 暫存 dividers (保留分隔線)
+  var dividers=Array.from(nb.querySelectorAll('.nav-divider'));
+  
+  // 依儲存的順序重建 (先按 navOrder,沒在 navOrder 的接在後面,以防新增按鈕被漏掉)
+  var seen={};
+  var newChildren=[];
+  state.meta.navOrder.forEach(function(k){
+    if(byKey[k]){
+      newChildren.push(byKey[k]);
+      seen[k]=true;
+    }
+  });
+  // 補上沒在 navOrder 的 (新版加的按鈕)
+  Object.keys(byKey).forEach(function(k){
+    if(!seen[k])newChildren.push(byKey[k]);
+  });
+  
+  // 清空 nav-bar (保留 dividers 之後再插入)
+  nb.innerHTML='';
+  newChildren.forEach(function(b){nb.appendChild(b)});
+};
+
+// 還原預設順序
+window.resetNavOrder=function(){
+  if(!confirm('還原成預設順序?\n\n您自訂的順序會被清除'))return;
+  if(state.meta&&state.meta.navOrder)delete state.meta.navOrder;
+  saveState();
+  // 重新整理頁面 (重新載入原始 HTML 順序)
+  location.reload();
+};
+
+// 在「⚙️ 設定」按鈕旁加「🔧 編輯選單」按鈕 + 套用儲存的順序
+setTimeout(function(){
+  try{
+    window._applyNavOrder();
+    window._initNavDrag();
+    
+    // 加「編輯選單」按鈕 (放在 nav-bar 結尾)
+    var nb=document.getElementById('nav-bar');
+    if(nb&&!document.getElementById('nav-edit-btn')){
+      var editBtn=document.createElement('button');
+      editBtn.id='nav-edit-btn';
+      editBtn.className='nav-btn';
+      editBtn.innerHTML='🔧 編輯選單';
+      editBtn.style.cssText='background:#9A6210;color:#fff';
+      editBtn.title='拖曳調整選單順序';
+      editBtn.onclick=function(){window.toggleNavEdit()};
+      editBtn.setAttribute('data-cp','_edit');
+      nb.appendChild(editBtn);
+    }
+  }catch(e){console.warn('nav drag init failed',e)}
+},800);
 
 document.addEventListener('DOMContentLoaded',()=>{
   const ds=new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
