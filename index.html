@@ -297,7 +297,10 @@ const COST_KEY='hm_cost_v3';
 const DEFAULT_META={company:'好洺餐飲事業有限公司',taxId:'',phone:'',address:'',stores:['交大店','竹北店','台積電店'],targetMargin:0.65,currency:'NT$'};
 let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}],currentUser:null,invHistory:[],recipeVersions:{},internalProducts:[],internalOrders:[],arList:[],countList:[],returnList:[],taxConfig:{rate:0.05},workOrders:[],customers:[],custOrders:[],assets:[],salesData:[],cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haomin-system-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyAk8D1oXTYaq9E1t96bPW-1rMu0EhW1JzQ',fbAuthDomain:'haomin-system.firebaseapp.com',fbProjectId:'haomin-system',fbStorageBucket:'haomin-system.firebasestorage.app',fbMessagingSenderId:'348193196599',fbAppId:'1:348193196599:web:c5aa85961d929e7e39cdb2',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[],kitchenCosts:{}};
 
-(function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions','kitchenCosts','prodReports'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
+(function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions','kitchenCosts','prodReports'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});
+// 🆕 還原所有以 _ 開頭的暫存狀態 (篩選/分頁/月份/搜尋等),讓使用者重新登入時看到上次的篩選結果
+Object.keys(sv).forEach(k=>{if(k.charAt(0)==='_'&&sv[k]!=null)state[k]=sv[k]});
+state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
 
 // 🔧 migrate: 補舊資料缺少的新欄位 (v2.1.0+)
 // ⚠️ 抽為 window.runMigrations 給 firebaseLoad / jsonbinLoad 重複呼叫
@@ -2439,7 +2442,21 @@ window.dcExportCSV=function(key){
 };
 
 // ── DASHBOARD ───
-function renderDash(){const pg=dv({});const sw=sopBox('dash');if(sw)pg.appendChild(sw);const im=imap();const low=state.ings.filter(i=>i.stock>0&&i.stock<=i.safety);const out=state.ings.filter(i=>i.stock<=0);const val=state.ings.reduce((s,i)=>s+(i.stock||0)*(i.price||0),0);const tgt=state.meta.targetMargin;const mc=state.menu.map(m=>{const inv=im[m.ing1];const c=inv?calcIngCost(inv,m.qty1||0,m.unit1||inv.unit):0;return{...m,cost:c,margin:m.price>0?(m.price-c)/m.price:null}});const avg=mc.filter(m=>m.margin!=null).reduce((s,m)=>s+m.margin,0)/(mc.filter(m=>m.margin!=null).length||1);const mon=toMon();const buyMon=state.buyLog.filter(b=>b.date.startsWith(mon));const buyAmt=buyMon.reduce((s,b)=>s+b.total,0);const wasteMon=state.waste.filter(w=>w.date.startsWith(mon));const wasteAmt=wasteMon.reduce((s,w)=>s+(im[w.name]?calcIngCost(im[w.name],w.lossQty||0,w.unit||im[w.name].unit):0),0);
+function renderDash(){const pg=dv({});const sw=sopBox('dash');if(sw)pg.appendChild(sw);const im=imap();
+// 🆕 庫存警示開關 (預設停用,Tim 還沒開始用採購功能)
+if(state.meta&&state.meta.hideStockAlerts===undefined){state.meta.hideStockAlerts=true}
+const hideAlerts=state.meta&&state.meta.hideStockAlerts;
+const low=hideAlerts?[]:state.ings.filter(i=>i.stock>0&&i.stock<=i.safety);const out=hideAlerts?[]:state.ings.filter(i=>i.stock<=0);const val=state.ings.reduce((s,i)=>s+(i.stock||0)*(i.price||0),0);const tgt=state.meta.targetMargin;const mc=state.menu.map(m=>{const inv=im[m.ing1];const c=inv?calcIngCost(inv,m.qty1||0,m.unit1||inv.unit):0;return{...m,cost:c,margin:m.price>0?(m.price-c)/m.price:null}});const avg=mc.filter(m=>m.margin!=null).reduce((s,m)=>s+m.margin,0)/(mc.filter(m=>m.margin!=null).length||1);const mon=toMon();const buyMon=state.buyLog.filter(b=>b.date.startsWith(mon));const buyAmt=buyMon.reduce((s,b)=>s+b.total,0);const wasteMon=state.waste.filter(w=>w.date.startsWith(mon));const wasteAmt=wasteMon.reduce((s,w)=>s+(im[w.name]?calcIngCost(im[w.name],w.lossQty||0,w.unit||im[w.name].unit):0),0);
+
+// 🆕 庫存警示開關按鈕
+pg.appendChild(dv({style:'margin-bottom:10px;text-align:right'},
+  btn('btn btn-sm btn-outline',hideAlerts?'🔕 庫存警示已停用 (點擊啟用)':'🔔 庫存警示啟用中 (點擊停用)',function(){
+    if(!state.meta)state.meta={};
+    state.meta.hideStockAlerts=!state.meta.hideStockAlerts;
+    saveState();renderPage();
+    toast(state.meta.hideStockAlerts?'🔕 已停用庫存警示':'🔔 已啟用庫存警示');
+  })
+));
 pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:20px'},dv({cls:'page-title',style:'margin:0'},'📊 營運儀表板'),dv({style:'font-size:0.85rem;color:#706E68'},'目標毛利：'+pct(tgt)+' ｜ '+toDay())));
 pg.appendChild(dv({cls:'grid4',style:'margin-bottom:14px'},metCard('食材品項',state.ings.length+' 種',''),metCard('低庫存警示',low.length+' 項','需補貨',low.length>0?'#9A6210':'#0A5A46'),metCard('缺貨品項',out.length+' 項','緊急',out.length>0?'#B82525':'#0A5A46'),metCard('庫存估值',CUR()+fmt(val),'進價計算')));
 pg.appendChild(dv({cls:'grid4',style:'margin-bottom:14px'},metCard('菜單毛利率',pct(avg),'達標率',avg>=tgt?'#0A5A46':'#B82525'),metCard('本月進貨',CUR()+fmt(buyAmt),buyMon.length+' 筆'),metCard('本月損耗',CUR()+fmt(wasteAmt),wasteMon.length+' 筆',wasteAmt>0?'#9A6210':'#0A5A46'),metCard('菜單品項',state.menu.length+' 項','')));
@@ -4802,6 +4819,35 @@ function buildProfitTrendTab(){
 
 
 function renderRef(){const pg=dv({});const sw=sopBox('ref');if(sw)pg.appendChild(sw);pg.appendChild(dv({cls:'page-title'},'⚙️ 系統設定'));
+
+// 🆕 自動備份設定卡片
+var ab=(state.meta&&state.meta.autoBackup)||{enabled:false,day:1};
+var lastTxt=ab.lastBackupDate?'最後備份:'+ab.lastBackupDate:'尚未自動備份';
+var bkCard=dv({cls:'card',style:'background:linear-gradient(135deg,#dbeafe,#eff6ff);border:1px solid #93c5fd'});
+bkCard.innerHTML='<div class="card-title" style="color:#1455A0">☁️ 自動備份 (每月固定下載 JSON 備份檔)</div>'+
+  '<div style="font-size:0.86rem;color:#1455A0;margin-bottom:10px;line-height:1.6">'+
+  '系統會在每月設定日第一次開啟時,自動下載 JSON 備份檔到您的「下載」資料夾。<br>'+
+  '<b>使用方法</b>:下載後手動上傳到 Google Drive / 雲端硬碟保存。<br>'+
+  '<small style="color:#666">※ 直接整合 Google Drive API 需 OAuth 授權,目前用「下載 + 手動上傳」方式最簡單可靠。</small>'+
+  '</div>'+
+  '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">'+
+    '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700">'+
+      '<input type="checkbox" id="ab-enabled" '+(ab.enabled?'checked':'')+' style="width:18px;height:18px;cursor:pointer">'+
+      '啟用每月自動備份'+
+    '</label>'+
+    '<div style="display:flex;align-items:center;gap:6px">'+
+      '<span style="font-size:0.86rem">每月</span>'+
+      '<select id="ab-day" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px">'+
+        Array.from({length:28},(_,i)=>i+1).map(function(d){return '<option value="'+d+'"'+(ab.day===d?' selected':'')+'>'+d+'</option>'}).join('')+
+      '</select>'+
+      '<span style="font-size:0.86rem">號自動下載</span>'+
+    '</div>'+
+    '<button class="btn btn-sm btn-primary" onclick="saveAutoBackupSettings()" style="background:#1455A0">💾 儲存設定</button>'+
+    '<button class="btn btn-sm btn-outline" onclick="exportBackup()">📥 立即手動備份</button>'+
+  '</div>'+
+  '<div style="font-size:0.78rem;color:#1455A0;margin-top:8px;font-weight:600">'+lastTxt+'</div>';
+pg.appendChild(bkCard);
+
 // 🆕 資料清理入口
 var dcCard=dv({cls:'card',style:'background:linear-gradient(135deg,#fff4e6,#fff8ed);border:1px solid #f5c98a'});
 dcCard.innerHTML='<div class="card-title" style="color:#9A6210">🗑️ 資料清理工具</div><div style="font-size:0.86rem;color:#9A6210;margin-bottom:10px;line-height:1.6">系統使用一段時間後可能累積無用資料 (未使用食材、過期訂單、停用客戶等),建議定期清理以提升效能與資料整潔度。</div><button class="btn btn-primary" onclick="showDataCleaning()" style="background:#9A6210">🗑️ 開啟資料清理</button>';
@@ -4883,6 +4929,79 @@ window.resetUnitDisplay=function(){
   setTimeout(function(){renderPage()},300);
 };
 function exportBackup(){const blob=new Blob([JSON.stringify({...state,exportedAt:new Date().toISOString()},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='好洺ERP備份_'+toDay()+'.json';a.click();toast('✅ 備份已下載')}
+
+// ══════════════════════════════════════════════════════
+// 🆕 關閉系統時強制儲存所有資料
+// ══════════════════════════════════════════════════════
+window.addEventListener('beforeunload',function(){
+  try{
+    // 1. localStorage 立刻寫 (取消防抖)
+    if(typeof _saveTimer!=='undefined')clearTimeout(_saveTimer);
+    localStorage.setItem(COST_KEY,JSON.stringify(state));
+    
+    // 2. Firebase 用 sendBeacon 不會被 unload 中斷 (best-effort)
+    if(typeof _fbSaveTimer!=='undefined')clearTimeout(_fbSaveTimer);
+    if(typeof _saveToFirebase==='function')_saveToFirebase();
+  }catch(e){}
+});
+
+// ══════════════════════════════════════════════════════
+// 🆕 每月自動備份 (下載 JSON 檔,可手動上傳到 Google Drive)
+// ══════════════════════════════════════════════════════
+// 儲存自動備份設定
+window.saveAutoBackupSettings=function(){
+  var enabled=document.getElementById('ab-enabled');
+  var day=document.getElementById('ab-day');
+  if(!state.meta)state.meta={};
+  if(!state.meta.autoBackup)state.meta.autoBackup={};
+  state.meta.autoBackup.enabled=enabled?enabled.checked:false;
+  state.meta.autoBackup.day=day?+day.value:1;
+  saveState();
+  toast('✅ 自動備份設定已儲存');
+};
+
+window.checkMonthlyBackup=function(){
+  if(!state.meta||!state.meta.autoBackup||!state.meta.autoBackup.enabled)return;
+  
+  var cfg=state.meta.autoBackup;
+  var today=new Date();
+  var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  var thisMonth=todayStr.substring(0,7);
+  
+  // 已備份過本月就不再觸發
+  if(cfg.lastBackupMonth===thisMonth)return;
+  
+  // 是否到設定日 (預設每月 1 號)
+  var triggerDay=+cfg.day||1;
+  if(today.getDate()<triggerDay)return;
+  
+  // 觸發備份
+  setTimeout(function(){
+    try{
+      var data=JSON.stringify({...state,exportedAt:new Date().toISOString(),autoBackup:true},null,2);
+      var blob=new Blob([data],{type:'application/json'});
+      var a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='好洺ERP_自動備份_'+todayStr+'.json';
+      a.click();
+      
+      // 記錄已備份
+      cfg.lastBackupMonth=thisMonth;
+      cfg.lastBackupDate=todayStr;
+      saveState();
+      
+      // 提示使用者
+      setTimeout(function(){
+        if(typeof toast==='function')toast('📦 本月自動備份已下載,請上傳到 Google Drive');
+      },500);
+    }catch(e){console.error('自動備份失敗',e)}
+  },2000);  // 等系統載入完成
+};
+
+// 載入後檢查是否需要備份
+setTimeout(function(){
+  try{window.checkMonthlyBackup()}catch(e){}
+},3500);
 function importBackup(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.ings)throw new Error();if(!confirm('確定匯入？目前資料將被覆蓋'))return;Object.assign(state,d);saveState();renderPage();toast('✅ 備份已匯入')}catch{alert('❌ 無效的備份檔案')}};reader.readAsText(file);e.target.value=''}
 function clearAllData(){if(!confirm('⚠️ 確定清除所有資料？'))return;if(!confirm('再次確認？'))return;localStorage.removeItem(COST_KEY);location.reload()}
 </script>
@@ -6059,8 +6178,49 @@ window.deleteSchedule=function(id){
 
 // ══════════════════════════════════════════════════════
 // 🆕 從排程算採購清單 (showProcurementFromSchedule)
-// 邏輯:抓「待生產」排程 → 累計食材需求 → 對比庫存 → 算缺口 → 按廠商分組
+// 邏輯:抓「待生產」排程 → 累計食材需求 (含單位換算) → 對比庫存 → 算缺口 → 按廠商分組
 // ══════════════════════════════════════════════════════
+
+// 數量單位轉換工具 (重量↔重量、體積↔體積、重量↔體積透過密度)
+window._convertProcQty=function(qty,fromUnit,toUnit,invName){
+  if(!qty)return 0;
+  if(!fromUnit||!toUnit||fromUnit===toUnit)return qty;
+  
+  var UD=window.UNIT_DB||{};
+  var fromInfo=UD[fromUnit];
+  var toInfo=UD[toUnit];
+  var fromType=fromInfo&&fromInfo.type;
+  var toType=toInfo&&toInfo.type;
+  
+  // 同類別 (重量↔重量, 體積↔體積)
+  if(fromType&&toType&&fromType===toType&&(fromType==='weight'||fromType==='volume')){
+    var qtyInBase=window.unitToG?window.unitToG(qty,fromUnit):qty;
+    var oneInBase=window.unitToG?window.unitToG(1,toUnit):1;
+    if(oneInBase>0)return qtyInBase/oneInBase;
+  }
+  
+  // 跨類別 (重量↔體積) — 用密度
+  if(fromType&&toType&&((fromType==='weight'&&toType==='volume')||(fromType==='volume'&&toType==='weight'))){
+    var density=(window.getDensity&&invName?window.getDensity(invName):null)||1.0;
+    var qtyInBaseUnit=window.unitToG?window.unitToG(qty,fromUnit):qty;
+    if(fromType==='weight'&&toType==='volume'){
+      // g → ml: vol = mass / density
+      var qtyInMl=qtyInBaseUnit/density;
+      var oneInMl=window.unitToG?window.unitToG(1,toUnit):1;
+      if(oneInMl>0)return qtyInMl/oneInMl;
+    }else{
+      // ml → g: mass = vol × density
+      var qtyInG=qtyInBaseUnit*density;
+      var oneInG=window.unitToG?window.unitToG(1,toUnit):1;
+      if(oneInG>0)return qtyInG/oneInG;
+    }
+  }
+  
+  // 計件類無法換算 — 警告並回原值 (此 case 應該不會走到,因為 detectIngAnomalies 會擋)
+  if(typeof console!=='undefined')console.warn('[採購清單] 單位無法換算 '+fromUnit+' → '+toUnit+' ('+invName+')');
+  return qty;
+};
+
 window.calcProcurementFromSchedule=function(opts){
   opts=opts||{};
   var statuses=opts.statuses||['待生產'];
@@ -6076,7 +6236,11 @@ window.calcProcurementFromSchedule=function(opts){
   
   if(schedules.length===0)return {needs:[],schedules:[],summary:{scheduleCount:0,ingCount:0,totalCost:0,buyCount:0}};
   
-  // 累計每個食材的總需求量 (含批次倍數)
+  // 食材庫 lookup (先建立,需求累計時要用)
+  var im={};
+  (state.ings||[]).forEach(function(i){im[i.name]=i});
+  
+  // 累計每個食材的總需求量 (含批次倍數,並換算到食材單位)
   var needs={};
   schedules.forEach(function(s){
     var rec=(state.recipes||[]).find(function(r){return r.id===s.recipeId});
@@ -6084,26 +6248,48 @@ window.calcProcurementFromSchedule=function(opts){
     var mult=s.multiplier||1;
     (rec.ings||[]).forEach(function(ing){
       var k=ing.name;
+      var inv=im[ing.name];
+      // 用食材單位作為計算基準 (沒食材就用配方單位,事後會標 ⚠️ 未建食材)
+      var displayUnit=inv?inv.unit:(ing.unit||'');
+      
       if(!needs[k]){
-        needs[k]={name:ing.name,totalQty:0,unit:ing.unit||'',schedules:[]};
+        needs[k]={
+          name:ing.name,
+          totalQty:0,
+          unit:displayUnit,
+          recipeUnit:ing.unit||'',
+          schedules:[]
+        };
       }
-      var qtyNeed=(ing.qty||0)*mult;
-      needs[k].totalQty+=qtyNeed;
-      needs[k].schedules.push({date:s.date,recipeName:s.recipeName,qty:qtyNeed});
+      
+      // 配方需求量 (配方單位)
+      var qtyInRecipeUnit=(ing.qty||0)*mult;
+      // 🆕 換算到食材單位 (避免 30000g vs 1kg 直接相減的單位錯亂)
+      var qtyInInvUnit=qtyInRecipeUnit;
+      if(inv&&ing.unit&&inv.unit&&ing.unit!==inv.unit){
+        qtyInInvUnit=window._convertProcQty(qtyInRecipeUnit,ing.unit,inv.unit,ing.name);
+      }
+      
+      needs[k].totalQty+=qtyInInvUnit;
+      needs[k].schedules.push({
+        date:s.date,
+        recipeName:s.recipeName,
+        qty:qtyInInvUnit
+      });
     });
   });
   
   // 對比庫存 + 算缺口 + 廠商
-  var im={};
-  (state.ings||[]).forEach(function(i){im[i.name]=i});
-  
   var result=Object.keys(needs).map(function(k){
     var n=needs[k];
     var inv=im[n.name];
     var stock=inv?(+inv.stock||0):0;
     var safety=inv?(+inv.safety||0):0;
-    // 需採購 = 需求量 - 現有庫存 + 安全庫存(用完還要保留)
-    var needBuy=Math.max(0,n.totalQty-stock+safety);
+    // 需採購 = 需求量 - 現有庫存 + 安全庫存 (用完還要保留)
+    // 此時 totalQty/stock/safety 都是同單位 (食材單位)
+    // 🆕 deductStock=false 時:不扣庫存,直接顯示總需求 (Tim 還沒用採購功能時的純叫貨量)
+    var deductStock=opts.deductStock!==false;  // 預設 true (扣庫存)
+    var needBuy=deductStock?Math.max(0,n.totalQty-stock+safety):n.totalQty;
     
     // 廠商
     var supId=inv&&inv.sup?inv.sup:'';
@@ -6118,11 +6304,12 @@ window.calcProcurementFromSchedule=function(opts){
       name:n.name,
       totalQty:n.totalQty,
       unit:n.unit,
+      recipeUnit:n.recipeUnit,
       stock:stock,
       safety:safety,
       needBuy:needBuy,
       price:inv?(+inv.price||0):0,
-      cost:needBuy*(inv?(+inv.price||0):0),
+      cost:needBuy*(inv?(+inv.price||0):0),  // needBuy 跟 price 都是食材單位 → 直接乘正確
       supId:supId,
       supName:supName,
       hasInventory:!!inv,
@@ -6156,12 +6343,18 @@ window.showProcurementFromSchedule=function(){
       dateTo:d2.toISOString().substring(0,10)
     };
   }
+  // 🆕 預設不扣庫存 (Tim 還沒開始用採購功能,純叫貨量比較直觀)
+  if(state._procFilter.deductStock===undefined)state._procFilter.deductStock=false;
   
   var data=window.calcProcurementFromSchedule({
     statuses:['待生產'],
     dateFrom:state._procFilter.dateFrom,
-    dateTo:state._procFilter.dateTo
+    dateTo:state._procFilter.dateTo,
+    deductStock:state._procFilter.deductStock
   });
+  
+  var deduct=state._procFilter.deductStock;
+  var modeLabel=deduct?'需採購量':'總叫貨量';
   
   var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:1.1rem;font-weight:700;color:#0f1b35">📦 採購清單 (從排程計算)</div><button class="btn btn-sm btn-outline" onclick="closeModal()">✕ 關閉</button></div>';
   
@@ -6174,6 +6367,8 @@ window.showProcurementFromSchedule=function(){
   html+='<button class="btn btn-sm btn-outline" onclick="setProcRange(7)">未來 7 天</button>';
   html+='<button class="btn btn-sm btn-outline" onclick="setProcRange(14)">14 天</button>';
   html+='<button class="btn btn-sm btn-outline" onclick="setProcRange(30)">30 天</button>';
+  // 🆕 扣庫存切換
+  html+='<label style="display:flex;align-items:center;gap:6px;background:#fff;padding:6px 12px;border:1.5px solid '+(deduct?'#0A5A46':'#9A6210')+';border-radius:6px;cursor:pointer;font-weight:700;color:'+(deduct?'#0A5A46':'#9A6210')+'"><input type="checkbox" '+(deduct?'checked':'')+' onchange="toggleProcDeductStock()" style="cursor:pointer">'+(deduct?'☑ 扣除現有庫存':'☐ 顯示總叫貨量 (不扣庫存)')+'</label>';
   html+='</div>';
   
   // 統計卡
@@ -6204,7 +6399,7 @@ window.showProcurementFromSchedule=function(){
       
       html+='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:10px;overflow:hidden">';
       html+='<div style="background:#f9fafb;padding:8px 12px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:0.86rem"><b style="color:#0f1b35">'+esc(supName)+'</b><span style="color:#666">'+groupBuyCount+' 項需購 · '+CUR()+fmt(groupCost,0)+'</span></div>';
-      html+='<div style="overflow-x:auto"><table class="tbl" style="font-size:0.82rem;margin:0"><thead><tr><th>食材</th><th style="text-align:right">需求量</th><th style="text-align:right">庫存</th><th style="text-align:right">安全</th><th style="text-align:right">需採購</th><th style="text-align:right">單價</th><th style="text-align:right">小計</th></tr></thead><tbody>';
+      html+='<div style="overflow-x:auto"><table class="tbl" style="font-size:0.82rem;margin:0"><thead><tr><th>食材</th><th style="text-align:right">需求量</th><th style="text-align:right">庫存</th><th style="text-align:right">安全</th><th style="text-align:right">'+modeLabel+'</th><th style="text-align:right">單價</th><th style="text-align:right">小計</th></tr></thead><tbody>';
       
       items.forEach(function(n){
         var rowStyle=n.needBuy>0?'':'background:#f9fafb;color:#999';
@@ -6225,7 +6420,7 @@ window.showProcurementFromSchedule=function(){
       html+='</tbody></table></div></div>';
     });
     
-    html+='<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:6px;padding:10px 12px;font-size:0.82rem;color:#9A6210;margin-top:8px">💡 <b>需採購計算</b>:總需求量 - 現有庫存 + 安全庫存 (確保用完還有安全存量) ｜ ⚠️ = 食材庫尚未建立</div>';
+    html+='<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:6px;padding:10px 12px;font-size:0.82rem;color:#9A6210;margin-top:8px">💡 <b>'+modeLabel+'計算</b>:'+(deduct?'總需求量 - 現有庫存 + 安全庫存 (確保用完還有安全存量)':'總需求量 (不扣庫存,直接顯示完整叫貨量)')+' ｜ ⚠️ = 食材庫尚未建立</div>';
   }
   
   // 暫存資料供 CSV 匯出
@@ -6238,6 +6433,14 @@ window.updateProcFilter=function(){
   var f=$('proc-from'),t=$('proc-to');
   if(f)state._procFilter.dateFrom=f.value;
   if(t)state._procFilter.dateTo=t.value;
+  closeModal();
+  setTimeout(showProcurementFromSchedule,50);
+};
+
+// 🆕 切換扣庫存模式
+window.toggleProcDeductStock=function(){
+  if(!state._procFilter)state._procFilter={};
+  state._procFilter.deductStock=!state._procFilter.deductStock;
   closeModal();
   setTimeout(showProcurementFromSchedule,50);
 };
