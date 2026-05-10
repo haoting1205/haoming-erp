@@ -234,12 +234,14 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 #modal-ov::-webkit-scrollbar-thumb{background:#BA7517;border:2px solid rgba(0,0,0,.1)}
 #modal-ov::-webkit-scrollbar-thumb:hover{background:#D49B30}
 </style>
+<!-- 🆕 Google Identity Services (Google Drive 自動備份用) -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div id="topbar">
   <div id="topbar-row1">
     <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.1.0</span></div>
-    <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><div id="topbar-right"></div></div>
+    <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
 </div>
@@ -4820,30 +4822,26 @@ function buildProfitTrendTab(){
 
 function renderRef(){const pg=dv({});const sw=sopBox('ref');if(sw)pg.appendChild(sw);pg.appendChild(dv({cls:'page-title'},'⚙️ 系統設定'));
 
-// 🆕 自動備份設定卡片
-var ab=(state.meta&&state.meta.autoBackup)||{enabled:false,day:1};
-var lastTxt=ab.lastBackupDate?'最後備份:'+ab.lastBackupDate:'尚未自動備份';
+// 🆕 自動備份設定卡片 (Google Drive 整合,每日 1 次)
+var ab=(state.meta&&state.meta.autoBackup)||{enabled:false};
+var lastDate=localStorage.getItem('hm_erp_lastBackupDate')||'';
+var lastTxt=lastDate?'最後備份:'+lastDate:'尚未備份';
 var bkCard=dv({cls:'card',style:'background:linear-gradient(135deg,#dbeafe,#eff6ff);border:1px solid #93c5fd'});
-bkCard.innerHTML='<div class="card-title" style="color:#1455A0">☁️ 自動備份 (每月固定下載 JSON 備份檔)</div>'+
+bkCard.innerHTML='<div class="card-title" style="color:#1455A0">☁️ Google Drive 自動備份</div>'+
   '<div style="font-size:0.86rem;color:#1455A0;margin-bottom:10px;line-height:1.6">'+
-  '系統會在每月設定日第一次開啟時,自動下載 JSON 備份檔到您的「下載」資料夾。<br>'+
-  '<b>使用方法</b>:下載後手動上傳到 Google Drive / 雲端硬碟保存。<br>'+
-  '<small style="color:#666">※ 直接整合 Google Drive API 需 OAuth 授權,目前用「下載 + 手動上傳」方式最簡單可靠。</small>'+
+  '系統每天會自動上傳備份到您的 Google Drive (每天 1 次,不重複)。<br>'+
+  '<b>首次使用</b>:會跳出 Google 登入授權畫面,授權後系統會記住,之後全自動。<br>'+
+  '<b>檔案位置</b>:Google Drive 根目錄,檔名「好洺ERP_備份_YYYYMMDD.json」<br>'+
+  '<small style="color:#666">※ 備份檔包含所有業務資料、設定、操作紀錄</small>'+
   '</div>'+
   '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">'+
     '<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700">'+
       '<input type="checkbox" id="ab-enabled" '+(ab.enabled?'checked':'')+' style="width:18px;height:18px;cursor:pointer">'+
-      '啟用每月自動備份'+
+      '啟用每日自動備份'+
     '</label>'+
-    '<div style="display:flex;align-items:center;gap:6px">'+
-      '<span style="font-size:0.86rem">每月</span>'+
-      '<select id="ab-day" style="padding:4px 8px;border:1px solid #ccc;border-radius:4px">'+
-        Array.from({length:28},(_,i)=>i+1).map(function(d){return '<option value="'+d+'"'+(ab.day===d?' selected':'')+'>'+d+'</option>'}).join('')+
-      '</select>'+
-      '<span style="font-size:0.86rem">號自動下載</span>'+
-    '</div>'+
     '<button class="btn btn-sm btn-primary" onclick="saveAutoBackupSettings()" style="background:#1455A0">💾 儲存設定</button>'+
-    '<button class="btn btn-sm btn-outline" onclick="exportBackup()">📥 立即手動備份</button>'+
+    '<button class="btn btn-sm" onclick="cloudBackup(true)" style="background:#0A5A46;color:#fff">☁️ 立即雲端備份</button>'+
+    '<button class="btn btn-sm btn-outline" onclick="exportBackup()">📥 下載本機備份檔</button>'+
   '</div>'+
   '<div style="font-size:0.78rem;color:#1455A0;margin-top:8px;font-weight:600">'+lastTxt+'</div>';
 pg.appendChild(bkCard);
@@ -4946,62 +4944,205 @@ window.addEventListener('beforeunload',function(){
 });
 
 // ══════════════════════════════════════════════════════
-// 🆕 每月自動備份 (下載 JSON 檔,可手動上傳到 Google Drive)
+// 🆕 Google Drive 自動備份 (每日 1 次)
+// Client ID: 48292281688-gr3cu08uu4ib7i9ebdl62pl40ej0ojt7.apps.googleusercontent.com
+// Scope: drive.file
 // ══════════════════════════════════════════════════════
-// 儲存自動備份設定
+window._gdConfig={
+  clientId:'48292281688-gr3cu08uu4ib7i9ebdl62pl40ej0ojt7.apps.googleusercontent.com',
+  scope:'https://www.googleapis.com/auth/drive.file',
+  systemName:'好洺ERP',
+  storageKey:'hm_erp_lastBackupDate'
+};
+window._gdToken=null;
+window._gdClient=null;
+window._gdInitialized=false;
+window._gdPendingUpload=false;
+window._gdManual=false;
+
+window._gdToday=function(){
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+};
+
+window._gdLastBackup=function(){
+  return localStorage.getItem(window._gdConfig.storageKey)||'';
+};
+
+window._gdBackedUpToday=function(){
+  return window._gdLastBackup()===window._gdToday();
+};
+
+// 初始化 OAuth client (Lazy 載入)
+window._gdInit=function(callback){
+  if(window._gdInitialized){callback&&callback();return}
+  
+  var tries=0;
+  var maxTries=50;  // 5 秒
+  var checkLoaded=function(){
+    if(typeof google!=='undefined'&&google.accounts&&google.accounts.oauth2){
+      try{
+        window._gdClient=google.accounts.oauth2.initTokenClient({
+          client_id:window._gdConfig.clientId,
+          scope:window._gdConfig.scope,
+          callback:function(response){
+            if(response.error){
+              if(window._gdManual){
+                alert('⚠ Google 授權失敗:'+(response.error_description||response.error));
+              }
+              window._gdToken=null;
+              window._gdPendingUpload=false;
+              return;
+            }
+            window._gdToken=response.access_token;
+            if(window._gdPendingUpload){
+              window._gdPendingUpload=false;
+              window._gdDoUpload();
+            }
+          }
+        });
+        window._gdInitialized=true;
+        callback&&callback();
+      }catch(e){
+        console.error('GIS init failed',e);
+        if(window._gdManual)alert('⚠ Google Drive 初始化失敗:'+e.message);
+      }
+      return;
+    }
+    tries++;
+    if(tries>=maxTries){
+      if(window._gdManual)alert('⚠ Google 授權服務載入失敗,請檢查網路連線');
+      return;
+    }
+    setTimeout(checkLoaded,100);
+  };
+  checkLoaded();
+};
+
+// 上傳到 Google Drive (multipart upload)
+window._gdDoUpload=function(){
+  if(!window._gdToken){
+    if(window._gdManual)alert('⚠ 未授權,無法上傳');
+    return;
+  }
+  
+  try{
+    var backupData=JSON.stringify(Object.assign({},state,{
+      exportedAt:new Date().toISOString(),
+      systemVersion:window.SYSTEM_VERSION||'unknown',
+      autoBackup:true
+    }),null,2);
+    
+    var fileName=window._gdConfig.systemName+'_備份_'+window._gdToday().replace(/-/g,'')+'.json';
+    
+    var metadata={name:fileName,mimeType:'application/json'};
+    var form=new FormData();
+    form.append('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));
+    form.append('file',new Blob([backupData],{type:'application/json'}));
+    
+    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+window._gdToken},
+      body:form
+    }).then(function(res){
+      if(!res.ok){
+        return res.json().then(function(err){throw new Error((err.error&&err.error.message)||res.statusText)});
+      }
+      return res.json();
+    }).then(function(data){
+      // 成功 → 靜默
+      localStorage.setItem(window._gdConfig.storageKey,window._gdToday());
+      console.log('[Google Drive] 備份成功:',fileName);
+      window._gdUpdateBtn();
+      if(window._gdManual){
+        window._gdManual=false;
+        if(typeof toast==='function')toast('☁️ 備份已上傳到 Google Drive');
+      }
+    }).catch(function(err){
+      alert('⚠ 上傳 Google Drive 失敗:'+err.message);
+      console.error('[Google Drive] upload failed',err);
+    });
+  }catch(e){
+    if(window._gdManual)alert('⚠ 備份過程錯誤:'+e.message);
+  }
+};
+
+// 觸發雲端備份 (手動或自動)
+window.cloudBackup=function(isManual){
+  window._gdManual=!!isManual;
+  
+  window._gdInit(function(){
+    if(!window._gdClient)return;
+    
+    window._gdPendingUpload=true;
+    if(isManual){
+      // 手動 → 強制顯示授權
+      window._gdClient.requestAccessToken();
+    }else{
+      // 自動 → 靜默授權 (已授權過才會成功)
+      window._gdClient.requestAccessToken({prompt:''});
+    }
+  });
+};
+
+// 更新工具列「雲端備份」按鈕狀態
+window._gdUpdateBtn=function(){
+  var btn=document.getElementById('cloud-backup-btn');
+  if(!btn)return;
+  
+  var last=window._gdLastBackup();
+  var today=window._gdToday();
+  
+  if(last===today){
+    btn.innerHTML='✅ 已備份';
+    btn.style.background='#0A5A46';
+    btn.style.color='#fff';
+    btn.title='今日已自動備份至 Google Drive';
+  }else if(last){
+    var lastShort=last.substring(5);
+    btn.innerHTML='📥 備份('+lastShort+')';
+    btn.style.background='#1455A0';
+    btn.style.color='#fff';
+    btn.title='上次備份:'+last+' (今日尚未備份)';
+  }else{
+    btn.innerHTML='📥 雲端備份';
+    btn.style.background='#1455A0';
+    btn.style.color='#fff';
+    btn.title='點擊上傳備份到 Google Drive (首次需 Google 登入授權)';
+  }
+};
+
+// 自動備份檢查 (啟動 5 秒後)
+window._gdAutoCheck=function(){
+  if(!state.meta||!state.meta.autoBackup||!state.meta.autoBackup.enabled)return;
+  if(window._gdBackedUpToday())return;
+  
+  console.log('[Google Drive] 啟動自動備份');
+  window.cloudBackup(false);
+};
+
+// 儲存自動備份設定 (給設定頁用)
 window.saveAutoBackupSettings=function(){
   var enabled=document.getElementById('ab-enabled');
-  var day=document.getElementById('ab-day');
   if(!state.meta)state.meta={};
   if(!state.meta.autoBackup)state.meta.autoBackup={};
   state.meta.autoBackup.enabled=enabled?enabled.checked:false;
-  state.meta.autoBackup.day=day?+day.value:1;
+  state.meta.autoBackup.method='google_drive';  // 標記用 Google Drive
   saveState();
   toast('✅ 自動備份設定已儲存');
+  // 立刻檢查一次
+  if(state.meta.autoBackup.enabled){
+    setTimeout(function(){window._gdAutoCheck()},500);
+  }
 };
 
-window.checkMonthlyBackup=function(){
-  if(!state.meta||!state.meta.autoBackup||!state.meta.autoBackup.enabled)return;
-  
-  var cfg=state.meta.autoBackup;
-  var today=new Date();
-  var todayStr=today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
-  var thisMonth=todayStr.substring(0,7);
-  
-  // 已備份過本月就不再觸發
-  if(cfg.lastBackupMonth===thisMonth)return;
-  
-  // 是否到設定日 (預設每月 1 號)
-  var triggerDay=+cfg.day||1;
-  if(today.getDate()<triggerDay)return;
-  
-  // 觸發備份
-  setTimeout(function(){
-    try{
-      var data=JSON.stringify({...state,exportedAt:new Date().toISOString(),autoBackup:true},null,2);
-      var blob=new Blob([data],{type:'application/json'});
-      var a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download='好洺ERP_自動備份_'+todayStr+'.json';
-      a.click();
-      
-      // 記錄已備份
-      cfg.lastBackupMonth=thisMonth;
-      cfg.lastBackupDate=todayStr;
-      saveState();
-      
-      // 提示使用者
-      setTimeout(function(){
-        if(typeof toast==='function')toast('📦 本月自動備份已下載,請上傳到 Google Drive');
-      },500);
-    }catch(e){console.error('自動備份失敗',e)}
-  },2000);  // 等系統載入完成
-};
-
-// 載入後檢查是否需要備份
+// 啟動 5 秒後自動檢查
 setTimeout(function(){
-  try{window.checkMonthlyBackup()}catch(e){}
-},3500);
+  try{window._gdUpdateBtn();window._gdAutoCheck()}catch(e){}
+},5000);
+
+// 舊函式保留向後相容 (不再執行)
+window.checkMonthlyBackup=function(){};
 function importBackup(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!d.ings)throw new Error();if(!confirm('確定匯入？目前資料將被覆蓋'))return;Object.assign(state,d);saveState();renderPage();toast('✅ 備份已匯入')}catch{alert('❌ 無效的備份檔案')}};reader.readAsText(file);e.target.value=''}
 function clearAllData(){if(!confirm('⚠️ 確定清除所有資料？'))return;if(!confirm('再次確認？'))return;localStorage.removeItem(COST_KEY);location.reload()}
 </script>
