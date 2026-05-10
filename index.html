@@ -634,21 +634,37 @@ function _bindModalEnterToSave(ov){
     // select 開啟下拉時 Enter 是選擇,不要搶
     if(tag==='select')return;
     
-    // 找儲存按鈕 (modal 內)
-    var btns=mov.querySelectorAll('button');
+    // 找儲存按鈕 (modal 內) — 優先級從高到低
     var saveBtn=null;
-    for(var i=0;i<btns.length;i++){
-      var b=btns[i];
-      var oc=b.getAttribute('onclick')||'';
-      var txt=(b.textContent||'').trim();
-      // onclick 含 save/submit/confirm
-      if(/save|submit|confirm/i.test(oc)){saveBtn=b;break}
-      // 文字含儲存關鍵字 (✔ ✓ ✅ 💾 都涵蓋)
-      if(/儲存|確定|確認|提交|送出|新增|建立|✔|✓|✅|💾|📤|📥/.test(txt)){saveBtn=b;break}
-    }
-    // Fallback: 最後一個 .btn-primary 通常是主動作
+    
+    // 優先 1:.save-btns 區塊內的 .btn-primary (mF 函式產生的儲存按鈕,最可靠)
+    var saveBtns=mov.querySelectorAll('.save-btns .btn-primary');
+    if(saveBtns.length>0)saveBtn=saveBtns[saveBtns.length-1];
+    
+    // 優先 2: onclick 開頭是 save (排除 saveBuy/saveIng 等真正儲存,排除 apply/import 等)
     if(!saveBtn){
-      var primaries=mov.querySelectorAll('.btn-primary,.btn-success');
+      var btns=mov.querySelectorAll('button');
+      for(var i=0;i<btns.length;i++){
+        var b=btns[i];
+        var oc=b.getAttribute('onclick')||'';
+        // 必須以 save 開頭 (saveIng/saveBuy/saveRecipe 等)
+        if(/^save[A-Z]/.test(oc.trim())||/^submit[A-Z]/.test(oc.trim())){saveBtn=b;break}
+      }
+    }
+    
+    // 優先 3: 文字含「儲存/確定/送出/新增/建立/提交」(精準關鍵字,不用圖示避免誤判)
+    if(!saveBtn){
+      var btns2=mov.querySelectorAll('button');
+      for(var j=0;j<btns2.length;j++){
+        var b2=btns2[j];
+        var txt=(b2.textContent||'').trim();
+        if(/儲存|確定送出|^✔ 儲存|^💾/.test(txt)){saveBtn=b2;break}
+      }
+    }
+    
+    // 優先 4 (Fallback): 最後一個 .btn-primary
+    if(!saveBtn){
+      var primaries=mov.querySelectorAll('.btn-primary');
       if(primaries.length>0)saveBtn=primaries[primaries.length-1];
     }
     
@@ -2484,7 +2500,7 @@ var filteredIngs=(state.ings||[]).filter(function(i){
   if(state._ingSearch.status==='full'&&i.stock<=i.safety)return false;
   return true;
 });
-pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th style="width:30px"></th><th>編號</th><th>食材名稱</th><th>類別</th><th>庫存量</th><th>安全量</th><th>進價/單位</th><th>狀態</th><th style="min-width:140px">操作</th></tr></thead><tbody>'+(filteredIngs.length===0?'<tr><td colspan="9" style="text-align:center;padding:40px;color:#999">無符合條件的食材</td></tr>':filteredIngs.map(i=>{
+pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th style="width:30px"></th><th>編號</th><th>食材名稱</th><th>類別</th><th>供應商</th><th>庫存量</th><th>安全量</th><th>進價/單位</th><th>狀態</th><th style="min-width:140px">操作</th></tr></thead><tbody>'+(filteredIngs.length===0?'<tr><td colspan="10" style="text-align:center;padding:40px;color:#999">無符合條件的食材</td></tr>':filteredIngs.map(i=>{
   // 🆕 依顯示偏好換算庫存
   var stockDisplay=fmt(i.stock,2)+' '+esc(i.unit);
   if(state.meta&&state.meta.unitDisplay&&state.meta.unitDisplay[i.cat]&&state.meta.unitDisplay[i.cat]!=='auto'&&state.meta.unitDisplay[i.cat]!==i.unit){
@@ -2504,7 +2520,7 @@ pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style
   var expandIcon=isExpanded?'▼':'▶';
   
   // 主行
-  var mainRow='<tr style="cursor:pointer" onclick="toggleIngDetail(\''+i.id+'\',event)"><td style="text-align:center;color:#0A5A46;font-weight:700;font-size:0.86rem">'+expandIcon+'</td><td style="font-family:monospace;font-size:0.78rem;color:#706E68">'+esc(i.id)+'</td><td style="font-weight:600">'+esc(i.name)+(i.brand?'<div style="font-size:0.7rem;color:#999">'+esc(i.brand)+'</div>':'')+'</td><td><span class="badge badge-gray">'+esc(i.cat)+'</span></td><td style="font-weight:600">'+stockDisplay+'</td><td style="color:#706E68">'+fmt(i.safety,0)+'</td><td>'+priceCell+'</td><td>'+sbadge(i.stock,i.safety)+'</td><td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openStockAdj(\''+i.id+'\')">📦</button><button class="btn btn-sm btn-outline" onclick="showSubstitutes(\''+esc(i.name)+'\')">🔄</button><button class="btn btn-sm btn-outline" onclick="openIngModal(\''+i.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delIng(\''+i.id+'\')">刪除</button></div></td></tr>';
+  var mainRow='<tr style="cursor:pointer" onclick="toggleIngDetail(\''+i.id+'\',event)"><td style="text-align:center;color:#0A5A46;font-weight:700;font-size:0.86rem">'+expandIcon+'</td><td style="font-family:monospace;font-size:0.78rem;color:#706E68">'+esc(i.id)+'</td><td style="font-weight:600">'+esc(i.name)+(i.brand?'<div style="font-size:0.7rem;color:#999">'+esc(i.brand)+'</div>':'')+'</td><td><span class="badge badge-gray">'+esc(i.cat)+'</span></td><td style="font-size:0.84rem">'+(function(){var s=(state.sups||[]).find(function(x){return x.id===i.sup||x.name===i.sup});return s?esc(s.name):(i.sup?esc(i.sup):'<span style="color:#bbb">—</span>')})()+'</td><td style="font-weight:600">'+stockDisplay+'</td><td style="color:#706E68">'+fmt(i.safety,0)+'</td><td>'+priceCell+'</td><td>'+sbadge(i.stock,i.safety)+'</td><td onclick="event.stopPropagation()"><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openStockAdj(\''+i.id+'\')">📦</button><button class="btn btn-sm btn-outline" onclick="showSubstitutes(\''+esc(i.name)+'\')">🔄</button><button class="btn btn-sm btn-outline" onclick="openIngModal(\''+i.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delIng(\''+i.id+'\')">刪除</button></div></td></tr>';
   
   // 展開的詳情行 (預設隱藏)
   var detailRow='';
