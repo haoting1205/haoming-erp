@@ -171,7 +171,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 .recipe-item:hover{background:var(--g50)}
 .recipe-item.active{background:var(--pri-l);border-left:3px solid var(--pri)}
 .recipe-detail{padding:16px 20px;overflow-y:auto;max-height:70vh}
-.recipe-ing-row{display:grid;grid-template-columns:2fr 80px 60px 90px 36px;gap:6px;align-items:center;padding:6px 0;border-bottom:var(--brd-l);font-size:0.88rem}
+.recipe-ing-row{display:grid;grid-template-columns:46px 2fr 80px 60px 90px 36px;gap:6px;align-items:center;padding:6px 0;border-bottom:var(--brd-l);font-size:0.88rem}
 
 /* ── Action Bar (叫貨表) ── */
 .action-bar{background:var(--card);padding:14px 24px;border-bottom:var(--brd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -209,7 +209,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
   .tbl th,.tbl td{padding:7px 10px;font-size:0.82rem}
   .metric-val{font-size:1.3rem}
   .metric{padding:10px 12px}
-  .recipe-ing-row{grid-template-columns:1fr 70px 55px 80px 30px;gap:4px}
+  .recipe-ing-row{grid-template-columns:34px 1fr 70px 55px 80px 30px;gap:4px}
   #cost-content{padding:12px}
   .btn{padding:8px 14px;font-size:0.86rem}
   .save-btns{padding:12px 16px}
@@ -2094,6 +2094,124 @@ window.calcDV=function(name,value){
 };
 
 // ══════════════════════════════════════════════════════
+// 🆕 產品總覽 — 一覽所有配方的售價/成本/毛利/批量
+// ══════════════════════════════════════════════════════
+window._overviewSort={key:'margin',asc:true};
+window.showProductOverview=function(){
+  var recs=state.recipes||[];
+  if(recs.length===0){alert('尚無配方');return}
+  
+  var tgt=(state.meta&&state.meta.targetMargin?state.meta.targetMargin:0.65)*100;
+  
+  // 計算每個配方的數據
+  var rows=recs.map(function(r){
+    var cc=window.calcCost?window.calcCost(r):null;
+    var cost=cc?(cc.opLossRate>0?cc.perFull:cc.per)||cc.perTotalCost||cc.perFood||0:0;
+    if(!cost&&cc)cost=cc.perFood||0;
+    var sp=+r.sellPrice||0;
+    var profit=sp>0?sp-cost:0;
+    var margin=sp>0?(profit/sp*100):null;
+    var sugPrice=cost>0?cost/(1-tgt/100):0;
+    var perBatch=+r.perBatch||1;
+    var mult=+r.multiplier||1;
+    return {
+      id:r.id,code:r.code||'',name:r.name,cat:r.cat||'',
+      perBatch:perBatch,mult:mult,batchOut:perBatch*mult,unit:r.unit||'包',
+      cost:cost,sellPrice:sp,profit:profit,margin:margin,sugPrice:sugPrice,
+      isOk:margin!=null&&margin>=tgt,
+      isLoss:sp>0&&profit<0,
+      noPrice:sp<=0
+    };
+  });
+  
+  // 排序
+  var sk=window._overviewSort.key,asc=window._overviewSort.asc;
+  rows.sort(function(a,b){
+    var va,vb;
+    if(sk==='name'){va=a.name;vb=b.name;return asc?va.localeCompare(vb):vb.localeCompare(va)}
+    if(sk==='margin'){va=a.margin==null?-999:a.margin;vb=b.margin==null?-999:b.margin}
+    else if(sk==='cost'){va=a.cost;vb=b.cost}
+    else if(sk==='sellPrice'){va=a.sellPrice;vb=b.sellPrice}
+    else if(sk==='batchOut'){va=a.batchOut;vb=b.batchOut}
+    else{va=a.margin==null?-999:a.margin;vb=b.margin==null?-999:b.margin}
+    return asc?va-vb:vb-va;
+  });
+  
+  // 統計
+  var withPrice=rows.filter(function(r){return !r.noPrice});
+  var okCount=rows.filter(function(r){return r.isOk}).length;
+  var lossCount=rows.filter(function(r){return r.isLoss}).length;
+  var noPriceCount=rows.filter(function(r){return r.noPrice}).length;
+  var avgMargin=withPrice.length>0?withPrice.reduce(function(s,r){return s+(r.margin||0)},0)/withPrice.length:0;
+  
+  var sortIcon=function(k){return sk===k?(asc?' ▲':' ▼'):''};
+  
+  var trs=rows.map(function(r){
+    var marginCell;
+    if(r.noPrice)marginCell='<span style="color:#999">未設售價</span>';
+    else if(r.isLoss)marginCell='<span style="color:#B82525;font-weight:700">虧損 ('+r.margin.toFixed(1)+'%)</span>';
+    else{var mc=r.isOk?'#0A5A46':(r.margin>=tgt-10?'#9A6210':'#B82525');var mi=r.isOk?'✅':(r.margin>=tgt-10?'⚠️':'❌');marginCell='<span style="color:'+mc+';font-weight:700">'+mi+' '+r.margin.toFixed(1)+'%</span>'}
+    
+    var sugCell=(r.noPrice||r.margin<tgt)&&r.cost>0?'<span style="color:#1455A0;font-weight:600">'+CUR()+fmt(r.sugPrice,0)+'</span>':'<span style="color:#999">—</span>';
+    
+    return '<tr style="cursor:pointer" onclick="closeModal();setTimeout(function(){toggleRecipeDetail(\''+r.id+'\')},150)">'+
+      '<td style="font-family:monospace;font-size:0.78rem;color:#888">'+esc(r.code)+'</td>'+
+      '<td style="font-weight:700">'+esc(r.name)+'</td>'+
+      '<td><span class="badge badge-gray" style="font-size:0.7rem">'+esc(r.cat)+'</span></td>'+
+      '<td style="text-align:center;font-size:0.82rem">'+r.perBatch+' '+esc(r.unit)+' ×'+fmt(r.mult,1)+'<br><span style="color:#888;font-size:0.74rem">= '+fmt(r.batchOut,0)+' '+esc(r.unit)+'</span></td>'+
+      '<td style="text-align:right;font-weight:600">'+CUR()+fmt(r.cost,1)+'</td>'+
+      '<td style="text-align:right;font-weight:600;color:#0A5A46">'+(r.noPrice?'<span style="color:#999">—</span>':CUR()+fmt(r.sellPrice,0))+'</td>'+
+      '<td style="text-align:center">'+marginCell+'</td>'+
+      '<td style="text-align:right">'+sugCell+'</td>'+
+    '</tr>';
+  }).join('');
+  
+  modal('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 style="margin:0;font-size:1.2rem">📊 產品總覽 ('+rows.length+' 項)</h2><button onclick="closeModal()" style="background:none;border:1px solid #ccc;border-radius:6px;padding:4px 12px;cursor:pointer">✕ 關閉</button></div>'+
+    '<div class="grid4" style="margin-bottom:14px">'+
+      '<div class="metric"><span class="metric-label">平均毛利率</span><div class="metric-val" style="font-size:1.2rem;color:'+(avgMargin>=tgt?'#0A5A46':'#9A6210')+'">'+avgMargin.toFixed(1)+'%</div></div>'+
+      '<div class="metric"><span class="metric-label">✅ 達標 (≥'+tgt.toFixed(0)+'%)</span><div class="metric-val" style="font-size:1.2rem;color:#0A5A46">'+okCount+' 項</div></div>'+
+      '<div class="metric"><span class="metric-label">❌ 虧損</span><div class="metric-val" style="font-size:1.2rem;color:#B82525">'+lossCount+' 項</div></div>'+
+      '<div class="metric"><span class="metric-label">未設售價</span><div class="metric-val" style="font-size:1.2rem;color:#999">'+noPriceCount+' 項</div></div>'+
+    '</div>'+
+    '<div style="margin-bottom:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span style="font-size:0.8rem;color:#666">排序:</span>'+
+      '<button class="btn btn-sm '+(sk==='margin'?'btn-primary':'btn-outline')+'" onclick="setOverviewSort(\'margin\')">毛利率'+sortIcon('margin')+'</button>'+
+      '<button class="btn btn-sm '+(sk==='cost'?'btn-primary':'btn-outline')+'" onclick="setOverviewSort(\'cost\')">成本'+sortIcon('cost')+'</button>'+
+      '<button class="btn btn-sm '+(sk==='sellPrice'?'btn-primary':'btn-outline')+'" onclick="setOverviewSort(\'sellPrice\')">售價'+sortIcon('sellPrice')+'</button>'+
+      '<button class="btn btn-sm '+(sk==='batchOut'?'btn-primary':'btn-outline')+'" onclick="setOverviewSort(\'batchOut\')">批量'+sortIcon('batchOut')+'</button>'+
+      '<button class="btn btn-sm '+(sk==='name'?'btn-primary':'btn-outline')+'" onclick="setOverviewSort(\'name\')">名稱'+sortIcon('name')+'</button>'+
+      '<button class="btn btn-sm btn-outline" style="margin-left:auto;background:#0A5A46;color:#fff" onclick="exportProductOverview()">📥 匯出 CSV</button>'+
+    '</div>'+
+    '<div style="max-height:440px;overflow-y:auto;border:1px solid #eee;border-radius:8px"><table class="tbl"><thead style="position:sticky;top:0;background:#fff;z-index:1"><tr><th>代碼</th><th>配方</th><th>分類</th><th style="text-align:center">每批產出</th><th style="text-align:right">每'+'包成本</th><th style="text-align:right">對外售價</th><th style="text-align:center">實際毛利</th><th style="text-align:right">建議售價</th></tr></thead><tbody>'+trs+'</tbody></table></div>'+
+    '<div style="font-size:0.74rem;color:#888;margin-top:8px">💡 點任一列可跳到該配方詳情 ｜ 目標毛利率 '+tgt.toFixed(0)+'% (設定頁可改) ｜ 建議售價 = 成本 ÷ (1−目標毛利)</div>'
+  ,true);
+};
+
+window.setOverviewSort=function(key){
+  if(window._overviewSort.key===key){window._overviewSort.asc=!window._overviewSort.asc}
+  else{window._overviewSort.key=key;window._overviewSort.asc=(key==='name')}
+  showProductOverview();
+};
+
+window.exportProductOverview=function(){
+  var recs=state.recipes||[];
+  var tgt=(state.meta&&state.meta.targetMargin?state.meta.targetMargin:0.65)*100;
+  var lines=['代碼,配方名稱,分類,每批產出,批次倍數,單批總產出,單位,每單位成本,對外售價(未稅),淨利,實際毛利率(%),目標毛利率(%),建議售價'];
+  recs.forEach(function(r){
+    var cc=window.calcCost?window.calcCost(r):null;
+    var cost=cc?(cc.opLossRate>0?cc.perFull:cc.per)||cc.perFood||0:0;
+    var sp=+r.sellPrice||0;
+    var profit=sp>0?sp-cost:0;
+    var margin=sp>0?(profit/sp*100):0;
+    var sug=cost>0?cost/(1-tgt/100):0;
+    var pb=+r.perBatch||1,mt=+r.multiplier||1;
+    lines.push([r.code||'',r.name,r.cat||'',pb,mt,pb*mt,r.unit||'包',cost.toFixed(2),sp,profit.toFixed(2),margin.toFixed(1),tgt.toFixed(0),sug.toFixed(0)].join(','));
+  });
+  var blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='好洺ERP_產品總覽_'+toDay()+'.csv';a.click();
+  toast('📥 產品總覽已匯出');
+};
+
+// ══════════════════════════════════════════════════════
 // 🆕 一鍵修正真空袋用量 (掃描所有配方,真空袋用量 → 成品包數 perBatch)
 // 規則 (Tim 確認):每個成品包用 1 張真空袋,所以真空袋張數 = 成品包數
 // ══════════════════════════════════════════════════════
@@ -2186,10 +2304,11 @@ function renderRecipe(){const pg=dv({});var sw=sopBox('recipe');if(sw)pg.appendC
 var allMissing=window.analyzeMissingIngs();
 var missingBtn=allMissing.length>0?dv({style:'display:inline-block'},btn('btn btn-sm','⚠️ 缺料報告 ('+allMissing.length+')',showMissingReport,'background:#B82525;color:#fff;font-weight:700')):'';
 var studioBtn=dv({style:'display:inline-block'},btn('btn btn-sm','🍳 餐點靈感工坊',function(){showRecipeStudio()},'background:#0A5A46;color:#fff;font-weight:700'));
+var overviewBtn=dv({style:'display:inline-block'},btn('btn btn-sm','📊 產品總覽',function(){showProductOverview()},'background:#1455A0;color:#fff;font-weight:700'));
 // 🆕 偵測有無真空袋用量異常的配方
 var bagFixCount=(window.scanVacuumBagFix?window.scanVacuumBagFix(true):[]).length;
 var bagFixBtn=bagFixCount>0?dv({style:'display:inline-block'},btn('btn btn-sm','🔧 修正真空袋用量 ('+bagFixCount+')',function(){showVacuumBagFix()},'background:#9A6210;color:#fff;font-weight:700')):'';
-pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'},dv({cls:'page-title',style:'margin:0'},'📋 配方卡管理（'+state.recipes.length+' 份）'),dv({style:'display:flex;gap:8px;align-items:center;flex-wrap:wrap'},studioBtn,bagFixBtn,missingBtn,btn('btn btn-primary','＋ 新增配方',()=>openRecipeModal('')))));
+pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'},dv({cls:'page-title',style:'margin:0'},'📋 配方卡管理（'+state.recipes.length+' 份）'),dv({style:'display:flex;gap:8px;align-items:center;flex-wrap:wrap'},overviewBtn,studioBtn,bagFixBtn,missingBtn,btn('btn btn-primary','＋ 新增配方',()=>openRecipeModal('')))));
 const grid=dv({cls:'grid2'});const lc=dv({cls:'card',style:'padding:0;overflow:hidden',id:'recipe-list-card'});
 lc.innerHTML='<table class="tbl"><thead><tr><th>代碼</th><th>配方名稱</th><th>分類</th><th>每批成本</th><th style="min-width:110px">操作</th></tr></thead><tbody>'+state.recipes.map(r=>{const rc=calcCost(r);var missingBadge=rc.missingCount>0?' <span style="background:#FCE8E8;color:#B82525;font-size:0.7rem;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #f5b5b5">⚠️ 缺'+rc.missingCount+'項</span>':'';var anom=window.detectRecipeAnomalies(r);var anomBadge=anom.length>0?' <span style="background:#FFF8ED;color:#9A6210;font-size:0.7rem;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #f5c98a">⚠️ 異常'+anom.length+'</span>':'';var costStyle=(rc.missingCount>0||anom.length>0)?'color:#B82525;font-weight:600':'color:#0A5A46;font-weight:600';return'<tr class="recipe-row" data-id="'+r.id+'" style="cursor:pointer" onclick="showRecipeDetail(\''+r.id+'\')"><td style="font-family:monospace;font-size:0.78rem;color:#706E68">'+esc(r.code)+'</td><td style="font-weight:600">'+esc(r.name)+missingBadge+anomBadge+'</td><td><span class="badge badge-blue">'+esc(r.cat||'未分類')+'</span></td><td style="'+costStyle+'">'+CUR()+' '+fmt(rc.per,1)+((rc.missingCount>0||anom.length>0)?'<span style="font-size:0.7rem;color:#B82525"> ⚠️</span>':'')+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openRecipeModal(\''+r.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();delRecipe(\''+r.id+'\')">刪除</button></div></td></tr>'}).join('')+'</tbody></table>';
 grid.appendChild(lc);grid.appendChild(dv({id:'recipe-detail',html:'<div class="card" style="display:flex;align-items:center;justify-content:center;min-height:200px;color:#706E68;font-size:0.92rem">← 點選左側配方卡查看詳情</div>'}));pg.appendChild(grid);return pg}
@@ -2283,6 +2402,7 @@ var actualMarginCard=(function(){
         "<div style='font-size:1.4rem;font-weight:700;color:"+color+"'>"+CUR()+fmt(profit,1)+"</div></div>"+
     "</div>"+
     "<div style='font-size:0.72rem;color:"+color+";margin-top:6px;border-top:1px solid "+color+"33;padding-top:6px'>售價 "+CUR()+fmt(sp,0)+" − 每"+esc(rec.unit)+"成本 "+CUR()+fmt(cost,2)+" = 淨利 "+CUR()+fmt(profit,2)+" ｜ 目標毛利 "+tgt.toFixed(0)+"%</div>"+
+    (marginPct<tgt&&cost>0?(function(){var sug=cost/(1-tgt/100);var diff=sug-sp;return "<div style='font-size:0.8rem;color:#0A5A46;background:#DFF5EC;border-radius:6px;padding:8px 10px;margin-top:8px;font-weight:600'>💡 建議售價:達目標 "+tgt.toFixed(0)+"% 毛利,售價應調至 <b style='font-size:1rem'>"+CUR()+fmt(sug,0)+"</b> (現售價 "+CUR()+fmt(sp,0)+",需漲 "+CUR()+fmt(diff,0)+")</div>"})():"")+
   "</div>";
 })();
 // 缺料警示卡 (重要!)
@@ -2336,7 +2456,7 @@ const bld=()=>(window._editR.ings||[]).map((ing,i)=>{
   const warningIcon=notFound?' <span style="color:#B82525;font-weight:700" title="食材庫無此項">❌</span>':'';
   // 已選食材的顯示資訊 (規格/單價/可食率)
   const ingHint=foundIng?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">'+CUR()+(foundIng.price||0)+'/'+esc(foundIng.unit)+(foundIng.yieldRate&&foundIng.yieldRate<1?' (可食率 '+Math.round(foundIng.yieldRate*100)+'%)':'')+'</div>':'';
-  return '<div class="recipe-ing-row" id="ring-'+i+'" style="'+wrapStyle+'padding:6px;border-radius:6px;margin-bottom:4px"><div style="position:relative"><input type="text" id="ri-search-'+i+'" value="'+esc(ing.name||'')+'" placeholder="🔍 輸入食材名稱..." style="'+inputStyle+'" oninput="riSearch('+i+',this.value)" onfocus="riSearch('+i+',this.value)" onblur="setTimeout(function(){var d=document.getElementById(\'ri-drop-'+i+'\');if(d)d.style.display=\'none\'},200)" autocomplete="off">'+warningIcon+ingHint+'<div id="ri-drop-'+i+'" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-radius:6px;max-height:240px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.1)"></div></div><input type="number" min="0" step="0.1" value="'+(ing.qty||0)+'" onchange="updRI('+i+',\'qty\',+this.value)" placeholder="用量"><select onchange="updRI('+i+',\'unit\',this.value)">'+['g','ml','公斤','台斤','公升','顆','個','張','盒','份'].map(u=>'<option'+(u===ing.unit?' selected':'')+'>'+u+'</option>').join('')+'</select><select onchange="updRI('+i+',\'form\',this.value)">'+opts(state.refs.forms||['整顆/原形'],ing.form||'整顆/原形')+'</select><button class="btn btn-sm btn-danger" onclick="delRI('+i+')">✕</button></div>';
+  return '<div class="recipe-ing-row" id="ring-'+i+'" ondragover="_riDragOver(event)" ondrop="_riDrop(event,'+i+')" style="'+wrapStyle+'padding:6px;border-radius:6px;margin-bottom:4px"><div draggable="true" ondragstart="_riDragStart(event,'+i+')" ondragend="_riDragEnd(event)" style="display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:move;color:#999;user-select:none" title="拖曳調整順序"><span style="font-size:1.05rem;line-height:1">⠿</span><span style="font-weight:700;color:#0A5A46;font-size:0.82rem">'+(i+1)+'</span></div><div style="position:relative"><input type="text" id="ri-search-'+i+'" value="'+esc(ing.name||'')+'" placeholder="🔍 輸入食材名稱..." style="'+inputStyle+'" oninput="riSearch('+i+',this.value)" onfocus="riSearch('+i+',this.value)" onblur="setTimeout(function(){var d=document.getElementById(\'ri-drop-'+i+'\');if(d)d.style.display=\'none\'},200)" autocomplete="off">'+warningIcon+ingHint+'<div id="ri-drop-'+i+'" style="display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-radius:6px;max-height:240px;overflow-y:auto;z-index:1000;box-shadow:0 4px 12px rgba(0,0,0,0.1)"></div></div><input type="number" min="0" step="0.1" value="'+(ing.qty||0)+'" onchange="updRI('+i+',\'qty\',+this.value)" placeholder="用量"><select onchange="updRI('+i+',\'unit\',this.value)">'+['g','ml','公斤','台斤','公升','顆','個','張','盒','份'].map(u=>'<option'+(u===ing.unit?' selected':'')+'>'+u+'</option>').join('')+'</select><select onchange="updRI('+i+',\'form\',this.value)">'+opts(state.refs.forms||['整顆/原形'],ing.form||'整顆/原形')+'</select><button class="btn btn-sm btn-danger" onclick="delRI('+i+')">✕</button></div>';
 }).join('');
 
 // 智慧搜尋過濾 (已移到 openRecipeModal 外面)
@@ -2425,6 +2545,48 @@ window.riQuickAdd=function(idx,name){
 window.updRI=(i,k,v)=>{if(window._editR)window._editR.ings[i][k]=v};
 window.delRI=function(i){if(!window._editR)return;window._editR.ings.splice(i,1);if(window._rebuildRI)window._rebuildRI()};
 window.addRI=function(){if(!window._editR)return;window._editR.ings.push({name:'',qty:0,unit:'g',form:'整顆/原形'});if(window._rebuildRI)window._rebuildRI()};
+
+// 🆕 食材列拖曳排序
+window._riDragIdx=null;
+// 拖曳前先把當前 DOM 的 input 值同步回 window._editR.ings (避免重畫丟失未存的值)
+window._syncRIFromDOM=function(){
+  if(!window._editR||!window._editR.ings)return;
+  window._editR.ings.forEach(function(ing,i){
+    var nameEl=document.getElementById('ri-search-'+i);
+    if(nameEl)ing.name=nameEl.value;
+    var row=document.getElementById('ring-'+i);
+    if(row){
+      var qtyEl=row.querySelector('input[type="number"]');
+      if(qtyEl)ing.qty=+qtyEl.value||0;
+      var sels=row.querySelectorAll('select');
+      if(sels[0])ing.unit=sels[0].value;
+      if(sels[1])ing.form=sels[1].value;
+    }
+  });
+};
+window._riDragStart=function(e,i){
+  window._syncRIFromDOM();
+  window._riDragIdx=i;
+  if(e.dataTransfer){e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',String(i))}catch(err){}}
+  var row=document.getElementById('ring-'+i);
+  if(row)row.style.opacity='0.4';
+};
+window._riDragOver=function(e){e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='move'};
+window._riDragEnd=function(e){
+  // 還原所有列透明度
+  document.querySelectorAll('.recipe-ing-row').forEach(function(r){r.style.opacity=''});
+};
+window._riDrop=function(e,targetIdx){
+  e.preventDefault();
+  var from=window._riDragIdx;
+  window._riDragIdx=null;
+  if(from==null||from===targetIdx||!window._editR||!window._editR.ings)return;
+  var ings=window._editR.ings;
+  if(from<0||from>=ings.length||targetIdx<0||targetIdx>=ings.length)return;
+  var moved=ings.splice(from,1)[0];
+  ings.splice(targetIdx,0,moved);
+  if(window._rebuildRI)window._rebuildRI();
+};
 window.saveRecipe=function(eid){const name=$('rf-name')?.value?.trim();if(!name){alert('請填入配方名稱');return}
 // 收集「包材組合」勾選的包材
 var pickedPacks=window.collectSelectedPackaging?window.collectSelectedPackaging():[];
