@@ -296,7 +296,7 @@ const TW_BANKS=[
 // ERP Core Module — Complete with all CRUD, SOP, Modals
 // ════════════════════════════════════════════════════════════════
 const COST_KEY='hm_cost_v3';
-const DEFAULT_META={company:'好洺餐飲事業有限公司',taxId:'',phone:'',address:'',stores:['交大店','竹北店','台積電店'],targetMargin:0.65,currency:'NT$'};
+const DEFAULT_META={company:'好洺餐飲事業有限公司',taxId:'',phone:'',address:'',stores:['交大店','竹北店','台積電店'],targetMargin:0.65,marginTiers:[55,60,65],currency:'NT$'};
 let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}],currentUser:null,invHistory:[],recipeVersions:{},internalProducts:[],internalOrders:[],arList:[],countList:[],returnList:[],taxConfig:{rate:0.05},workOrders:[],customers:[],custOrders:[],assets:[],salesData:[],cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haomin-system-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyAk8D1oXTYaq9E1t96bPW-1rMu0EhW1JzQ',fbAuthDomain:'haomin-system.firebaseapp.com',fbProjectId:'haomin-system',fbStorageBucket:'haomin-system.firebasestorage.app',fbMessagingSenderId:'348193196599',fbAppId:'1:348193196599:web:c5aa85961d929e7e39cdb2',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[],kitchenCosts:{}};
 
 (function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions','kitchenCosts','prodReports'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});
@@ -1213,6 +1213,20 @@ function calcIngCost(inv, qty, useUnit, opts){
     return unitPrice * qty;
   }
   
+  // 🆕 包裝層級換算 (箱/包/張等多層計件包裝)
+  // 食材有 packageLevels 且 useUnit 在層級中 → 用 factor 換算
+  if(inv.packageLevels&&inv.packageLevels.length>0){
+    var levels=inv.packageLevels;
+    var mainLvl=levels.find(function(l){return l.unit===invUnit});
+    var useLvl=levels.find(function(l){return l.unit===useUnit});
+    if(mainLvl&&useLvl&&mainLvl.factor>0&&useLvl.factor>0){
+      // 每基本單位的價格 = unitPrice / mainLvl.factor
+      // qty (useUnit) → 換成基本單位 = qty × useLvl.factor
+      // 總價 = (unitPrice/mainLvl.factor) × (qty × useLvl.factor)
+      return (unitPrice/mainLvl.factor)*(qty*useLvl.factor);
+    }
+  }
+  
   // 🆕 用 UNIT_DB 判斷類型 (不再用硬編碼陣列,避免漏斤/台兩/磅/盎司等)
   var invInfo = (window.UNIT_DB&&window.UNIT_DB[invUnit])||null;
   var useInfo = (window.UNIT_DB&&window.UNIT_DB[useUnit])||null;
@@ -1256,6 +1270,148 @@ function calcIngCost(inv, qty, useUnit, opts){
   return unitPrice * qty;
 }
 window.calcIngCost = calcIngCost;
+
+// ══════════════════════════════════════════════════════
+// 🆕 包裝層級換算工具 (Phase: 無限層級包裝)
+// 資料結構:ing.packageLevels = [
+//   {unit:'張', factor:1},    // 基本單位 (factor 永遠 1)
+//   {unit:'包', factor:100},  // 1 包 = 100 張
+//   {unit:'箱', factor:2000}  // 1 箱 = 2000 張
+// ]
+// inv.unit = 主單位 (採購用), inv.price = 主單位價格
+// ══════════════════════════════════════════════════════
+
+// 取得食材所有可用單位 (含包裝層級)
+window.getIngUnits=function(inv){
+  if(!inv)return [];
+  if(inv.packageLevels&&inv.packageLevels.length>0){
+    return inv.packageLevels.map(function(l){return l.unit});
+  }
+  return [inv.unit||'公斤'];
+};
+
+// 取得指定單位的單價
+window.getUnitPrice=function(inv,unit){
+  if(!inv)return 0;
+  var price=+inv.price||0;
+  if(!unit||unit===inv.unit)return price;
+  
+  if(inv.packageLevels&&inv.packageLevels.length>0){
+    var mainLvl=inv.packageLevels.find(function(l){return l.unit===inv.unit});
+    var tgtLvl=inv.packageLevels.find(function(l){return l.unit===unit});
+    if(mainLvl&&tgtLvl&&mainLvl.factor>0){
+      // 該單位單價 = 主單位價 × (該單位 factor / 主單位 factor)
+      return price*(tgtLvl.factor/mainLvl.factor);
+    }
+  }
+  return price;
+};
+
+// 包裝層級之間的數量換算 (例如 5 箱 → 多少張)
+window.convertPackageQty=function(inv,qty,fromUnit,toUnit){
+  if(!inv||fromUnit===toUnit)return qty;
+  if(!inv.packageLevels||inv.packageLevels.length===0)return qty;
+  
+  var fromLvl=inv.packageLevels.find(function(l){return l.unit===fromUnit});
+  var toLvl=inv.packageLevels.find(function(l){return l.unit===toUnit});
+  if(!fromLvl||!toLvl||toLvl.factor<=0)return qty;
+  
+  // qty (fromUnit) × fromLvl.factor = 基本單位數量
+  // 基本單位數量 / toLvl.factor = toUnit 數量
+  return (qty*fromLvl.factor)/toLvl.factor;
+};
+
+// 偵測食材是否「可升級」(尚未設定 packageLevels 但名稱看起來有多層包裝)
+window.canUpgradeToPackageLevels=function(inv){
+  if(!inv)return false;
+  if(inv.packageLevels&&inv.packageLevels.length>0)return false;  // 已升級
+  if(!inv.name)return false;
+  
+  // 從名稱偵測包裝層級
+  var parsed=window.parsePackageName?window.parsePackageName(inv.name,inv.unit):null;
+  // 或從 _innerQty / _parentPackage (舊版 packInner 升級殘留) 偵測
+  return !!(parsed&&parsed.innerQty>1)||!!(inv._parentPackage)||!!(inv._innerQty);
+};
+
+// 從名稱自動建議包裝層級結構
+// 例如「真空袋200*300mm100張/20包/箱」+ 單位「箱」
+//   → [{unit:'張',factor:1},{unit:'包',factor:100},{unit:'箱',factor:2000}]
+window.suggestPackageLevels=function(name,mainUnit){
+  if(!name||!mainUnit)return null;
+  
+  var parts=name.split('/');
+  var unitIdx=-1;
+  for(var i=0;i<parts.length;i++){
+    if(parts[i].indexOf(mainUnit)>=0){unitIdx=i;break;}
+  }
+  if(unitIdx<=0)return null;
+  
+  var levels=[];
+  var cumFactor=1;
+  
+  // 處理 0 ~ unitIdx 每一層
+  // 每層 part 內含「數字+單位」配對 (例:「20包」→ n=20, u=包)
+  // 或只有「單位」沒數字 (例:「箱」→ n=1, u=箱)
+  for(var j=0;j<=unitIdx;j++){
+    var p=parts[j];
+    var n=1,u='';
+    // 取最後出現的「數字+中文單位」配對 (排除規格如 200*300mm)
+    var ms=p.match(/(\d+)\s*([\u4e00-\u9fa5]+)/g);
+    if(ms&&ms.length>0){
+      var lastM=ms[ms.length-1].match(/(\d+)\s*([\u4e00-\u9fa5]+)/);
+      if(lastM){n=+lastM[1];u=lastM[2]}
+    }else{
+      // 沒數字 → 整段當單位 (例「箱」)
+      u=p.trim();
+      n=1;
+    }
+    if(!u)continue;
+    
+    if(j===0){
+      // 第一層 = 基本單位 (factor=1)
+      levels.push({unit:u,factor:1});
+    }else{
+      // 上層 factor = 累積到目前 (本層 1 單位含基本單位數)
+      levels.push({unit:u,factor:cumFactor});
+    }
+    cumFactor*=n;
+  }
+  
+  return levels.length>=2?levels:null;
+};
+
+// 一鍵升級食材 (從舊資料生成 packageLevels)
+window.upgradeIngToPackageLevels=function(invId){
+  var inv=(state.ings||[]).find(function(i){return i.id===invId});
+  if(!inv)return false;
+  
+  var suggested=null;
+  
+  // 優先 1:從舊 _innerQty / _parentPackage 升級
+  if(inv._parentPackage&&inv._innerQty>1){
+    // 找父食材
+    var parent=(state.ings||[]).find(function(i){return i.name===inv._parentPackage});
+    if(parent){
+      // 把 parent 升級
+      parent.packageLevels=[
+        {unit:inv.unit,factor:1},
+        {unit:parent.unit,factor:inv._innerQty}
+      ];
+      // 移除子食材 (合併到父食材)
+      var idx=state.ings.indexOf(inv);
+      if(idx>=0)state.ings.splice(idx,1);
+      return true;
+    }
+  }
+  
+  // 優先 2:從名稱解析
+  if(!suggested)suggested=window.suggestPackageLevels(inv.name,inv.unit);
+  
+  if(!suggested)return false;
+  
+  inv.packageLevels=suggested;
+  return true;
+};
 
 // 🔧 取得食材的「真實單位成本」(含可食率)
 window.calcRealUnitCost = function(inv){
@@ -1937,12 +2093,103 @@ window.calcDV=function(name,value){
   return Math.round(value/dv*100);
 };
 
+// ══════════════════════════════════════════════════════
+// 🆕 一鍵修正真空袋用量 (掃描所有配方,真空袋用量 → 成品包數 perBatch)
+// 規則 (Tim 確認):每個成品包用 1 張真空袋,所以真空袋張數 = 成品包數
+// ══════════════════════════════════════════════════════
+window.scanVacuumBagFix=function(previewOnly){
+  var fixes=[];
+  (state.recipes||[]).forEach(function(r){
+    var perBatch=+r.perBatch||1;  // 每批成品包數
+    (r.ings||[]).forEach(function(ing){
+      // 找名稱含「真空袋」的包材
+      if(!ing.name||ing.name.indexOf('真空袋')<0)return;
+      
+      // 取得真空袋食材的基本單位 (有 packageLevels 取 factor=1 的,否則「張」)
+      var inv=(state.ings||[]).find(function(x){return x.name===ing.name});
+      var baseUnit='張';
+      if(inv&&inv.packageLevels&&inv.packageLevels.length>0){
+        var base=inv.packageLevels.find(function(l){return l.factor===1});
+        if(base)baseUnit=base.unit;
+      }
+      
+      // 當前用量 ≠ perBatch (或單位不是基本單位) → 需修正
+      var curQty=+ing.qty||0;
+      if(curQty!==perBatch||ing.unit!==baseUnit){
+        fixes.push({
+          recipeId:r.id,
+          recipeName:r.name,
+          ingName:ing.name,
+          oldQty:curQty,
+          oldUnit:ing.unit||'',
+          newQty:perBatch,
+          newUnit:baseUnit,
+          perBatch:perBatch
+        });
+      }
+    });
+  });
+  return fixes;
+};
+
+window.showVacuumBagFix=function(){
+  var fixes=window.scanVacuumBagFix(true);
+  if(fixes.length===0){
+    alert('✅ 沒有需要修正的配方\n\n所有配方的真空袋用量都已正確 (= 成品包數)');
+    return;
+  }
+  
+  var rows=fixes.map(function(fx){
+    return '<tr><td style="font-weight:600">'+esc(fx.recipeName)+'</td>'+
+      '<td style="text-align:center;color:#B82525">'+fx.oldQty+' '+esc(fx.oldUnit)+'</td>'+
+      '<td style="text-align:center;color:#999">→</td>'+
+      '<td style="text-align:center;color:#0A5A46;font-weight:700">'+fx.newQty+' '+esc(fx.newUnit)+'</td>'+
+      '<td style="text-align:center;font-size:0.78rem;color:#666">每批 '+fx.perBatch+' 包</td></tr>';
+  }).join('');
+  
+  modal(mH('🔧 修正真空袋用量')+
+    '<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:0.86rem;color:#9A6210;line-height:1.6">'+
+    '偵測到 <b>'+fixes.length+'</b> 個配方的真空袋用量需修正。<br>'+
+    '修正規則:<b>真空袋張數 = 成品包數</b> (每包成品用 1 張真空袋)<br>'+
+    '<span style="font-size:0.78rem">※ 這些是舊版包材換算殘留的錯誤資料,修正後成本計算才正確</span>'+
+    '</div>'+
+    '<div style="max-height:340px;overflow-y:auto;border:1px solid #eee;border-radius:8px"><table class="tbl"><thead><tr><th>配方</th><th style="text-align:center">目前用量</th><th></th><th style="text-align:center">修正為</th><th style="text-align:center">依據</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px"><button class="btn btn-outline" onclick="closeModal()">取消</button><button class="btn btn-primary" style="background:#9A6210" onclick="execVacuumBagFix()">✅ 確認修正 '+fixes.length+' 個配方</button></div>'
+  );
+};
+
+window.execVacuumBagFix=function(){
+  var fixes=window.scanVacuumBagFix(true);
+  if(fixes.length===0){closeModal();return}
+  
+  var done=0;
+  fixes.forEach(function(fx){
+    var r=(state.recipes||[]).find(function(x){return x.id===fx.recipeId});
+    if(!r)return;
+    var ing=(r.ings||[]).find(function(x){return x.name===fx.ingName});
+    if(ing){
+      ing.qty=fx.newQty;
+      ing.unit=fx.newUnit;
+      done++;
+    }
+  });
+  
+  if(typeof addAudit==='function')addAudit('一鍵修正真空袋用量',done+' 個配方');
+  saveState();
+  closeModal();
+  renderPage();
+  toast('✅ 已修正 '+done+' 個配方的真空袋用量');
+};
+
 function renderRecipe(){const pg=dv({});var sw=sopBox('recipe');if(sw)pg.appendChild(sw);
 // 計算總缺料數
 var allMissing=window.analyzeMissingIngs();
 var missingBtn=allMissing.length>0?dv({style:'display:inline-block'},btn('btn btn-sm','⚠️ 缺料報告 ('+allMissing.length+')',showMissingReport,'background:#B82525;color:#fff;font-weight:700')):'';
 var studioBtn=dv({style:'display:inline-block'},btn('btn btn-sm','🍳 餐點靈感工坊',function(){showRecipeStudio()},'background:#0A5A46;color:#fff;font-weight:700'));
-pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'},dv({cls:'page-title',style:'margin:0'},'📋 配方卡管理（'+state.recipes.length+' 份）'),dv({style:'display:flex;gap:8px;align-items:center;flex-wrap:wrap'},studioBtn,missingBtn,btn('btn btn-primary','＋ 新增配方',()=>openRecipeModal('')))));
+// 🆕 偵測有無真空袋用量異常的配方
+var bagFixCount=(window.scanVacuumBagFix?window.scanVacuumBagFix(true):[]).length;
+var bagFixBtn=bagFixCount>0?dv({style:'display:inline-block'},btn('btn btn-sm','🔧 修正真空袋用量 ('+bagFixCount+')',function(){showVacuumBagFix()},'background:#9A6210;color:#fff;font-weight:700')):'';
+pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'},dv({cls:'page-title',style:'margin:0'},'📋 配方卡管理（'+state.recipes.length+' 份）'),dv({style:'display:flex;gap:8px;align-items:center;flex-wrap:wrap'},studioBtn,bagFixBtn,missingBtn,btn('btn btn-primary','＋ 新增配方',()=>openRecipeModal('')))));
 const grid=dv({cls:'grid2'});const lc=dv({cls:'card',style:'padding:0;overflow:hidden',id:'recipe-list-card'});
 lc.innerHTML='<table class="tbl"><thead><tr><th>代碼</th><th>配方名稱</th><th>分類</th><th>每批成本</th><th style="min-width:110px">操作</th></tr></thead><tbody>'+state.recipes.map(r=>{const rc=calcCost(r);var missingBadge=rc.missingCount>0?' <span style="background:#FCE8E8;color:#B82525;font-size:0.7rem;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #f5b5b5">⚠️ 缺'+rc.missingCount+'項</span>':'';var anom=window.detectRecipeAnomalies(r);var anomBadge=anom.length>0?' <span style="background:#FFF8ED;color:#9A6210;font-size:0.7rem;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #f5c98a">⚠️ 異常'+anom.length+'</span>':'';var costStyle=(rc.missingCount>0||anom.length>0)?'color:#B82525;font-weight:600':'color:#0A5A46;font-weight:600';return'<tr class="recipe-row" data-id="'+r.id+'" style="cursor:pointer" onclick="showRecipeDetail(\''+r.id+'\')"><td style="font-family:monospace;font-size:0.78rem;color:#706E68">'+esc(r.code)+'</td><td style="font-weight:600">'+esc(r.name)+missingBadge+anomBadge+'</td><td><span class="badge badge-blue">'+esc(r.cat||'未分類')+'</span></td><td style="'+costStyle+'">'+CUR()+' '+fmt(rc.per,1)+((rc.missingCount>0||anom.length>0)?'<span style="font-size:0.7rem;color:#B82525"> ⚠️</span>':'')+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openRecipeModal(\''+r.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="event.stopPropagation();delRecipe(\''+r.id+'\')">刪除</button></div></td></tr>'}).join('')+'</tbody></table>';
 grid.appendChild(lc);grid.appendChild(dv({id:'recipe-detail',html:'<div class="card" style="display:flex;align-items:center;justify-content:center;min-height:200px;color:#706E68;font-size:0.92rem">← 點選左側配方卡查看詳情</div>'}));pg.appendChild(grid);return pg}
@@ -2015,6 +2262,29 @@ const ingRows=(rec.ings||[]).map((ing,idx)=>{
 var costDiffTotal=rc.total-costNoYield;
 var costDiffPct=costNoYield>0?(costDiffTotal/costNoYield*100):0;
 var yieldCompareCard=costDiffTotal>0.01?'<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div><div style="font-size:0.78rem;color:#9A6210;margin-bottom:3px">📦 進貨帳面成本(不含損耗)</div><div style="font-size:1rem;font-weight:600;color:#9A6210">'+CUR()+fmt(costNoYield,2)+'</div></div><div style="font-size:1.2rem;color:#999">→</div><div><div style="font-size:0.78rem;color:#B82525;margin-bottom:3px">🍽️ 真實成本(含備料損耗)</div><div style="font-size:1rem;font-weight:700;color:#B82525">'+CUR()+fmt(rc.total,2)+' <span style="font-size:0.74rem">(+'+fmt(costDiffPct,1)+'%)</span></div></div><div style="font-size:0.74rem;color:#9A6210;flex-basis:100%;border-top:1px dashed #E8C098;padding-top:6px;margin-top:4px">💡 因有食材設定可食率 < 100%,真實使用成本比進貨帳面多 '+CUR()+fmt(costDiffTotal,2)+',毛利計算採用真實成本較準確</div></div>':'';
+// 🆕 實際毛利卡片 (依對外售價算實際毛利率)
+var actualMarginCard=(function(){
+  var sp=+rec.sellPrice||0;
+  if(sp<=0)return "<div style='background:#FFF8ED;border:1px dashed #E8C098;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:0.84rem;color:#9A6210'>💡 尚未設定「對外售價」,在配方編輯填入後,這裡會顯示實際毛利</div>";
+  var cost=rc.opLossRate>0?rc.perFull:rc.per;
+  var profit=sp-cost;
+  var marginPct=sp>0?(profit/sp*100):0;
+  var tgt=(state.meta&&state.meta.targetMargin?state.meta.targetMargin:0.65)*100;
+  var isOk=marginPct>=tgt;
+  var isWarn=marginPct>=tgt-10&&marginPct<tgt;
+  var color=profit<0?"#B82525":isOk?"#0A5A46":isWarn?"#9A6210":"#B82525";
+  var bg=profit<0?"#FCE8E8":isOk?"#DFF5EC":isWarn?"#FFF8ED":"#FCE8E8";
+  var icon=profit<0?"⚠️ 虧損":isOk?"✅ 達標":isWarn?"⚠️ 偏低":"❌ 過低";
+  return "<div style='background:"+bg+";border:2px solid "+color+";border-radius:8px;padding:12px 14px;margin-bottom:12px'>"+
+    "<div style='display:flex;justify-content:space-between;align-items:center'>"+
+      "<div><div style='font-size:0.78rem;color:"+color+";margin-bottom:3px'>🎯 實際毛利 (對外售價 "+CUR()+fmt(sp,0)+" 未稅)</div>"+
+        "<div style='font-size:1.6rem;font-weight:700;color:"+color+"'>"+marginPct.toFixed(1)+"% <span style='font-size:0.86rem'>"+icon+"</span></div></div>"+
+      "<div style='text-align:right'><div style='font-size:0.78rem;color:"+color+";margin-bottom:3px'>每 "+esc(rec.unit)+" 淨賺</div>"+
+        "<div style='font-size:1.4rem;font-weight:700;color:"+color+"'>"+CUR()+fmt(profit,1)+"</div></div>"+
+    "</div>"+
+    "<div style='font-size:0.72rem;color:"+color+";margin-top:6px;border-top:1px solid "+color+"33;padding-top:6px'>售價 "+CUR()+fmt(sp,0)+" − 每"+esc(rec.unit)+"成本 "+CUR()+fmt(cost,2)+" = 淨利 "+CUR()+fmt(profit,2)+" ｜ 目標毛利 "+tgt.toFixed(0)+"%</div>"+
+  "</div>";
+})();
 // 缺料警示卡 (重要!)
 var missingCard='';
 if(missingList.length>0){
@@ -2049,7 +2319,7 @@ if(rec.packWeight){
   var packU=rec.packUnit||'g';
   packSpecCard='<div style="background:#FCEFE5;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:0.84rem;color:#9A6210"><b>📏 包裝規格:</b> 每'+esc(rec.unit||'包')+' '+rec.packWeight+' '+packU+(rec.packNote?' ('+esc(rec.packNote)+')':'')+'</div>';
 }
-det.innerHTML='<div class="card"><div class="card-title" style="display:flex;justify-content:space-between"><span>💰 '+esc(rec.name)+'</span><span class="badge badge-blue">'+esc(rec.cat||'未分類')+'</span></div><div style="background:linear-gradient(135deg,#DFF5EC,#C0ECDA);border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end"><div><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">每 '+esc(rec.unit)+' 成本'+(rc.opLossRate>0?' (含 '+(rc.opLossRate*100).toFixed(1)+'% 損耗)':'')+'</div><div style="font-size:1.75rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.opLossRate>0?rc.perFull:rc.per,2)+'</div>'+(rc.opLossRate>0?'<div style="font-size:0.74rem;color:#0A5A46;margin-top:2px">原始 '+CUR()+fmt(rc.per,2)+' / 全成本 '+CUR()+fmt(rc.perFull,2)+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">批次總成本</div><div style="font-size:1.2rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.opLossRate>0?rc.fullCost:rc.total,0)+'</div></div></div>'+packSpecCard+costBreakdownCard+anomalyCard+missingCard+yieldCompareCard+'<div class="grid3">'+[[55,'55%'],[60,'60%'],[65,'65%']].map(([m,lb])=>'<div class="metric"><span class="metric-label">毛利 '+lb+' 售價'+(rc.opLossRate>0?' (含損耗)':'')+'</span><div class="metric-val" style="font-size:1.1rem">'+CUR()+' '+fmt((rc.opLossRate>0?rc.perFull:rc.per)/(1-m/100),0)+'</div></div>').join('')+'</div></div><div class="card"><div class="card-title">📋 食材明細（'+(rec.ings||[]).length+' 項）</div><div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">💡 點擊任一食材列展開計算過程</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>序</th><th>食材</th><th>用量</th><th>單位</th><th>型態</th><th>可食率</th><th style="text-align:right">帳面成本</th><th style="text-align:right">真實成本</th><th>庫存</th></tr></thead><tbody>'+ingRows+'</tbody></table></div></div>';
+det.innerHTML='<div class="card"><div class="card-title" style="display:flex;justify-content:space-between"><span>💰 '+esc(rec.name)+'</span><span class="badge badge-blue">'+esc(rec.cat||'未分類')+'</span></div><div style="background:linear-gradient(135deg,#DFF5EC,#C0ECDA);border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:flex-end"><div><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">每 '+esc(rec.unit)+' 成本'+(rc.opLossRate>0?' (含 '+(rc.opLossRate*100).toFixed(1)+'% 損耗)':'')+'</div><div style="font-size:1.75rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.opLossRate>0?rc.perFull:rc.per,2)+'</div>'+(rc.opLossRate>0?'<div style="font-size:0.74rem;color:#0A5A46;margin-top:2px">原始 '+CUR()+fmt(rc.per,2)+' / 全成本 '+CUR()+fmt(rc.perFull,2)+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:0.78rem;color:#0A5A46;margin-bottom:3px">批次總成本</div><div style="font-size:1.2rem;font-weight:600;color:#0A5A46">'+CUR()+' '+fmt(rc.opLossRate>0?rc.fullCost:rc.total,0)+'</div></div></div>'+packSpecCard+costBreakdownCard+anomalyCard+missingCard+yieldCompareCard+actualMarginCard+'<div class="grid3">'+(function(){var tiers=(state.meta&&state.meta.marginTiers&&state.meta.marginTiers.length===3)?state.meta.marginTiers.slice().sort(function(a,b){return a-b}):[55,60,65];return tiers.map(function(m){return '<div class="metric"><span class="metric-label">毛利 '+m+'% 售價'+(rc.opLossRate>0?' (含損耗)':'')+'</span><div class="metric-val" style="font-size:1.1rem">'+CUR()+' '+fmt((rc.opLossRate>0?rc.perFull:rc.per)/(1-m/100),0)+'</div></div>'}).join('')})()+'</div></div><div class="card"><div class="card-title">📋 食材明細（'+(rec.ings||[]).length+' 項）</div><div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">💡 點擊任一食材列展開計算過程</div><div style="overflow-x:auto"><table class="tbl"><thead><tr><th>序</th><th>食材</th><th>用量</th><th>單位</th><th>型態</th><th>可食率</th><th style="text-align:right">帳面成本</th><th style="text-align:right">真實成本</th><th>庫存</th></tr></thead><tbody>'+ingRows+'</tbody></table></div></div>';
 var rn=calcNut(rec);
 det.innerHTML+='<div style="display:flex;gap:8px;margin-bottom:12px"><button class="btn btn-sm btn-outline" onclick="showRecipeVersions(\''+rec.id+'\')">📜 版本歷史</button></div>';
 det.innerHTML+='<div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center"><span>🏷️ 每100g 營養估算</span>'+(rn.ingCount>0?'<span style="font-size:0.78rem;color:'+(rn.completeness>=0.8?'#0A5A46':rn.completeness>=0.5?'#9A6210':'#B82525')+';font-weight:600">完整度 '+rn.withNutCount+'/'+rn.ingCount+' ('+Math.round(rn.completeness*100)+'%)</span>':'')+'</div>'+(rn.completeness<0.8&&rn.ingCount>0?'<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:0.82rem;color:#9A6210">⚠️ '+rn.ingCount+' 項食材中只有 '+rn.withNutCount+' 項有營養資料,實際營養值可能高於估算'+(rn.fromDbCount>0?' (其中 '+rn.fromDbCount+' 項用內建資料庫估算)':'')+'</div>':'')+(rn.totalWeight>0?'<div style="font-size:0.78rem;color:#706E68;margin-bottom:8px">配方總重: <b>'+fmt(rn.totalWeight,0)+' g</b> (= '+fmt(rn.totalWeight/1000,2)+' 公斤)</div>':'')+'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'+[['熱量',rn.kcal,'kcal','#B82525'],['蛋白質',rn.prot,'g','#1455A0'],['脂肪',rn.fat,'g','#9A6210'],['　飽和脂肪',rn.satFat,'g','#9A6210'],['　反式脂肪',rn.transFat,'g','#9A6210'],['碳水',rn.carb,'g','#0A6B30'],['　糖',rn.sugar,'g','#0A6B30'],['鈉',rn.sodium,'mg','#7B2D8E']].map(function(x){return'<div style="background:#F3F1EB;border-radius:6px;padding:10px;text-align:center;border:.5px solid #eee"><div style="font-size:1.15rem;font-weight:600;color:'+x[3]+'">'+fmt(x[1],1)+'<span style="font-size:0.72rem;font-weight:400;color:#706E68"> '+x[2]+'</span></div><div style="font-size:0.72rem;color:#706E68;margin-top:3px">'+x[0]+'</div></div>'}).join('')+'</div></div>'};
@@ -2729,10 +2999,129 @@ window.ingFilterReset=function(){
 };
 
 function openIngModal(id){const def={id:nxtId(state.ings,'I'),name:'',cat:'肉類',unit:'公斤',stock:0,safety:0,price:0,sup:'S001',form:'整顆/原形',meatSrc:'',kcal:0,prot:0,fat:0,carb:0,sodium:0};const ing=id?state.ings.find(x=>x.id===id):def;if(!ing)return;
-modal(mH(id?'編輯食材':'新增食材')+`<div class="form-row c3"><div class="fg"><label>食材編號</label><input id="fi-id" value="${esc(ing.id)}"${id?' disabled':''}></div><div class="fg"><label>食材名稱 *</label><input id="fi-name" value="${esc(ing.name)}"></div><div class="fg"><label>類別 🔍</label>${window.buildSearchSelect({id:'fi-cat',options:state.refs.cats||[],value:ing.cat,placeholder:'點此搜尋類別...',sortField:'cat'})}</div></div><div class="form-row c4"><div class="fg"><label>單位 🔍</label>${window.buildSearchSelect({id:'fi-unit',options:state.refs.units||[],value:ing.unit,placeholder:'點此搜尋單位...',sortField:'unit'})}</div><div class="fg"><label>型態 🔍</label>${window.buildSearchSelect({id:'fi-form',options:state.refs.forms||[],value:ing.form,placeholder:'點此搜尋型態...',sortField:'form'})}</div><div class="fg"><label>供應商 🔍</label>${window.buildSearchSelect({id:'fi-sup',options:state.sups.map(function(s){return s.id+' '+s.name}),value:(function(){var s=state.sups.find(function(x){return x.id===ing.sup});return s?s.id+' '+s.name:''})(),placeholder:'點此搜尋供應商...'})}</div><div class="fg"><label>進價 (${CUR()}/單位)</label><input id="fi-price" type="number" min="0" step="0.01" value="${ing.price||0}" oninput="updatePriceConv()"><div id="fi-price-conv" style="font-size:0.74rem;color:#999;margin-top:3px;min-height:14px"></div></div></div><div style="background:#E8F4EE;border:1px solid #b5d4c5;border-radius:8px;padding:10px 12px;margin-top:6px"><div style="font-size:0.86rem;font-weight:600;color:#0A5A46;margin-bottom:6px">📦 包裝採購試算 (買 1 包/罐 N 公斤 NT$X 自動算單價)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.74rem">買幾包/罐</label><input id="fi-pkg-count" type="number" min="1" step="1" value="${ing.pkgCount||1}" placeholder="如 1" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">每包內容量</label><input id="fi-pkg-content" type="number" min="0" step="0.01" value="${ing.pkgContent||''}" placeholder="如 2" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">內容量單位</label>${window.buildSearchSelect({id:'fi-pkg-unit',options:(state.refs.units||[]).filter(function(u){var info=window.UNIT_DB?window.UNIT_DB[u]:null;return info&&(info.type==='weight'||info.type==='volume')}),value:ing.pkgUnit||'公斤',placeholder:'公斤/公升...'})}</div><div class="fg"><label style="font-size:0.74rem">總價</label><input id="fi-pkg-total" type="number" min="0" step="0.01" value="${ing.pkgTotal||''}" placeholder="如 440" oninput="updatePkgPrice()"></div></div><div class="form-row c2" style="margin-top:6px"><div class="fg"><label style="font-size:0.74rem;color:#9A6210">💰 上方總價是?</label><div style="display:flex;gap:14px;padding:8px 4px;background:#fff;border:1px solid #ddd;border-radius:6px"><label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer"><input type="radio" name="fi-pkg-incl" value="excl" ${(!ing.pkgIncl||ing.pkgIncl==='excl')?'checked':''} onchange="updatePkgPrice()"><span><b>未稅</b> (ERP 標準)</span></label><label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer"><input type="radio" name="fi-pkg-incl" value="incl" ${ing.pkgIncl==='incl'?'checked':''} onchange="updatePkgPrice()"><span><b>含稅</b> (發票價)</span></label></div></div><div class="fg"><label style="font-size:0.74rem;color:#9A6210">稅率</label><select id="fi-pkg-tax-rate" onchange="updatePkgPrice()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"><option value="0.05" ${(!ing.pkgTaxRate||ing.pkgTaxRate===0.05)?'selected':''}>應稅 5%</option><option value="0" ${ing.pkgTaxRate===0?'selected':''}>免稅 0%</option></select></div></div><div id="fi-pkg-result" style="font-size:0.82rem;color:#0A5A46;margin-top:6px;font-weight:700">💡 填入上方數值,自動計算「未稅進價/單位」</div><button type="button" onclick="applyPkgPrice()" class="btn btn-sm" style="background:#0A5A46;color:#fff;margin-top:6px;padding:4px 14px;font-size:0.78rem">📥 套用為食材主進價 (未稅)</button></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label>現有庫存</label><input id="fi-stock" type="number" min="0" step="0.01" value="${ing.stock||0}"></div><div class="fg"><label>安全庫存</label><input id="fi-safety" type="number" min="0" step="0.01" value="${ing.safety||0}"></div><div class="fg"><label>肉品來源 🔍</label>${window.buildSearchSelect({id:'fi-meat',options:state.refs.meatSrc||[],value:ing.meatSrc||'',placeholder:'點此搜尋或選擇...',sortField:'meatSrc'})}</div></div><div style="background:#FFF8ED;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📦 固形物重量（罐頭/醃漬品用）</div><div class="form-row c3"><div class="fg"><label>總重量(g)</label><input id="fi-tw" type="number" min="0" step="1" value="${ing.totalWeight||''}" placeholder="整罐/整包重量"></div><div class="fg"><label>固形物重量(g)</label><input id="fi-sw" type="number" min="0" step="1" value="${ing.solidWeight||''}" placeholder="瀝乾後實際重量"></div><div class="fg"><label>固形物比例 / 實際成本</label><div style="padding:8px 0;font-weight:700;color:#0A5A46">${ing.totalWeight&&ing.solidWeight?Math.round(ing.solidWeight/ing.totalWeight*100)+'% ｜ $'+((ing.price||0)/(ing.solidWeight/1000)).toFixed(1)+'/kg':'填入上方欄位自動計算'}</div></div></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🍽️ 可食率 / 備料良率 (Yield Rate)</div><div class="form-row c3"><div class="fg"><label>可食率 (%)</label><input id="fi-yield" type="number" min="1" max="100" step="1" value="${Math.round((ing.yieldRate||1)*100)}" oninput="updateYieldPreview()"><div style="font-size:0.74rem;color:#999;margin-top:3px">100% = 全部可食 (預設)</div></div><div class="fg"><label>真實單位成本 (含損耗)</label><input id="fi-real-cost" type="text" disabled value="—" style="background:#F3F1EB;color:#B82525;font-weight:700"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動 = 進價 ÷ 可食率</div></div><div class="fg"><label>備料損耗預估</label><input id="fi-yield-loss" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">每 1 單位進貨會損耗多少</div></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px;line-height:1.5">💡 範例:鳳梨整顆 60元/kg, 去皮去芯後可食 60% → 真實成本 100元/kg<br>計件類食材 (顆/包/盒) 通常維持 100% (除非有耗損)</div></div><div style="background:#E8F4EE;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="fi-cust-sell" ${ing.customerSell?'checked':''} onchange="toggleCustSellPrice()"><span>🛒 對外可賣 (B2B 客戶可訂購)</span></label></div><div id="fi-cust-sell-price" style="${ing.customerSell?'':'display:none;'}margin-top:8px"><div class="form-row c2"><div class="fg"><label>對外售價 (${CUR()}/單位)</label><input id="fi-sell-price" type="number" min="0" step="0.01" value="${ing.sellPrice||ing.price||0}" oninput="updateMargin()"><div style="font-size:0.74rem;color:#0A5A46;margin-top:3px">客戶下單預設售價,可在客戶資料設專屬價</div></div><div class="fg"><label>毛利率 (參考)</label><input id="fi-margin" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動依進價計算</div></div></div></div></div><div style="background:#F3F1EB;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🏷️ 每100g 營養值（以固形物為基準）</div><div class="form-row c5">${[['fi-kcal','熱量 kcal',ing.kcal||0],['fi-prot','蛋白質 g',ing.prot||0],['fi-fat','脂肪 g',ing.fat||0],['fi-carb','碳水 g',ing.carb||0],['fi-sodium','鈉 mg',ing.sodium||0]].map(([fid,lb,v])=>`<div class="fg"><label>${lb}</label><input id="${fid}" type="number" min="0" step="0.01" value="${v}"></div>`).join('')}</div></div><div style="background:#FFF4E6;border:1px solid #f5c98a;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#9A6210">⚠️ 過敏原標示 (8 大法定過敏原)</div><div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${['麩質','蛋','奶','花生','堅果','大豆','魚','甲殼類'].map(function(a){var checked=(ing.allergens||[]).indexOf(a)>=0;return '<label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer;padding:4px 6px;background:#fff;border-radius:4px"><input type="checkbox" name="fi-allergen" value="'+a+'"'+(checked?' checked':'')+'>'+a+'</label>'}).join('')}</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 依照「食品過敏原標示規定」設定,菜單會自動帶入過敏原警示</div></div><div style="background:#F0F9FF;border:1px solid #7dd3fc;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#0369a1">📋 ERP 進階資訊 (採購/庫存管控)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.78rem">條碼/SKU</label><input id="fi-barcode" type="text" value="${esc(ing.barcode||'')}" placeholder="如 4710..."></div><div class="fg"><label style="font-size:0.78rem">品牌</label><input id="fi-brand" type="text" value="${esc(ing.brand||'')}" placeholder="如 義美"></div><div class="fg"><label style="font-size:0.78rem">規格</label><input id="fi-spec" type="text" value="${esc(ing.spec||'')}" placeholder="如 500g x 24"></div><div class="fg"><label style="font-size:0.78rem">儲存位置</label><input id="fi-location" type="text" value="${esc(ing.location||'')}" placeholder="如 冷藏A1"></div></div><div class="form-row c4" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">最低訂購量(MOQ)</label><input id="fi-moq" type="number" min="0" step="1" value="${ing.minOrderQty||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">前置時間(天)</label><input id="fi-leadtime" type="number" min="0" step="1" value="${ing.leadTime||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">最高庫存量</label><input id="fi-maxstock" type="number" min="0" step="0.01" value="${ing.maxStock||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">儲存溫度</label>${window.buildSearchSelect({id:'fi-storage',options:['冷藏(0~7°C)','冷凍(-18°C↓)','常溫','陰涼乾燥處','避光保存'],value:ing.storageTemp||'',placeholder:'選擇儲存條件...',sortField:'storageTemp'})}</div></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">保存期限(天)</label><input id="fi-shelflife" type="number" min="0" step="1" value="${ing.shelfLife||0}" placeholder="如 30"></div><div class="fg"><label style="font-size:0.78rem">原產地</label><input id="fi-origin" type="text" value="${esc(ing.originCountry||'')}" placeholder="如 台灣/澳洲"></div><div class="fg"><label style="font-size:0.78rem">認證標章</label>${window.buildSearchSelect({id:'fi-cert',options:['無認證','HACCP','ISO22000','有機認證','產銷履歷','清真認證','其他'],value:ing.certification||'',placeholder:'選擇認證...',sortField:'certification'})}</div></div></div><div style="background:#F8F9FA;border:1px solid #d1d5db;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📝 餐飲業特化欄位</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">季節性</label>${window.buildSearchSelect({id:'fi-seasonal',options:['全年','春','夏','秋','冬','春夏','秋冬'],value:ing.seasonal||'全年',placeholder:'選擇季節...',sortField:'seasonal'})}</div><div class="fg"><label style="font-size:0.78rem">使用備註</label><input id="fi-usage" type="text" value="${esc(ing.usageNote||'')}" placeholder="例:解凍後使用、需先汆燙..."></div></div></div>${mF("saveIng('"+id+"')")}`);
+modal(mH(id?'編輯食材':'新增食材')+`<div class="form-row c3"><div class="fg"><label>食材編號</label><input id="fi-id" value="${esc(ing.id)}"${id?' disabled':''}></div><div class="fg"><label>食材名稱 *</label><input id="fi-name" value="${esc(ing.name)}"></div><div class="fg"><label>類別 🔍</label>${window.buildSearchSelect({id:'fi-cat',options:state.refs.cats||[],value:ing.cat,placeholder:'點此搜尋類別...',sortField:'cat'})}</div></div><div class="form-row c4"><div class="fg"><label>單位 🔍</label>${window.buildSearchSelect({id:'fi-unit',options:state.refs.units||[],value:ing.unit,placeholder:'點此搜尋單位...',sortField:'unit'})}</div><div class="fg"><label>型態 🔍</label>${window.buildSearchSelect({id:'fi-form',options:state.refs.forms||[],value:ing.form,placeholder:'點此搜尋型態...',sortField:'form'})}</div><div class="fg"><label>供應商 🔍</label>${window.buildSearchSelect({id:'fi-sup',options:state.sups.map(function(s){return s.id+' '+s.name}),value:(function(){var s=state.sups.find(function(x){return x.id===ing.sup});return s?s.id+' '+s.name:''})(),placeholder:'點此搜尋供應商...'})}</div><div class="fg"><label>進價 (${CUR()}/單位)</label><input id="fi-price" type="number" min="0" step="0.01" value="${ing.price||0}" oninput="updatePriceConv();renderPackageLevels()"><div id="fi-price-conv" style="font-size:0.74rem;color:#999;margin-top:3px;min-height:14px"></div></div></div>${(function(){var canUpgrade=window.canUpgradeToPackageLevels&&window.canUpgradeToPackageLevels(ing);var hasLevels=ing.packageLevels&&ing.packageLevels.length>0;if(!canUpgrade&&!hasLevels)return '<div id="fi-pkg-levels-box" style="background:#F0F9FF;border:1px dashed #93c5fd;border-radius:8px;padding:10px 12px;margin-top:6px;font-size:0.82rem;color:#1455A0"><b>📦 包裝層級換算</b> (選用,例:1 箱=20 包=2000 張) <button type="button" class="btn btn-sm" style="background:#1455A0;color:#fff;margin-left:8px;padding:2px 10px;font-size:0.74rem" onclick="enablePackageLevels()">+ 啟用</button><div style="font-size:0.74rem;color:#666;margin-top:4px">啟用後可定義多層包裝,進貨/配方可用任一層計算</div></div>';return '<div id="fi-pkg-levels-box" style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-top:6px">'+(canUpgrade&&!hasLevels?'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="color:#9A6210;font-size:0.86rem">📦 偵測到此食材可升級為「包裝層級換算」</b><button type="button" class="btn btn-sm" style="background:#9A6210;color:#fff;padding:2px 10px;font-size:0.74rem" onclick="doUpgradePackageLevels()">✨ 一鍵升級</button></div>':'')+'<div style="font-size:0.86rem;font-weight:600;color:#9A6210;margin-bottom:6px">📦 包裝層級換算 (主單位「'+esc(ing.unit||'')+'」進價 '+CUR()+(ing.price||0)+')</div><div id="fi-pkg-levels-list"></div><div style="display:flex;gap:6px;margin-top:6px"><button type="button" class="btn btn-sm" style="background:#9A6210;color:#fff;padding:3px 10px;font-size:0.74rem" onclick="addPackageLevel()">+ 新增層級</button><button type="button" class="btn btn-sm btn-outline" style="padding:3px 10px;font-size:0.74rem" onclick="disablePackageLevels()">✕ 停用</button></div></div>';})()}<div style="background:#E8F4EE;border:1px solid #b5d4c5;border-radius:8px;padding:10px 12px;margin-top:6px"><div style="font-size:0.86rem;font-weight:600;color:#0A5A46;margin-bottom:6px">📦 包裝採購試算 (買 1 包/罐 N 公斤 NT$X 自動算單價)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.74rem">買幾包/罐</label><input id="fi-pkg-count" type="number" min="1" step="1" value="${ing.pkgCount||1}" placeholder="如 1" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">每包內容量</label><input id="fi-pkg-content" type="number" min="0" step="0.01" value="${ing.pkgContent||''}" placeholder="如 2" oninput="updatePkgPrice()"></div><div class="fg"><label style="font-size:0.74rem">內容量單位</label>${window.buildSearchSelect({id:'fi-pkg-unit',options:(state.refs.units||[]).filter(function(u){var info=window.UNIT_DB?window.UNIT_DB[u]:null;return info&&(info.type==='weight'||info.type==='volume')}),value:ing.pkgUnit||'公斤',placeholder:'公斤/公升...'})}</div><div class="fg"><label style="font-size:0.74rem">總價</label><input id="fi-pkg-total" type="number" min="0" step="0.01" value="${ing.pkgTotal||''}" placeholder="如 440" oninput="updatePkgPrice()"></div></div><div class="form-row c2" style="margin-top:6px"><div class="fg"><label style="font-size:0.74rem;color:#9A6210">💰 上方總價是?</label><div style="display:flex;gap:14px;padding:8px 4px;background:#fff;border:1px solid #ddd;border-radius:6px"><label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer"><input type="radio" name="fi-pkg-incl" value="excl" ${(!ing.pkgIncl||ing.pkgIncl==='excl')?'checked':''} onchange="updatePkgPrice()"><span><b>未稅</b> (ERP 標準)</span></label><label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer"><input type="radio" name="fi-pkg-incl" value="incl" ${ing.pkgIncl==='incl'?'checked':''} onchange="updatePkgPrice()"><span><b>含稅</b> (發票價)</span></label></div></div><div class="fg"><label style="font-size:0.74rem;color:#9A6210">稅率</label><select id="fi-pkg-tax-rate" onchange="updatePkgPrice()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px"><option value="0.05" ${(!ing.pkgTaxRate||ing.pkgTaxRate===0.05)?'selected':''}>應稅 5%</option><option value="0" ${ing.pkgTaxRate===0?'selected':''}>免稅 0%</option></select></div></div><div id="fi-pkg-result" style="font-size:0.82rem;color:#0A5A46;margin-top:6px;font-weight:700">💡 填入上方數值,自動計算「未稅進價/單位」</div><button type="button" onclick="applyPkgPrice()" class="btn btn-sm" style="background:#0A5A46;color:#fff;margin-top:6px;padding:4px 14px;font-size:0.78rem">📥 套用為食材主進價 (未稅)</button></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label>現有庫存</label><input id="fi-stock" type="number" min="0" step="0.01" value="${ing.stock||0}"></div><div class="fg"><label>安全庫存</label><input id="fi-safety" type="number" min="0" step="0.01" value="${ing.safety||0}"></div><div class="fg"><label>肉品來源 🔍</label>${window.buildSearchSelect({id:'fi-meat',options:state.refs.meatSrc||[],value:ing.meatSrc||'',placeholder:'點此搜尋或選擇...',sortField:'meatSrc'})}</div></div><div style="background:#FFF8ED;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📦 固形物重量（罐頭/醃漬品用）</div><div class="form-row c3"><div class="fg"><label>總重量(g)</label><input id="fi-tw" type="number" min="0" step="1" value="${ing.totalWeight||''}" placeholder="整罐/整包重量"></div><div class="fg"><label>固形物重量(g)</label><input id="fi-sw" type="number" min="0" step="1" value="${ing.solidWeight||''}" placeholder="瀝乾後實際重量"></div><div class="fg"><label>固形物比例 / 實際成本</label><div style="padding:8px 0;font-weight:700;color:#0A5A46">${ing.totalWeight&&ing.solidWeight?Math.round(ing.solidWeight/ing.totalWeight*100)+'% ｜ $'+((ing.price||0)/(ing.solidWeight/1000)).toFixed(1)+'/kg':'填入上方欄位自動計算'}</div></div></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🍽️ 可食率 / 備料良率 (Yield Rate)</div><div class="form-row c3"><div class="fg"><label>可食率 (%)</label><input id="fi-yield" type="number" min="1" max="100" step="1" value="${Math.round((ing.yieldRate||1)*100)}" oninput="updateYieldPreview()"><div style="font-size:0.74rem;color:#999;margin-top:3px">100% = 全部可食 (預設)</div></div><div class="fg"><label>真實單位成本 (含損耗)</label><input id="fi-real-cost" type="text" disabled value="—" style="background:#F3F1EB;color:#B82525;font-weight:700"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動 = 進價 ÷ 可食率</div></div><div class="fg"><label>備料損耗預估</label><input id="fi-yield-loss" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">每 1 單位進貨會損耗多少</div></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px;line-height:1.5">💡 範例:鳳梨整顆 60元/kg, 去皮去芯後可食 60% → 真實成本 100元/kg<br>計件類食材 (顆/包/盒) 通常維持 100% (除非有耗損)</div></div><div style="background:#E8F4EE;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px"><label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="fi-cust-sell" ${ing.customerSell?'checked':''} onchange="toggleCustSellPrice()"><span>🛒 對外可賣 (B2B 客戶可訂購)</span></label></div><div id="fi-cust-sell-price" style="${ing.customerSell?'':'display:none;'}margin-top:8px"><div class="form-row c2"><div class="fg"><label>對外售價 (${CUR()}/單位)</label><input id="fi-sell-price" type="number" min="0" step="0.01" value="${ing.sellPrice||ing.price||0}" oninput="updateMargin()"><div style="font-size:0.74rem;color:#0A5A46;margin-top:3px">客戶下單預設售價,可在客戶資料設專屬價</div></div><div class="fg"><label>毛利率 (參考)</label><input id="fi-margin" type="text" disabled value="—" style="background:#F3F1EB"><div style="font-size:0.74rem;color:#999;margin-top:3px">系統自動依進價計算</div></div></div></div></div><div style="background:#F3F1EB;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🏷️ 每100g 營養值（以固形物為基準）</div><div class="form-row c5">${[['fi-kcal','熱量 kcal',ing.kcal||0],['fi-prot','蛋白質 g',ing.prot||0],['fi-fat','脂肪 g',ing.fat||0],['fi-carb','碳水 g',ing.carb||0],['fi-sodium','鈉 mg',ing.sodium||0]].map(([fid,lb,v])=>`<div class="fg"><label>${lb}</label><input id="${fid}" type="number" min="0" step="0.01" value="${v}"></div>`).join('')}</div></div><div style="background:#FFF4E6;border:1px solid #f5c98a;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#9A6210">⚠️ 過敏原標示 (8 大法定過敏原)</div><div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${['麩質','蛋','奶','花生','堅果','大豆','魚','甲殼類'].map(function(a){var checked=(ing.allergens||[]).indexOf(a)>=0;return '<label style="display:flex;align-items:center;gap:4px;font-size:0.84rem;cursor:pointer;padding:4px 6px;background:#fff;border-radius:4px"><input type="checkbox" name="fi-allergen" value="'+a+'"'+(checked?' checked':'')+'>'+a+'</label>'}).join('')}</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 依照「食品過敏原標示規定」設定,菜單會自動帶入過敏原警示</div></div><div style="background:#F0F9FF;border:1px solid #7dd3fc;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px;color:#0369a1">📋 ERP 進階資訊 (採購/庫存管控)</div><div class="form-row c4"><div class="fg"><label style="font-size:0.78rem">條碼/SKU</label><input id="fi-barcode" type="text" value="${esc(ing.barcode||'')}" placeholder="如 4710..."></div><div class="fg"><label style="font-size:0.78rem">品牌</label><input id="fi-brand" type="text" value="${esc(ing.brand||'')}" placeholder="如 義美"></div><div class="fg"><label style="font-size:0.78rem">規格</label><input id="fi-spec" type="text" value="${esc(ing.spec||'')}" placeholder="如 500g x 24"></div><div class="fg"><label style="font-size:0.78rem">儲存位置</label><input id="fi-location" type="text" value="${esc(ing.location||'')}" placeholder="如 冷藏A1"></div></div><div class="form-row c4" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">最低訂購量(MOQ)</label><input id="fi-moq" type="number" min="0" step="1" value="${ing.minOrderQty||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">前置時間(天)</label><input id="fi-leadtime" type="number" min="0" step="1" value="${ing.leadTime||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">最高庫存量</label><input id="fi-maxstock" type="number" min="0" step="0.01" value="${ing.maxStock||0}" placeholder="0"></div><div class="fg"><label style="font-size:0.78rem">儲存溫度</label>${window.buildSearchSelect({id:'fi-storage',options:['冷藏(0~7°C)','冷凍(-18°C↓)','常溫','陰涼乾燥處','避光保存'],value:ing.storageTemp||'',placeholder:'選擇儲存條件...',sortField:'storageTemp'})}</div></div><div class="form-row c3" style="margin-top:8px"><div class="fg"><label style="font-size:0.78rem">保存期限(天)</label><input id="fi-shelflife" type="number" min="0" step="1" value="${ing.shelfLife||0}" placeholder="如 30"></div><div class="fg"><label style="font-size:0.78rem">原產地</label><input id="fi-origin" type="text" value="${esc(ing.originCountry||'')}" placeholder="如 台灣/澳洲"></div><div class="fg"><label style="font-size:0.78rem">認證標章</label>${window.buildSearchSelect({id:'fi-cert',options:['無認證','HACCP','ISO22000','有機認證','產銷履歷','清真認證','其他'],value:ing.certification||'',placeholder:'選擇認證...',sortField:'certification'})}</div></div></div><div style="background:#F8F9FA;border:1px solid #d1d5db;border-radius:8px;padding:12px;margin-top:4px"><div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📝 餐飲業特化欄位</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">季節性</label>${window.buildSearchSelect({id:'fi-seasonal',options:['全年','春','夏','秋','冬','春夏','秋冬'],value:ing.seasonal||'全年',placeholder:'選擇季節...',sortField:'seasonal'})}</div><div class="fg"><label style="font-size:0.78rem">使用備註</label><input id="fi-usage" type="text" value="${esc(ing.usageNote||'')}" placeholder="例:解凍後使用、需先汆燙..."></div></div></div>${mF("saveIng('"+id+"')")}`);
+// 把 packageLevels 暫存到 modal,方便編輯
+window._editingPkgLevels=ing.packageLevels?JSON.parse(JSON.stringify(ing.packageLevels)):null;
 // modal 開啟後初始化進價對照顯示
-setTimeout(function(){if(typeof updatePriceConv==='function')updatePriceConv();if(typeof updateMargin==='function')updateMargin();if(typeof updateYieldPreview==='function')updateYieldPreview()},80);
+setTimeout(function(){if(typeof updatePriceConv==='function')updatePriceConv();if(typeof updateMargin==='function')updateMargin();if(typeof updateYieldPreview==='function')updateYieldPreview();if(typeof renderPackageLevels==='function')renderPackageLevels()},80);
 }
+
+// 🆕 包裝層級 UI 操作函式
+window.enablePackageLevels=function(){
+  var unit=document.getElementById('fi-unit')?.value||'箱';
+  // 預設給 2 層 (主單位 + 基本單位)
+  window._editingPkgLevels=[
+    {unit:'張',factor:1},
+    {unit:unit,factor:100}
+  ];
+  renderPackageLevelsBox();
+};
+
+window.disablePackageLevels=function(){
+  if(!confirm('停用包裝層級換算?\n\n設定會清空'))return;
+  window._editingPkgLevels=null;
+  renderPackageLevelsBox();
+};
+
+window.addPackageLevel=function(){
+  if(!window._editingPkgLevels)window._editingPkgLevels=[{unit:'張',factor:1}];
+  var maxFactor=Math.max.apply(Math,window._editingPkgLevels.map(function(l){return l.factor}));
+  window._editingPkgLevels.push({unit:'',factor:maxFactor*10});
+  renderPackageLevels();
+};
+
+window.removePackageLevel=function(idx){
+  if(!window._editingPkgLevels)return;
+  if(window._editingPkgLevels.length<=2){alert('至少要保留 2 層');return}
+  window._editingPkgLevels.splice(idx,1);
+  renderPackageLevels();
+};
+
+window.updatePackageLevel=function(idx,field,value){
+  if(!window._editingPkgLevels)return;
+  if(field==='factor')value=+value||1;
+  window._editingPkgLevels[idx][field]=value;
+  renderPackageLevels();
+};
+
+// 渲染包裝層級清單 (只重畫 list 部分,避免閃爍)
+window.renderPackageLevels=function(){
+  var listEl=document.getElementById('fi-pkg-levels-list');
+  if(!listEl)return;
+  
+  var lvls=window._editingPkgLevels;
+  if(!lvls||lvls.length===0){listEl.innerHTML='';return}
+  
+  var price=+document.getElementById('fi-price')?.value||0;
+  var mainUnit=document.getElementById('fi-unit')?.value||'';
+  var mainLvl=lvls.find(function(l){return l.unit===mainUnit})||lvls[lvls.length-1];
+  var mainFactor=mainLvl?mainLvl.factor:1;
+  
+  // 排序由小到大 (factor)
+  var sorted=lvls.slice().sort(function(a,b){return a.factor-b.factor});
+  
+  var html='<table style="width:100%;font-size:0.82rem"><thead><tr style="color:#9A6210"><th style="text-align:left;padding:4px">層級單位</th><th style="text-align:right;padding:4px">內含 (基本單位數)</th><th style="text-align:right;padding:4px">單價</th><th style="width:40px"></th></tr></thead><tbody>';
+  
+  sorted.forEach(function(l,i){
+    var origIdx=lvls.indexOf(l);
+    var unitPrice=mainFactor>0?price*(l.factor/mainFactor):0;
+    var isMain=l.unit===mainUnit;
+    var isBase=l.factor===1;
+    html+='<tr style="border-bottom:1px solid #f5d8b7">'+
+      '<td style="padding:4px"><input type="text" value="'+esc(l.unit)+'" '+(isBase?'placeholder="基本單位 如:張/個"':'')+' onchange="updatePackageLevel('+origIdx+',\'unit\',this.value)" style="width:90px;padding:2px 6px;font-size:0.78rem">'+(isMain?' <span style="background:#0A5A46;color:#fff;font-size:0.66rem;padding:1px 5px;border-radius:3px;margin-left:3px">主</span>':'')+(isBase?' <span style="background:#1455A0;color:#fff;font-size:0.66rem;padding:1px 5px;border-radius:3px;margin-left:3px">基本</span>':'')+'</td>'+
+      '<td style="text-align:right;padding:4px"><input type="number" min="1" step="1" value="'+l.factor+'" '+(isBase?'disabled style="background:#eee;':'style="')+'width:80px;padding:2px 6px;font-size:0.78rem;text-align:right" onchange="updatePackageLevel('+origIdx+',\'factor\',this.value)"></td>'+
+      '<td style="text-align:right;padding:4px;color:#0A5A46;font-weight:700">'+CUR()+unitPrice.toFixed(unitPrice<1?3:0)+'</td>'+
+      '<td style="text-align:center"><button type="button" class="btn btn-sm btn-danger" onclick="removePackageLevel('+origIdx+')" style="padding:1px 6px;font-size:0.7rem">×</button></td>'+
+      '</tr>';
+  });
+  
+  html+='</tbody></table>';
+  html+='<div style="font-size:0.72rem;color:#9A6210;margin-top:4px">💡 主單位 = 採購單位,基本單位 (factor=1) = 配方最常用的最小單位</div>';
+  
+  listEl.innerHTML=html;
+};
+
+// 重畫整個 box (啟用/停用切換時用)
+window.renderPackageLevelsBox=function(){
+  var box=document.getElementById('fi-pkg-levels-box');
+  if(!box)return;
+  var lvls=window._editingPkgLevels;
+  var unit=document.getElementById('fi-unit')?.value||'';
+  var price=+document.getElementById('fi-price')?.value||0;
+  
+  if(!lvls||lvls.length===0){
+    box.style.background='#F0F9FF';
+    box.style.border='1px dashed #93c5fd';
+    box.innerHTML='<b style="color:#1455A0">📦 包裝層級換算</b> (選用,例:1 箱=20 包=2000 張) <button type="button" class="btn btn-sm" style="background:#1455A0;color:#fff;margin-left:8px;padding:2px 10px;font-size:0.74rem" onclick="enablePackageLevels()">+ 啟用</button><div style="font-size:0.74rem;color:#666;margin-top:4px">啟用後可定義多層包裝,進貨/配方可用任一層計算</div>';
+  }else{
+    box.style.background='#FCEFE5';
+    box.style.border='1px solid #E8C098';
+    box.innerHTML='<div style="font-size:0.86rem;font-weight:600;color:#9A6210;margin-bottom:6px">📦 包裝層級換算 (主單位「'+esc(unit)+'」進價 '+CUR()+price+')</div><div id="fi-pkg-levels-list"></div><div style="display:flex;gap:6px;margin-top:6px"><button type="button" class="btn btn-sm" style="background:#9A6210;color:#fff;padding:3px 10px;font-size:0.74rem" onclick="addPackageLevel()">+ 新增層級</button><button type="button" class="btn btn-sm btn-outline" style="padding:3px 10px;font-size:0.74rem" onclick="disablePackageLevels()">✕ 停用</button></div>';
+    renderPackageLevels();
+  }
+};
+
+// 一鍵升級
+window.doUpgradePackageLevels=function(invId){
+  invId=invId||document.getElementById('fi-id')?.value;
+  var inv=(state.ings||[]).find(function(i){return i.id===invId});
+  if(!inv){
+    // modal 內可能還沒儲存,從現在欄位取
+    var name=document.getElementById('fi-name')?.value||'';
+    var unit=document.getElementById('fi-unit')?.value||'';
+    if(!name||!unit){alert('請先填入食材名稱和單位');return}
+    inv={name:name,unit:unit};
+  }
+  
+  var suggested=window.suggestPackageLevels(inv.name,inv.unit);
+  if(!suggested){alert('無法從名稱解析出包裝層級,請手動設定');return}
+  
+  if(!confirm('系統偵測到包裝層級:\n\n'+suggested.map(function(l){return '  • '+l.unit+' (1 '+l.unit+' = '+l.factor+' '+suggested[0].unit+')'}).join('\n')+'\n\n套用此設定?'))return;
+  
+  window._editingPkgLevels=suggested;
+  renderPackageLevelsBox();
+  toast('✅ 已套用建議的包裝層級');
+};
 
 // 進價對照工具:依單位類別自動顯示對應換算 (升級版,支援所有單位)
 window.updatePriceConv=function(){
@@ -3183,60 +3572,96 @@ window.getPackagingItems=function(){
 };
 
 // 建立配方 modal 的「包材組合」區塊 HTML
+// 🆕 智慧解析包裝名稱 (依「主單位」推算內含層級)
+// 例: 名稱「真空袋200*300mm100張/20包/箱」
+//   - 主單位「包」→ 1 包 = 100 張 (只算「包」之前的層級)
+//   - 主單位「箱」→ 1 箱 = 100×20 = 2000 張 (「箱」之前的所有層級)
+//   - 主單位「個」(無此單位在名稱中) → 不自動填 (避免猜錯)
+window.parsePackageName=function(name,unit){
+  if(!name||!unit)return null;
+  
+  // 把名稱按「/」切割成層級
+  var parts=name.split('/');
+  
+  // 找主單位在哪一層 (層級從 0 開始)
+  var unitIdx=-1;
+  for(var i=0;i<parts.length;i++){
+    if(parts[i].indexOf(unit)>=0){unitIdx=i;break;}
+  }
+  
+  // 主單位不在名稱中 → 不亂猜
+  if(unitIdx<0)return null;
+  // 主單位在第一層 → 它本身就是基本單位,沒子單位
+  if(unitIdx===0)return null;
+  
+  // 「主單位之前」的所有層級相乘
+  var subUnit=null;
+  var totalInner=1;
+  var subUnitChars=['張','片','入','顆','粒','只','支','條','根','塊'];
+  var subUnitRe=/(\d+)\s*([張片入顆粒只支條根塊])/g;
+  
+  for(var j=0;j<unitIdx;j++){
+    var p=parts[j];
+    // 優先抓「數字+子單位」配對 (例:100張)
+    var ms=p.match(subUnitRe);
+    if(ms&&ms.length>0){
+      var lastM=ms[ms.length-1].match(/(\d+)\s*([張片入顆粒只支條根塊])/);
+      if(lastM){
+        totalInner*=+lastM[1];
+        if(!subUnit)subUnit=lastM[2];
+      }
+    }else{
+      // 沒子單位 → 抓純數字 (例:「20包」抓 20)
+      var nm=p.match(/(\d+)/);
+      if(nm)totalInner*=+nm[1];
+    }
+  }
+  
+  if(totalInner<=1)return null;
+  return {innerQty:totalInner,innerUnit:subUnit||'張'};
+};
+
 window.buildPackagingPicker=function(rec){
   var packs=window.getPackagingItems();
   if(packs.length===0){
     return '<div style="background:#FFF8ED;border:1px solid #f5c98a;border-radius:8px;padding:10px 12px;margin:6px 0;font-size:0.84rem;color:#9A6210">💡 食材庫尚無「包材」類別食材。<button class="btn btn-sm" style="background:#9A6210;color:#fff;margin-left:8px" onclick="closeModal();setTimeout(function(){importPackagingFromSheets()},100)">📦 匯入包材</button></div>';
   }
-  
   var packNames={};
   packs.forEach(function(p){packNames[p.name]=true});
-  var selectedNames={};
+  var selectedNames={},selectedUnits={};
   (rec.ings||[]).forEach(function(ing){
     var inv=(state.ings||[]).find(function(x){return x.name===ing.name});
-    if((inv&&inv.cat==='包材')||packNames[ing.name])selectedNames[ing.name]=ing.qty||1;
+    if((inv&&inv.cat==='包材')||packNames[ing.name]){
+      selectedNames[ing.name]=ing.qty||1;
+      selectedUnits[ing.name]=ing.unit||'';
+    }
   });
-  
-  // 已儲存的「內含數量」設定 (rec.packInner = {packName: {innerQty, innerUnit}})
-  var savedInner=rec.packInner||{};
-  
-  var html='<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>📦 包材組合 (食材庫包材 + 轉售品項可選)</span><span style="font-size:0.74rem;font-weight:400">已選 <b id="pack-picked-count">'+Object.keys(selectedNames).length+'</b> 項</span></div>';
+  var html='<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><span>📦 包材組合</span><span style="font-size:0.74rem;font-weight:400">已選 <b id="pack-picked-count">'+Object.keys(selectedNames).length+'</b> 項</span></div>';
   html+='<div style="max-height:240px;overflow-y:auto;border:1px solid #f5d8b7;border-radius:6px;padding:6px;background:#fff">';
-  
   packs.forEach(function(p){
     var checked=selectedNames[p.name]!=null;
     var qty=selectedNames[p.name]||1;
     var srcBadge=p._fromInternal?'<span style="background:#dbeafe;color:#1455A0;font-size:0.68rem;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px">轉售</span>':'';
-    
-    // 🆕 內含數量設定 (用於 1 箱 = N 張這種多層包裝)
-    var innerCfg=savedInner[p.name]||{};
-    var innerQty=+innerCfg.innerQty||1;
-    var innerUnit=innerCfg.innerUnit||'張';
-    var hasInner=innerQty>1;
-    var unitPriceAfter=hasInner?(p.price/innerQty):p.price;
-    var unitAfter=hasInner?innerUnit:p.unit;
-    
+    // 🆕 找出此包材是否有 packageLevels (從 state.ings 抓)
+    var inv=(state.ings||[]).find(function(x){return x.name===p.name});
+    var availUnits=(inv&&inv.packageLevels&&inv.packageLevels.length>0)?inv.packageLevels.map(function(l){return l.unit}):[p.unit];
+    var hasLevels=availUnits.length>1;
+    var selectedUnit=selectedUnits[p.name]||p.unit;
     var nameSafe=esc(p.name).replace(/"/g,'&quot;');
-    
-    html+='<div style="padding:6px 4px;border-bottom:1px solid #f5f0e0">'+
-      '<div style="display:flex;align-items:center;gap:8px">'+
-        '<input type="checkbox" class="pack-pick" data-name="'+nameSafe+'" data-unit="'+esc(p.unit)+'" data-from-internal="'+(p._fromInternal?'1':'0')+'" data-price="'+(p.price||0)+'"'+(checked?' checked':'')+' onchange="updatePackPickCount();togglePackInner(this)" style="cursor:pointer">'+
-        '<span style="flex:1;font-size:0.82rem">'+esc(p.name)+srcBadge+' <span style="color:#999;font-size:0.74rem">'+CUR()+(p.price||0)+'/'+esc(p.unit)+'</span></span>'+
-        '<input type="number" class="pack-qty" data-name="'+nameSafe+'" min="0" step="0.01" value="'+qty+'" style="width:60px;padding:2px 6px;font-size:0.82rem">'+
-        '<span style="font-size:0.74rem;color:#666;min-width:40px" id="pack-unit-'+nameSafe.replace(/[^a-zA-Z0-9]/g,'_')+'">'+esc(unitAfter)+'</span>'+
-      '</div>'+
-      '<div class="pack-inner-row" data-name="'+nameSafe+'" style="display:'+(checked&&hasInner?'flex':'none')+';align-items:center;gap:6px;margin-top:4px;margin-left:24px;font-size:0.74rem;color:#666">'+
-        '<span>📐 內含換算:1 '+esc(p.unit)+' =</span>'+
-        '<input type="number" class="pack-inner-qty" data-name="'+nameSafe+'" min="1" step="1" value="'+innerQty+'" style="width:60px;padding:1px 4px;font-size:0.74rem" onchange="updatePackInnerHint(this)">'+
-        '<input type="text" class="pack-inner-unit" data-name="'+nameSafe+'" value="'+esc(innerUnit)+'" placeholder="張/個/片" style="width:50px;padding:1px 4px;font-size:0.74rem" onchange="updatePackInnerHint(this)">'+
-        '<span class="pack-inner-result" style="color:#0A5A46;font-weight:700">→ '+CUR()+unitPriceAfter.toFixed(3)+'/'+esc(innerUnit)+'</span>'+
-        '<a href="javascript:;" onclick="togglePackInnerRow(this,1)" style="margin-left:auto;color:#999;font-size:0.7rem">隱藏</a>'+
-      '</div>'+
-      (checked&&!hasInner?'<div class="pack-inner-toggle" data-name="'+nameSafe+'" style="margin-left:24px;margin-top:2px"><a href="javascript:;" onclick="togglePackInnerRow(this,0)" style="color:#1455A0;font-size:0.72rem">📐 設定內含數量 (如 1 箱=2000 張)</a></div>':'')+
+    var levelsBadge=hasLevels?'<span style="background:#dcfce7;color:#0A5A46;font-size:0.68rem;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:4px">📦 多層</span>':'';
+    var unitDisplay=hasLevels?
+      '<select class="pack-unit" data-name="'+nameSafe+'" style="padding:2px 4px;font-size:0.78rem;min-width:60px">'+
+        availUnits.map(function(u){return '<option value="'+esc(u)+'"'+(u===selectedUnit?' selected':'')+'>'+esc(u)+'</option>'}).join('')+
+      '</select>'
+      :'<span style="font-size:0.74rem;color:#666;min-width:40px">'+esc(p.unit)+'</span>';
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid #f5f0e0">'+
+      '<input type="checkbox" class="pack-pick" data-name="'+nameSafe+'" data-unit="'+esc(p.unit)+'" data-from-internal="'+(p._fromInternal?'1':'0')+'" data-price="'+(p.price||0)+'"'+(checked?' checked':'')+' onchange="updatePackPickCount()" style="cursor:pointer">'+
+      '<span style="flex:1;font-size:0.82rem">'+esc(p.name)+srcBadge+levelsBadge+' <span style="color:#999;font-size:0.74rem">'+CUR()+(p.price||0)+'/'+esc(p.unit)+'</span></span>'+
+      '<input type="number" class="pack-qty" data-name="'+nameSafe+'" min="0" step="0.01" value="'+qty+'" style="width:60px;padding:2px 6px;font-size:0.82rem">'+
+      unitDisplay+
     '</div>';
   });
-  
-  html+='</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 內含數量:1 箱真空袋=2000 張時,系統自動算每張單價 ｜ 勾「轉售」標記者,儲存時自動同步到食材庫</div></div>';
+  html+='</div><div style="font-size:0.74rem;color:#9A6210;margin-top:6px">💡 多層包材 (如真空袋:箱/包/張) 請至食材庫設定「包裝層級換算」即可在此選擇單位</div></div>';
   return html;
 };
 
@@ -3246,148 +3671,38 @@ window.updatePackPickCount=function(){
   if(el)el.textContent=cnt;
 };
 
-// 🆕 切換內含數量輸入區
-window.togglePackInner=function(checkbox){
-  var name=checkbox.dataset.name;
-  var row=document.querySelector('.pack-inner-row[data-name="'+name+'"]');
-  var toggle=document.querySelector('.pack-inner-toggle[data-name="'+name+'"]');
-  if(checkbox.checked){
-    if(toggle)toggle.style.display='block';
-    // row 預設隱藏 (除非已有設定)
-  }else{
-    if(row)row.style.display='none';
-    if(toggle)toggle.style.display='none';
-  }
-};
-
-window.togglePackInnerRow=function(link,hide){
-  var parent=link.closest('.pack-inner-row,.pack-inner-toggle');
-  if(!parent)return;
-  var name=parent.dataset.name;
-  var row=document.querySelector('.pack-inner-row[data-name="'+name+'"]');
-  var toggle=document.querySelector('.pack-inner-toggle[data-name="'+name+'"]');
-  if(hide){
-    // 隱藏 → 重設 innerQty=1
-    if(row){
-      row.querySelector('.pack-inner-qty').value=1;
-      window.updatePackInnerHint(row.querySelector('.pack-inner-qty'));
-      row.style.display='none';
-    }
-    if(toggle)toggle.style.display='block';
-  }else{
-    // 顯示
-    if(row)row.style.display='flex';
-    if(toggle)toggle.style.display='none';
-  }
-};
-
-// 🆕 即時更新內含換算後的單價
-window.updatePackInnerHint=function(input){
-  var name=input.dataset.name;
-  var row=input.closest('.pack-inner-row');
-  if(!row)return;
-  var pickEl=document.querySelector('.pack-pick[data-name="'+name+'"]');
-  if(!pickEl)return;
-  
-  var price=+pickEl.dataset.price||0;
-  var qty=+row.querySelector('.pack-inner-qty').value||1;
-  var unit=row.querySelector('.pack-inner-unit').value||'個';
-  var unitPrice=qty>0?price/qty:price;
-  
-  var hint=row.querySelector('.pack-inner-result');
-  if(hint)hint.innerHTML='→ '+CUR()+unitPrice.toFixed(3)+'/'+esc(unit);
-  
-  // 更新右邊顯示的單位
-  var safeName=name.replace(/[^a-zA-Z0-9]/g,'_');
-  var unitDisplay=document.getElementById('pack-unit-'+safeName);
-  if(unitDisplay)unitDisplay.textContent=qty>1?unit:pickEl.dataset.unit;
-};
-
 // 收集 modal 中已選的包材 (saveRecipe 用)
-// 🆕 內含數量設定:若包材設了內含 (如 1 箱=2000 張),自動以子單位建立食材
 window.collectSelectedPackaging=function(){
   var selected=[];
   var newIngsToAdd=[];
-  var packInner={};  // 記錄到 rec.packInner
-  
   document.querySelectorAll('.pack-pick:checked').forEach(function(cb){
     var name=cb.dataset.name;
-    var unit=cb.dataset.unit;
     var fromInternal=cb.dataset.fromInternal==='1';
     var price=+cb.dataset.price||0;
-    var qtyEl=document.querySelector('.pack-qty[data-name="'+name.replace(/"/g,'&quot;')+'"]');
+    var nameSafe=name.replace(/"/g,'&quot;');
+    var qtyEl=document.querySelector('.pack-qty[data-name="'+nameSafe+'"]');
+    var unitEl=document.querySelector('.pack-unit[data-name="'+nameSafe+'"]');
     var qty=qtyEl?+qtyEl.value:1;
+    var unit=unitEl?unitEl.value:cb.dataset.unit;
     if(qty<=0)return;
-    
-    // 🆕 內含數量
-    var innerRow=document.querySelector('.pack-inner-row[data-name="'+name.replace(/"/g,'&quot;')+'"]');
-    var innerQty=1,innerUnit=unit;
-    if(innerRow){
-      innerQty=+innerRow.querySelector('.pack-inner-qty').value||1;
-      innerUnit=innerRow.querySelector('.pack-inner-unit').value||unit;
-    }
-    
-    var hasInner=innerQty>1&&innerUnit!==unit;
-    
-    if(hasInner){
-      // 有內含換算 → 建立子單位食材
-      var subName=name+'('+innerUnit+')';
-      var subPrice=price/innerQty;
-      var existing=(state.ings||[]).find(function(x){return x.name===subName});
+    if(fromInternal){
+      var existing=(state.ings||[]).find(function(x){return x.name===name});
       if(!existing){
         newIngsToAdd.push({
           id:'I'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
-          name:subName,
-          cat:'包材',
-          unit:innerUnit,
-          price:subPrice,
-          stock:0,
-          safety:0,
-          yieldRate:1,
-          note:'從'+name+'自動換算 (1 '+unit+'='+innerQty+' '+innerUnit+')',
-          _parentPackage:name,
-          _innerQty:innerQty,
-          _syncedFromInternal:fromInternal
+          name:name,cat:'包材',unit:cb.dataset.unit,price:price,
+          stock:0,safety:0,yieldRate:1,
+          note:'從轉售品項自動同步',_syncedFromInternal:true
         });
       }
-      // 配方用子單位 (qty 表示用了幾個子單位)
-      // 因為 UI 上「需要量」是「主單位」(箱),內含換算後變成「張數」
-      // 例如:勾 1 箱 + 內含 2000 張 → 配方實際用 2000 張 (但通常配方一次只用 1 張)
-      // 所以這裡 qty 還是維持「箱」的數量,讓 Tim 自己改成想要的張數
-      selected.push({name:subName,qty:qty*innerQty,unit:innerUnit,form:'整顆/原形'});
-      packInner[name]={innerQty:innerQty,innerUnit:innerUnit};
-    }else{
-      // 沒內含換算 → 一般處理
-      if(fromInternal){
-        var ex=(state.ings||[]).find(function(x){return x.name===name});
-        if(!ex){
-          newIngsToAdd.push({
-            id:'I'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
-            name:name,
-            cat:'包材',
-            unit:unit,
-            price:price,
-            stock:0,
-            safety:0,
-            yieldRate:1,
-            note:'從轉售品項自動同步',
-            _syncedFromInternal:true
-          });
-        }
-      }
-      selected.push({name:name,qty:qty,unit:unit,form:'整顆/原形'});
     }
+    selected.push({name:name,qty:qty,unit:unit,form:'整顆/原形'});
   });
-  
   if(newIngsToAdd.length>0){
     if(!state.ings)state.ings=[];
     newIngsToAdd.forEach(function(i){state.ings.push(i)});
-    if(typeof addAudit==='function')addAudit('自動建立包材食材',newIngsToAdd.map(function(i){return i.name}).join(','));
+    if(typeof addAudit==='function')addAudit('自動同步轉售品項到包材',newIngsToAdd.map(function(i){return i.name}).join(','));
   }
-  
-  // 把 packInner 回傳給 saveRecipe (透過 window 暫存)
-  window._lastPackInner=packInner;
-  
   return selected;
 };
 
@@ -5039,7 +5354,7 @@ udHtml+=' <button class="btn btn-outline btn-sm" onclick="resetUnitDisplay()" st
 udCard.innerHTML=udHtml;
 pg.appendChild(udCard);
 
-const mc=dv({cls:'card'});mc.appendChild(dv({cls:'card-title'},'🏢 公司基本資訊'));mc.innerHTML+=`<div class="form-row c2"><div class="fg"><label>公司名稱</label><input id="mc-name" value="${esc(state.meta.company||'')}"></div><div class="fg"><label>統一編號</label><input id="mc-taxid" value="${esc(state.meta.taxId||'')}"></div></div><div class="form-row c2"><div class="fg"><label>電話</label><input id="mc-phone" value="${esc(state.meta.phone||'')}"></div><div class="fg"><label>地址</label><input id="mc-addr" value="${esc(state.meta.address||'')}"></div></div><div class="fg" style="margin-bottom:10px"><label>門市列表（逗號分隔）</label><input id="mc-stores" value="${esc((state.meta.stores||[]).join(', '))}"></div><div class="form-row c2"><div class="fg"><label>目標毛利率 (%)</label><input id="mc-margin" type="number" min="1" max="99" value="${Math.round((state.meta.targetMargin||0.65)*100)}"></div><div class="fg"><label>貨幣符號</label><input id="mc-cur" value="${esc(state.meta.currency||'NT$')}"></div></div><div><button class="btn btn-primary" onclick="saveMetaSettings()">💾 儲存公司設定</button></div>`;pg.appendChild(mc);
+const mc=dv({cls:'card'});mc.appendChild(dv({cls:'card-title'},'🏢 公司基本資訊'));mc.innerHTML+=`<div class="form-row c2"><div class="fg"><label>公司名稱</label><input id="mc-name" value="${esc(state.meta.company||'')}"></div><div class="fg"><label>統一編號</label><input id="mc-taxid" value="${esc(state.meta.taxId||'')}"></div></div><div class="form-row c2"><div class="fg"><label>電話</label><input id="mc-phone" value="${esc(state.meta.phone||'')}"></div><div class="fg"><label>地址</label><input id="mc-addr" value="${esc(state.meta.address||'')}"></div></div><div class="fg" style="margin-bottom:10px"><label>門市列表（逗號分隔）</label><input id="mc-stores" value="${esc((state.meta.stores||[]).join(', '))}"></div><div class="form-row c2"><div class="fg"><label>目標毛利率 (%)<span style="font-size:0.7rem;color:#999;font-weight:400">(配方達標/偏低判斷用)</span></label><input id="mc-margin" type="number" min="1" max="99" value="${Math.round((state.meta.targetMargin||0.65)*100)}"></div><div class="fg"><label>貨幣符號</label><input id="mc-cur" value="${esc(state.meta.currency||'NT$')}"></div></div><div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-bottom:10px"><label style="font-weight:700;color:#9A6210;font-size:0.86rem;display:block;margin-bottom:6px">📊 配方詳情三段毛利率 (%) <span style="font-size:0.74rem;color:#9A6210;font-weight:400">— 配方卡會用這 3 個值算建議售價</span></label><div class="form-row c3">${(function(){var t=(state.meta.marginTiers&&state.meta.marginTiers.length===3)?state.meta.marginTiers.slice().sort(function(a,b){return a-b}):[55,60,65];return ['<div class="fg"><label style="font-size:0.78rem">低</label><input id="mc-tier-low" type="number" min="1" max="99" value="'+t[0]+'"></div>','<div class="fg"><label style="font-size:0.78rem">中</label><input id="mc-tier-mid" type="number" min="1" max="99" value="'+t[1]+'"></div>','<div class="fg"><label style="font-size:0.78rem">高</label><input id="mc-tier-high" type="number" min="1" max="99" value="'+t[2]+'"></div>'].join('')})()}</div></div><div><button class="btn btn-primary" onclick="saveMetaSettings()">💾 儲存公司設定</button></div>`;pg.appendChild(mc);
 var verCard=dv({cls:'card'});verCard.appendChild(dv({cls:'card-title'},'📌 系統版本'));
 verCard.innerHTML+='<div style="display:flex;justify-content:space-between;align-items:center"><div><span style="font-size:1.1rem;font-weight:700;color:#0A5A46">v'+SYSTEM_VERSION+'</span><span style="font-size:0.82rem;color:#706E68;margin-left:8px">Build '+BUILD_NUMBER+'</span></div><button class="btn btn-sm btn-outline" onclick="showVersionInfo()">查看修改紀錄</button></div>';
 pg.appendChild(verCard);
@@ -5064,7 +5379,13 @@ pg.appendChild(dv({cls:'tip'},'在此新增或刪除下拉選單選項'));
 const FL=[{k:'cats',l:'食材類別'},{k:'units',l:'計量單位'},{k:'forms',l:'食材型態'},{k:'supTypes',l:'供應商類別'},{k:'payTerms',l:'付款條件'},{k:'lossReasons',l:'損耗原因'},{k:'lossHandles',l:'損耗處理'},{k:'meatSrc',l:'肉品來源'}];
 const grid=dv({cls:'grid2'});FL.forEach(({k,l})=>{const items=state.refs[k]||[];const card=dv({cls:'card'});card.appendChild(dv({cls:'card-title'},l+'（'+items.length+' 項）'));const tg=dv({style:'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px'});items.forEach((item,i)=>{const tag=dv({style:'display:inline-flex;align-items:center;gap:3px;background:#eee;border-radius:20px;padding:3px 10px;font-size:0.85rem'},item);const del=el('button',{style:'border:none;background:none;cursor:pointer;color:#706E68;font-size:0.85rem;padding:0',txt:'✕'});del.addEventListener('click',()=>{if(confirm('確定刪除「'+item+'」？')){state.refs[k]=items.filter((_,j)=>j!==i);saveState();renderPage()}});tag.appendChild(del);tg.appendChild(tag)});card.appendChild(tg);const row=dv({style:'display:flex;gap:6px'});const inp=el('input',{type:'text',placeholder:'輸入新選項...',style:'flex:1;border:.5px solid #d0d0d0;border-radius:6px;padding:5px 8px;font-size:0.85rem;outline:none;font-family:inherit'});const addB=btn('btn btn-sm btn-primary','新增',()=>{const v=inp.value.trim();if(!v||items.includes(v))return;state.refs[k]=[...items,v];saveState();renderPage()});inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addB.click()}});row.appendChild(inp);row.appendChild(addB);card.appendChild(row);grid.appendChild(card)});pg.appendChild(grid);return pg}
 
-window.saveMetaSettings=function(){state.meta.company=$('mc-name')?.value||'';state.meta.taxId=$('mc-taxid')?.value||'';state.meta.phone=$('mc-phone')?.value||'';state.meta.address=$('mc-addr')?.value||'';state.meta.stores=($('mc-stores')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);state.meta.targetMargin=(+$('mc-margin')?.value||65)/100;state.meta.currency=$('mc-cur')?.value||'NT$';saveState();renderPage();toast('✅ 公司設定已儲存')};
+window.saveMetaSettings=function(){state.meta.company=$('mc-name')?.value||'';state.meta.taxId=$('mc-taxid')?.value||'';state.meta.phone=$('mc-phone')?.value||'';state.meta.address=$('mc-addr')?.value||'';state.meta.stores=($('mc-stores')?.value||'').split(',').map(s=>s.trim()).filter(Boolean);state.meta.targetMargin=(+$('mc-margin')?.value||65)/100;
+// 🆕 儲存三段毛利率
+var tLow=+$('mc-tier-low')?.value||55;
+var tMid=+$('mc-tier-mid')?.value||60;
+var tHigh=+$('mc-tier-high')?.value||65;
+state.meta.marginTiers=[tLow,tMid,tHigh].sort(function(a,b){return a-b});
+state.meta.currency=$('mc-cur')?.value||'NT$';saveState();renderPage();toast('✅ 公司設定已儲存')};
 
 // 🆕 儲存顯示單位偏好
 window.saveUnitDisplay=function(){
@@ -6420,7 +6741,16 @@ if(state._scheduleView==='calendar'){
 }
 
 // 清單視圖 (預設)
-pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>時段</th><th>配方</th><th>倍數</th><th>預計產出</th><th>負責人</th><th>狀態</th><th style="min-width:160px">📱 APP 回報</th><th>操作</th></tr></thead><tbody>'+list.slice().reverse().map(function(s){var stMap={'待生產':'badge-warn','生產中':'badge-blue','已完成':'badge-green','已取消':'badge-red'};var reportCell=window.buildReportCell?window.buildReportCell(s.id,reportLookup[s.id]||[]):'—';return'<tr><td style="font-weight:600">'+esc(s.date)+'</td><td>'+esc(s.timeSlot||'—')+'</td><td style="font-weight:700">'+esc(s.recipeName)+'</td><td>x'+fmt(s.multiplier,1)+'</td><td style="color:#7A4D0B;font-weight:700">'+fmt(s.output,1)+' '+esc(s.unit)+'</td><td>'+esc(s.assignee||'—')+'</td><td><span class="badge '+(stMap[s.status]||'badge-gray')+'">'+esc(s.status)+'</span>'+(s.deductedAt?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">✓ 已扣料</div>':'')+'</td><td>'+reportCell+'</td><td><div style="display:flex;gap:4px;flex-wrap:wrap">'+(s.status==='待生產'?'<button class="btn btn-sm btn-success" onclick="execSchedule(\''+s.id+'\')">▶️ 開始+扣料</button><button class="btn btn-sm btn-outline" onclick="editSchedule(\''+s.id+'\')">✏️ 編輯</button><button class="btn btn-sm btn-danger" onclick="cancelSchedule(\''+s.id+'\')">取消</button>':'')+(s.status==='生產中'?'<button class="btn btn-sm btn-primary" onclick="completeSchedule(\''+s.id+'\')">✓ 完成</button>':'')+(s.status==='已取消'?'<button class="btn btn-sm btn-outline" onclick="editSchedule(\''+s.id+'\')">✏️ 編輯</button>':'')+'<button class="btn btn-sm btn-danger" onclick="deleteSchedule(\''+s.id+'\')" title="永久刪除">🗑️</button></div></td></tr>'}).join('')+'</tbody></table></div>'}));return pg}
+// 🆕 排序:未完成優先 (待生產→生產中→已完成→已取消),同狀態內日期新→舊
+var statusOrder={'待生產':0,'生產中':1,'已完成':2,'已取消':3};
+var sortedList=list.slice().sort(function(a,b){
+  var sa=statusOrder[a.status]==null?9:statusOrder[a.status];
+  var sb=statusOrder[b.status]==null?9:statusOrder[b.status];
+  if(sa!==sb)return sa-sb;  // 狀態優先
+  // 同狀態 → 日期新→舊
+  return (b.date||'').localeCompare(a.date||'');
+});
+pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>日期</th><th>時段</th><th>配方</th><th>倍數</th><th>預計產出</th><th>負責人</th><th>狀態</th><th style="min-width:160px">📱 APP 回報</th><th>操作</th></tr></thead><tbody>'+sortedList.map(function(s){var stMap={'待生產':'badge-warn','生產中':'badge-blue','已完成':'badge-green','已取消':'badge-red'};var reportCell=window.buildReportCell?window.buildReportCell(s.id,reportLookup[s.id]||[]):'—';return'<tr><td style="font-weight:600">'+esc(s.date)+'</td><td>'+esc(s.timeSlot||'—')+'</td><td style="font-weight:700">'+esc(s.recipeName)+'</td><td>x'+fmt(s.multiplier,1)+'</td><td style="color:#7A4D0B;font-weight:700">'+fmt(s.output,1)+' '+esc(s.unit)+'</td><td>'+esc(s.assignee||'—')+'</td><td><span class="badge '+(stMap[s.status]||'badge-gray')+'">'+esc(s.status)+'</span>'+(s.deductedAt?'<div style="font-size:0.7rem;color:#0A5A46;margin-top:2px">✓ 已扣料</div>':'')+'</td><td>'+reportCell+'</td><td><div style="display:flex;gap:4px;flex-wrap:wrap">'+(s.status==='待生產'?'<button class="btn btn-sm btn-success" onclick="execSchedule(\''+s.id+'\')">▶️ 開始+扣料</button><button class="btn btn-sm btn-outline" onclick="editSchedule(\''+s.id+'\')">✏️ 編輯</button><button class="btn btn-sm btn-danger" onclick="cancelSchedule(\''+s.id+'\')">取消</button>':'')+(s.status==='生產中'?'<button class="btn btn-sm btn-primary" onclick="completeSchedule(\''+s.id+'\')">✓ 完成</button>':'')+(s.status==='已取消'?'<button class="btn btn-sm btn-outline" onclick="editSchedule(\''+s.id+'\')">✏️ 編輯</button>':'')+'<button class="btn btn-sm btn-danger" onclick="deleteSchedule(\''+s.id+'\')" title="永久刪除">🗑️</button></div></td></tr>'}).join('')+'</tbody></table></div>'}));return pg}
 
 window.openScheduleModal=function(editId){var recs=state.recipes||[];
 var existing=editId?(state.prodSchedule||[]).find(function(x){return x.id===editId}):null;
@@ -11743,6 +12073,8 @@ pushUndo(); // 初始快照
         // 🆕 餐飲特化
         usageNote: document.getElementById('fi-usage')?.value || '',
         seasonal: document.getElementById('fi-seasonal')?.value || '',
+        // 🆕 包裝層級換算 (無限層級)
+        packageLevels: (window._editingPkgLevels&&window._editingPkgLevels.length>=2)?JSON.parse(JSON.stringify(window._editingPkgLevels)):null,
         // 稅務欄位
         taxType,
         taxNote,
