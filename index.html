@@ -9366,34 +9366,173 @@ pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style
 return pg}
 
 // ── 轉售品項管理 ──
-window.openInternalProductList=function(){
-var prods=state.internalProducts||[];
-var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><span style="font-size:1.05rem;font-weight:700">📦 轉售品項管理</span><button class="btn btn-sm btn-primary" onclick="openInternalProductModal(\'\')">＋ 新增品項</button></div>';
 
-if(!prods.length){html+='<div style="text-align:center;color:#706E68;padding:20px">尚無轉售品項</div>'}
-else{
-html+='<div style="overflow-x:auto;max-height:450px;overflow-y:auto"><table class="tbl"><thead><tr><th>編號</th><th>品名</th><th>類型</th><th>規格</th><th>成本</th><th>售價</th><th>加成%</th><th>操作</th></tr></thead><tbody>';
-prods.forEach(function(p){
-  var markup=p.cost>0?Math.round((p.sellPrice-p.cost)/p.cost*100):0;
-  html+='<tr><td style="font-family:monospace;font-size:0.82rem">'+esc(p.id)+'</td><td style="font-weight:700">'+esc(p.name)+'</td><td><span class="badge '+(p.type==='加工品'?'badge-warn':p.type==='分裝品'?'badge-blue':'badge-gray')+'">'+esc(p.type)+'</span></td><td style="font-size:0.84rem">'+esc(p.spec||'—')+'</td><td>'+CUR()+fmt(p.cost,1)+'</td><td style="font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td><td style="color:#0A5A46;font-weight:700">+'+markup+'%</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openInternalProductModal(\''+p.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delInternalProduct(\''+p.id+'\')">刪除</button></div></td></tr>';
-});
-html+='</tbody></table></div>'}
+// 🆕 注音聲母字典 (餐飲常用字,用於注音首字母搜尋,輔助用)
+var ZHUYIN_GROUPS={
+'ㄅ':'白百包薄冰餅扁玻菠斑鮑保',
+'ㄆ':'排盤皮泡瓶蘋片胚拼配胖',
+'ㄇ':'麵米麥麻梅毛芒蜜饅抹墨母貓',
+'ㄈ':'飯粉腐肥番佛芬蜂福風',
+'ㄉ':'蛋豆袋丁凍蒂單刀蛋低道蝶',
+'ㄊ':'糖湯甜兔吐統土塔特',
+'ㄋ':'牛奶嫩泥',
+'ㄌ':'辣料涼蘿綠滷藍蓮李梨臘咾',
+'ㄍ':'瓜果根乾鍋蛤膏罐桂高甘咕菇',
+'ㄎ':'咖可烤塊苦控殼',
+'ㄏ':'海蚵紅花火黑和厚滑壺',
+'ㄐ':'雞醬薑椒韭桔煎金節甲價結',
+'ㄑ':'青芹起茄千巧切',
+'ㄒ':'蝦鮮香蟹杏鹹西小新鹽(no)鬚',
+'ㄓ':'豬汁炸蒸知直真紙煮中珍朱蔗章',
+'ㄔ':'茶炒橙串炊腸吃醇',
+'ㄕ':'蔬生熟薯勺水獅燒沙手雙莎',
+'ㄖ':'肉乳日',
+'ㄗ':'紫雜糟',
+'ㄘ':'醋菜蔥粗草',
+'ㄙ':'蒜筍絲酸鬆三色嫂'
+};
+window._buildZhuyinMap=function(){
+  if(window._zyMap)return window._zyMap;
+  var map={};
+  Object.keys(ZHUYIN_GROUPS).forEach(function(ini){
+    ZHUYIN_GROUPS[ini].split('').forEach(function(ch){if(ch&&ch!=='('&&ch!==')'&&ch!=='n'&&ch!=='o')map[ch]=ini});
+  });
+  window._zyMap=map;return map;
+};
+// 品項是否符合搜尋 (關鍵字 contains + 注音首字母)
+window.matchIPSearch=function(p,kw){
+  if(!kw)return true;
+  kw=String(kw).trim();
+  if(!kw)return true;
+  var supName='';
+  if(p.supplier){var s=(state.sups||[]).find(function(x){return x.id===p.supplier});if(s)supName=s.name}
+  var hay=[(p.name||''),(p.id||''),(p.spec||''),(p.note||''),(p.sourceItems||''),supName].join(' ').toLowerCase();
+  if(hay.indexOf(kw.toLowerCase())>=0)return true;
+  // 注音首字母:kw 含注音聲母符號 (ㄅ-ㄙ, U+3105~U+3119)
+  if(/[\u3105-\u3119]/.test(kw)){
+    var zyMap=window._buildZhuyinMap();
+    var name=p.name||'';
+    for(var i=0;i<name.length;i++){
+      var ini=zyMap[name[i]];
+      if(ini&&kw.indexOf(ini)>=0)return true;
+    }
+  }
+  return false;
+};
+// 收集所有可用單位 (系統單位庫 + 食材 + 轉售品項用過的)
+window.getAllIPUnits=function(){
+  var set={};
+  (state.refs&&state.refs.units||[]).forEach(function(u){if(u)set[u]=1});
+  (state.ings||[]).forEach(function(i){if(i.unit)set[i.unit]=1;if(i.packageLevels)i.packageLevels.forEach(function(l){if(l.unit)set[l.unit]=1})});
+  (state.internalProducts||[]).forEach(function(i){if(i.unit)set[i.unit]=1});
+  var arr=Object.keys(set);
+  // 常用單位排前面
+  var common=['包','盒','箱','罐','瓶','袋','份','個','條','片','張','公斤','台斤','公克','公升','毫升'];
+  arr.sort(function(a,b){var ia=common.indexOf(a),ib=common.indexOf(b);if(ia<0)ia=999;if(ib<0)ib=999;return ia-ib||a.localeCompare(b)});
+  return arr;
+};
+// 判定品項是否「編輯完成」(成本+售價都 >0)
+window.isIPComplete=function(p){return (+p.cost>0)&&(+p.sellPrice>0)};
+
+window.openInternalProductList=function(keepSearch){
+var prods=state.internalProducts||[];
+var kw=keepSearch&&window._ipSearchKw?window._ipSearchKw:'';
+var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:1.05rem;font-weight:700">📦 轉售品項管理</span><button class="btn btn-sm btn-primary" onclick="openInternalProductModal(\'\')">＋ 新增品項</button></div>';
+
+// 🆕 搜尋框 (關鍵字 + 注音首字母)
+html+='<div style="margin-bottom:10px;position:relative"><input id="ip-search-box" value="'+esc(kw)+'" placeholder="🔍 搜尋品名/編號/供應商,或注音首字母 (例:ㄐ → 雞/醬)" oninput="filterIPList(this.value)" style="width:100%;padding:8px 12px;border:1px solid #D6D4CC;border-radius:8px;font-size:0.9rem"><span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:0.74rem;color:#999" id="ip-search-count"></span></div>';
+
+html+='<div id="ip-list-body">'+window._renderIPListBody(prods,kw)+'</div>';
 html+='<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
-modal(html,true)};
+modal(html,true);
+// scroll 到剛編輯的列 + 高亮
+setTimeout(function(){
+  var sb=document.getElementById('ip-search-box');
+  if(sb&&!kw)sb.focus();
+  if(window._lastEditIPId){
+    var row=document.getElementById('ip-row-'+window._lastEditIPId);
+    if(row){row.scrollIntoView({block:'center',behavior:'smooth'});var oldBg=row.style.background;row.style.transition='background .3s';row.style.background='#FFF3CD';setTimeout(function(){row.style.background=oldBg||''},1600)}
+    window._lastEditIPId=null;
+  }
+},150);
+};
+
+// 列表內容渲染 (含多層排序 + 搜尋過濾)
+window._renderIPListBody=function(prods,kw){
+  // 過濾
+  var filtered=prods.filter(function(p){return window.matchIPSearch(p,kw)});
+  if(!prods.length)return '<div style="text-align:center;color:#706E68;padding:20px">尚無轉售品項</div>';
+  if(!filtered.length)return '<div style="text-align:center;color:#706E68;padding:20px">查無符合「'+esc(kw)+'」的品項</div>';
+  
+  // 多層排序:1.分類(食材→包材) 2.完成狀態(完成→未完成) 3.供應商分組 4.品名
+  var catOrder={'食材':0,'包材':1};
+  filtered.sort(function(a,b){
+    var ca=catOrder[a.category]==null?0:catOrder[a.category];
+    var cb=catOrder[b.category]==null?0:catOrder[b.category];
+    if(ca!==cb)return ca-cb;  // 食材在前
+    var doneA=window.isIPComplete(a)?0:1,doneB=window.isIPComplete(b)?0:1;
+    if(doneA!==doneB)return doneA-doneB;  // 已完成在前
+    var supA=a.supplier||'zzz',supB=b.supplier||'zzz';
+    if(supA!==supB)return supA.localeCompare(supB);  // 同供應商相鄰
+    return (a.name||'').localeCompare(b.name||'');
+  });
+  
+  var html='<div style="overflow-x:auto;max-height:440px;overflow-y:auto"><table class="tbl"><thead style="position:sticky;top:0;background:#fff;z-index:1"><tr><th>分類</th><th>品名</th><th>類型</th><th>供應商</th><th>規格</th><th>成本</th><th>售價</th><th>加成%</th><th>狀態</th><th>操作</th></tr></thead><tbody>';
+  var lastGroup='';
+  filtered.forEach(function(p){
+    var markup=p.cost>0?Math.round((p.sellPrice-p.cost)/p.cost*100):0;
+    var supName='—';if(p.supplier){var s=(state.sups||[]).find(function(x){return x.id===p.supplier});if(s)supName=s.name}
+    var done=window.isIPComplete(p);
+    var cat=p.category||'食材';
+    // 分組標題 (分類 + 完成狀態變化時插入)
+    var groupKey=cat+'|'+(done?'完成':'未完成');
+    var groupRow='';
+    if(groupKey!==lastGroup){
+      lastGroup=groupKey;
+      var catColor=cat==='包材'?'#9A6210':'#0A5A46';
+      groupRow='<tr style="background:#F3F1EB"><td colspan="10" style="font-weight:700;font-size:0.82rem;color:'+catColor+';padding:6px 10px">'+(cat==='包材'?'📦 包材':'🥬 食材')+' · '+(done?'✅ 已完成':'⏳ 未完成')+'</td></tr>';
+    }
+    var catBadge=cat==='包材'?'<span class="badge badge-warn">包材</span>':'<span class="badge badge-green">食材</span>';
+    var typeBadge='<span class="badge '+(p.type==='加工品'?'badge-warn':p.type==='分裝品'?'badge-blue':'badge-gray')+'">'+esc(p.type||'')+'</span>';
+    var statusBadge=done?'<span style="color:#0A5A46;font-weight:700;font-size:0.8rem">✅ 完成</span>':'<span style="color:#B82525;font-weight:700;font-size:0.8rem">⏳ 待補</span>';
+    html+=groupRow+'<tr id="ip-row-'+esc(p.id)+'"><td>'+catBadge+'</td><td style="font-weight:700">'+esc(p.name)+'</td><td>'+typeBadge+'</td><td style="font-size:0.82rem">'+esc(supName)+'</td><td style="font-size:0.84rem">'+esc(p.spec||'—')+'</td><td>'+CUR()+fmt(p.cost,1)+'</td><td style="font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td><td style="color:#0A5A46;font-weight:700">+'+markup+'%</td><td>'+statusBadge+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openInternalProductModal(\''+p.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delInternalProduct(\''+p.id+'\')">刪除</button></div></td></tr>';
+  });
+  html+='</tbody></table></div>';
+  html+='<div style="font-size:0.72rem;color:#999;margin-top:6px">共 '+filtered.length+' 項'+(kw?' (已過濾)':'')+' ｜ 排序:食材→包材,已完成→未完成,同供應商相鄰</div>';
+  return html;
+};
+
+// 即時搜尋過濾 (只重畫 body,不重開 modal)
+window.filterIPList=function(kw){
+  window._ipSearchKw=kw;
+  var body=document.getElementById('ip-list-body');
+  if(body)body.innerHTML=window._renderIPListBody(state.internalProducts||[],kw);
+  var cnt=document.getElementById('ip-search-count');
+  if(cnt){var n=(state.internalProducts||[]).filter(function(p){return window.matchIPSearch(p,kw)}).length;cnt.textContent=kw?(n+' 筆'):''}
+};
 
 window.openInternalProductModal=function(id){
-var def={id:'IP'+Date.now(),name:'',type:'加工品',spec:'',unit:'包',cost:0,sellPrice:0,sourceItems:'',note:''};
+var def={id:'IP'+Date.now(),name:'',category:'食材',type:'加工品',spec:'',unit:'包',cost:0,sellPrice:0,supplier:'',sourceItems:'',note:''};
 var p=id?(state.internalProducts||[]).find(function(x){return x.id===id}):def;if(!p)p=def;
+var units=window.getAllIPUnits();
+var unitOpts=units.map(function(u){return '<option value="'+esc(u)+'"'+(u===(p.unit||'包')?' selected':'')+'>'+esc(u)+'</option>'}).join('');
+var supOpts='<option value="">— 選擇供應商 —</option>'+(state.sups||[]).map(function(s){return '<option value="'+esc(s.id)+'"'+(s.id===p.supplier?' selected':'')+'>'+esc(s.name)+'</option>'}).join('');
 
 modal(mH(id?'編輯轉售品項':'新增轉售品項')+
-'<div class="form-row c3"><div class="fg"><label>品名 *</label><input id="ip-name" value="'+esc(p.name)+'" placeholder="例：醃製雞腿排"></div><div class="fg"><label>類型</label><select id="ip-type"><option value="加工品"'+(p.type==='加工品'?' selected':'')+'>🔪 加工品（醃製/調理）</option><option value="分裝品"'+(p.type==='分裝品'?' selected':'')+'>📦 分裝品（拆包/秤重）</option><option value="原裝轉售"'+(p.type==='原裝轉售'?' selected':'')+'>📋 原裝轉售</option></select></div><div class="fg"><label>規格</label><input id="ip-spec" value="'+esc(p.spec||'')+'" placeholder="例：500g/包、1kg/盒"></div></div>'+
-'<div class="form-row c3"><div class="fg"><label>單位</label><input id="ip-unit" value="'+esc(p.unit||'包')+'" placeholder="包/盒/公斤"></div><div class="fg"><label>成本（中央廚房）</label><input id="ip-cost" type="number" min="0" step="0.1" value="'+(p.cost||0)+'" oninput="calcIPMarkup();calcIPSuggestPrice()"></div><div class="fg"><label>售價（賣給門市）</label><input id="ip-sell" type="number" min="0" step="0.1" value="'+(p.sellPrice||0)+'" oninput="calcIPMarkup()"></div></div>'+
+'<div class="form-row c3"><div class="fg"><label>品名 *</label><input id="ip-name" value="'+esc(p.name)+'" placeholder="例：醃製雞腿排"></div><div class="fg"><label>分類 *</label><select id="ip-category"><option value="食材"'+((p.category||'食材')==='食材'?' selected':'')+'>🥬 食材</option><option value="包材"'+(p.category==='包材'?' selected':'')+'>📦 包材</option></select></div><div class="fg"><label>類型</label><select id="ip-type"><option value="加工品"'+(p.type==='加工品'?' selected':'')+'>🔪 加工品（醃製/調理）</option><option value="分裝品"'+(p.type==='分裝品'?' selected':'')+'>📦 分裝品（拆包/秤重）</option><option value="原裝轉售"'+(p.type==='原裝轉售'?' selected':'')+'>📋 原裝轉售</option></select></div></div>'+
+'<div class="form-row c3"><div class="fg"><label>供應商</label><select id="ip-supplier">'+supOpts+'</select></div><div class="fg"><label>規格</label><input id="ip-spec" value="'+esc(p.spec||'')+'" placeholder="例：500g/包、1kg/盒"></div><div class="fg"><label>單位</label><select id="ip-unit">'+unitOpts+'</select></div></div>'+
+'<div class="form-row c2"><div class="fg"><label>成本（中央廚房）</label><input id="ip-cost" type="number" min="0" step="0.1" value="'+(p.cost||0)+'" oninput="calcIPMarkup();calcIPSuggestPrice()"></div><div class="fg"><label>售價（賣給門市）</label><input id="ip-sell" type="number" min="0" step="0.1" value="'+(p.sellPrice||0)+'" oninput="calcIPMarkup()"></div></div>'+
 '<div id="ip-margin" style="background:#DFF5EC;border-radius:8px;padding:8px 14px;margin-bottom:10px;font-size:0.88rem;color:#0A5A46;font-weight:600"></div>'+
 '<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-bottom:10px"><div style="font-size:0.84rem;font-weight:600;color:#9A6210;margin-bottom:8px">💡 依加成定價 (成本 × 加成率 → 建議售價，批發轉售標準作法)</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span style="font-size:0.82rem;color:#9A6210">快選加成:</span>'+[20,30,40,50].map(function(m){return '<button type="button" class="btn btn-sm btn-outline" style="padding:2px 10px;font-size:0.78rem" onclick="setIPMarkup('+m+')">'+m+'%</button>'}).join('')+'</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:0.82rem">加成率</span><input id="ip-target-markup" type="number" min="1" max="500" step="1" value="'+(p.targetMarkup||p.targetMargin||30)+'" style="width:70px;padding:4px 8px" oninput="calcIPSuggestPrice()"><span style="font-size:0.82rem">%</span><span id="ip-suggest-price" style="font-weight:700;color:#0A5A46;font-size:0.92rem"></span><button type="button" class="btn btn-sm" style="background:#9A6210;color:#fff;margin-left:auto;padding:4px 14px;font-size:0.8rem" onclick="applyIPSuggestPrice()">📥 套用到售價</button></div></div>'+
 '<div class="fg"><label>原料組成（備註用）</label><input id="ip-source" value="'+esc(p.sourceItems||'')+'" placeholder="例：雞腿排+醃料+真空袋"></div>'+
 '<div class="fg"><label>備註</label><input id="ip-note" value="'+esc(p.note||'')+'" placeholder="保存條件、注意事項..."></div>'+
 mF("saveInternalProduct('"+id+"')"));
-setTimeout(function(){calcIPMarkup();calcIPSuggestPrice()},100)};
+setTimeout(function(){
+  calcIPMarkup();calcIPSuggestPrice();
+  // 🆕 Enter 直接儲存 (textarea 除外,本表單無 textarea)
+  var ov=document.getElementById('modal-ov');
+  if(ov){ov.querySelectorAll('input').forEach(function(inp){inp.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();saveInternalProduct(id||'')}})})}
+},100)};
 
 window.calcIPMarkup=function(){var cost=+($('ip-cost')?$('ip-cost').value:0)||0;var sell=+($('ip-sell')?$('ip-sell').value:0)||0;var el=$('ip-margin');if(!el)return;if(!cost){el.textContent='請填入成本';return}var markup=Math.round((sell-cost)/cost*100);var margin=sell>0?Math.round((sell-cost)/sell*100):0;el.innerHTML='加成 <b>+'+markup+'%</b> ｜ 毛利率 <b>'+margin+'%</b> ｜ 每單位利潤 <b>'+CUR()+fmt(sell-cost,1)+'</b>'};
 
@@ -9423,13 +9562,14 @@ window.applyIPSuggestPrice=function(){
 };
 
 window.saveInternalProduct=function(eid){var name=$('ip-name')?$('ip-name').value.trim():'';if(!name){alert('請填入品名');return}
-var obj={id:eid||'IP'+Date.now(),name:name,type:$('ip-type')?$('ip-type').value:'加工品',spec:$('ip-spec')?$('ip-spec').value:'',unit:$('ip-unit')?$('ip-unit').value:'包',cost:+($('ip-cost')?$('ip-cost').value:0)||0,sellPrice:+($('ip-sell')?$('ip-sell').value:0)||0,targetMarkup:+($('ip-target-markup')?$('ip-target-markup').value:30)||30,sourceItems:$('ip-source')?$('ip-source').value:'',note:$('ip-note')?$('ip-note').value:''};
+var obj={id:eid||'IP'+Date.now(),name:name,category:$('ip-category')?$('ip-category').value:'食材',type:$('ip-type')?$('ip-type').value:'加工品',spec:$('ip-spec')?$('ip-spec').value:'',unit:$('ip-unit')?$('ip-unit').value:'包',cost:+($('ip-cost')?$('ip-cost').value:0)||0,sellPrice:+($('ip-sell')?$('ip-sell').value:0)||0,supplier:$('ip-supplier')?$('ip-supplier').value:'',targetMarkup:+($('ip-target-markup')?$('ip-target-markup').value:30)||30,sourceItems:$('ip-source')?$('ip-source').value:'',note:$('ip-note')?$('ip-note').value:''};
 if(!state.internalProducts)state.internalProducts=[];
 if(eid){state.internalProducts=state.internalProducts.map(function(x){return x.id===eid?obj:x})}
 else{state.internalProducts.push(obj)}
-addAudit(eid?'編輯轉售品項':'新增轉售品項',name);saveState();closeModal();openInternalProductList();toast('✅ '+name+' 已儲存')};
+window._lastEditIPId=obj.id;  // 🆕 記住剛編輯的,列表重開捲動定位
+addAudit(eid?'編輯轉售品項':'新增轉售品項',name);saveState();closeModal();openInternalProductList(true);toast('✅ '+name+' 已儲存')};
 
-window.delInternalProduct=function(id){if(!confirm('確定刪除？'))return;state.internalProducts=(state.internalProducts||[]).filter(function(x){return x.id!==id});saveState();closeModal();openInternalProductList()};
+window.delInternalProduct=function(id){if(!confirm('確定刪除？'))return;state.internalProducts=(state.internalProducts||[]).filter(function(x){return x.id!==id});saveState();closeModal();openInternalProductList(true)};
 
 // ── 出貨單 ──
 window.openInternalOrderModal=function(){
@@ -12734,7 +12874,8 @@ pushUndo(); // 初始快照
           '📅 排程清單智慧排序 (未完成優先 + 日期新→舊)',
           '↕️ 配方食材拖曳排序 + 數字序號',
           '🛒 配方包材選擇器支援多層單位下拉 (箱/包/張)',
-          '🏪 轉售品項「依加成定價」工具 (成本×加成→售價,顯示對應毛利率)'
+          '🏪 轉售品項「依加成定價」工具 (成本×加成→售價,顯示對應毛利率)',
+          '🔍 轉售品項管理大升級:食材/包材分類+供應商+注音搜尋+多層排序+Enter儲存+編輯定位'
         ]
       });
     }
