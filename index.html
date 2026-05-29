@@ -299,7 +299,12 @@ const COST_KEY='hm_cost_v3';
 const DEFAULT_META={company:'好洺餐飲事業有限公司',taxId:'',phone:'',address:'',stores:['交大店','竹北店','台積電店'],targetMargin:0.65,marginTiers:[55,60,65],currency:'NT$'};
 let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}],currentUser:null,invHistory:[],recipeVersions:{},internalProducts:[],internalOrders:[],arList:[],countList:[],returnList:[],taxConfig:{rate:0.05},workOrders:[],customers:[],custOrders:[],assets:[],salesData:[],cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haomin-system-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyAk8D1oXTYaq9E1t96bPW-1rMu0EhW1JzQ',fbAuthDomain:'haomin-system.firebaseapp.com',fbProjectId:'haomin-system',fbStorageBucket:'haomin-system.firebasestorage.app',fbMessagingSenderId:'348193196599',fbAppId:'1:348193196599:web:c5aa85961d929e7e39cdb2',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[],kitchenCosts:{}};
 
-(function loadState(){try{const raw=localStorage.getItem(COST_KEY);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions','kitchenCosts','prodReports'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});
+(function loadState(){try{
+  // 🆕 檢查是否為示範模式 session (上次登入是 demo)
+  var demoActive=localStorage.getItem('hm_erp_demo_active')==='1';
+  var loadKey=demoActive?'hm_erp_state_demo':COST_KEY;
+  if(demoActive)window._isDemoMode=true;
+  const raw=localStorage.getItem(loadKey);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions','kitchenCosts','prodReports'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});
 // 🆕 還原所有以 _ 開頭的暫存狀態 (篩選/分頁/月份/搜尋等),讓使用者重新登入時看到上次的篩選結果
 Object.keys(sv).forEach(k=>{if(k.charAt(0)==='_'&&sv[k]!=null)state[k]=sv[k]});
 state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
@@ -438,6 +443,56 @@ window.runMigrations=function(){
   }
 })();
 
+// 🆕 確保示範訪客帳號 demo 存在
+(function ensureDemoAccount(){
+  if(!state.users)state.users=[];
+  var hasDemo=state.users.some(function(u){return u.username==='demo'});
+  if(!hasDemo){
+    state.users.push({id:'UDEMO',username:'demo',password:'demo1234',role:'示範訪客',name:'示範訪客',active:true});
+  }
+})();
+
+// 🆕 確保門市資料存在 (從 HR 同步三家)
+(function ensureStores(){
+  if(!state.stores||!state.stores.length){
+    state.stores=[
+      {id:'HQ',name:'總公司/中央廚房',code:'HQ'},
+      {id:'NCTU',name:'交大店',code:'NCTU'},
+      {id:'TSMC',name:'台積電店',code:'TSMC'}
+    ];
+  }
+})();
+
+// 🆕 菜單類別預設
+(function ensureMenuCategories(){
+  if(!state.menuCategories||!state.menuCategories.length){
+    state.menuCategories=['主食類','湯品類','配菜類','飲料類','小菜類','前菜類','甜點類','其他'];
+  }
+})();
+
+// 🆕 舊菜單資料遷移到新結構 (一次性,僅遷移未有 components 的舊筆)
+(function migrateMenu(){
+  if(!state.menu||!state.menu.length)return;
+  var migrated=0;
+  state.menu.forEach(function(m){
+    if(m.components&&Array.isArray(m.components))return;  // 已是新結構
+    // 舊結構 {ing1, qty1, unit1} → 新 components
+    m.storeId=m.storeId||'HQ';
+    m.version=m.version||'v1';
+    m.category=m.category||'其他';
+    m.status=m.status||'active';
+    var comps=[];
+    if(m.ing1){
+      var inv=(state.ings||[]).find(function(x){return x.name===m.ing1});
+      comps.push({sourceType:'ing',sourceId:inv?inv.id:'',name:m.ing1,qty:m.qty1||1,unit:m.unit1||'公斤',lossRate:0});
+    }
+    m.components=comps;
+    delete m.ing1;delete m.qty1;delete m.unit1;
+    migrated++;
+  });
+  if(migrated>0)console.log('  ✅ 已遷移 '+migrated+' 筆舊菜單到新結構');
+})();
+
 // ── 進貨單匯入 (2026-04-18 建檔) ──
 (function initImportedPurchases(){
   if(state.buyLog&&state.buyLog.some(function(b){return b.docNo==='309618'}))return;
@@ -476,6 +531,14 @@ function saveState(){
   // 儲存當下視為已存,清空 modal snapshot 避免 closeModal 誤判 dirty
   window._modalSnapshot=null;
   pushUndo();
+  // 🆕 示範模式:存獨立 key,不打 Firebase
+  if(window._isDemoMode||(state.currentUser&&state.currentUser.role==='示範訪客')){
+    clearTimeout(_saveTimer);
+    _saveTimer=setTimeout(function(){
+      try{localStorage.setItem('hm_erp_state_demo',JSON.stringify(state))}catch(e){}
+    },300);
+    return;  // 跳過 Firebase
+  }
   // 1. localStorage 快取（即時）
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(function(){
@@ -2769,7 +2832,7 @@ window.findUnusedIngs=function(){
     (r.ings||[]).forEach(function(ing){usedNames.add(ing.name)});
   });
   // 菜單使用的食材
-  (state.menu||[]).forEach(function(m){if(m.ing1)usedNames.add(m.ing1)});
+  (state.menu||[]).forEach(function(m){(m.components||[]).forEach(function(c){if(c.sourceType==='ing'&&c.name)usedNames.add(c.name)});if(m.ing1)usedNames.add(m.ing1)});
   // 還在庫存有量的食材也保留
   return state.ings.filter(function(i){
     return !usedNames.has(i.name)&&(+i.stock||0)===0;
@@ -2956,7 +3019,7 @@ function renderDash(){const pg=dv({});const sw=sopBox('dash');if(sw)pg.appendChi
 // 🆕 庫存警示開關 (預設停用,Tim 還沒開始用採購功能)
 if(state.meta&&state.meta.hideStockAlerts===undefined){state.meta.hideStockAlerts=true}
 const hideAlerts=state.meta&&state.meta.hideStockAlerts;
-const low=hideAlerts?[]:state.ings.filter(i=>i.stock>0&&i.stock<=i.safety);const out=hideAlerts?[]:state.ings.filter(i=>i.stock<=0);const val=state.ings.reduce((s,i)=>s+(i.stock||0)*(i.price||0),0);const tgt=state.meta.targetMargin;const mc=state.menu.map(m=>{const inv=im[m.ing1];const c=inv?calcIngCost(inv,m.qty1||0,m.unit1||inv.unit):0;return{...m,cost:c,margin:m.price>0?(m.price-c)/m.price:null}});const avg=mc.filter(m=>m.margin!=null).reduce((s,m)=>s+m.margin,0)/(mc.filter(m=>m.margin!=null).length||1);const mon=toMon();const buyMon=state.buyLog.filter(b=>b.date.startsWith(mon));const buyAmt=buyMon.reduce((s,b)=>s+b.total,0);const wasteMon=state.waste.filter(w=>w.date.startsWith(mon));const wasteAmt=wasteMon.reduce((s,w)=>s+(im[w.name]?calcIngCost(im[w.name],w.lossQty||0,w.unit||im[w.name].unit):0),0);
+const low=hideAlerts?[]:state.ings.filter(i=>i.stock>0&&i.stock<=i.safety);const out=hideAlerts?[]:state.ings.filter(i=>i.stock<=0);const val=state.ings.reduce((s,i)=>s+(i.stock||0)*(i.price||0),0);const tgt=state.meta.targetMargin;const mc=state.menu.map(m=>{const c=window.calcMenuItemCost?window.calcMenuItemCost(m):0;return{...m,cost:c,margin:m.price>0?(m.price-c)/m.price:null}});const avg=mc.filter(m=>m.margin!=null).reduce((s,m)=>s+m.margin,0)/(mc.filter(m=>m.margin!=null).length||1);const mon=toMon();const buyMon=state.buyLog.filter(b=>b.date.startsWith(mon));const buyAmt=buyMon.reduce((s,b)=>s+b.total,0);const wasteMon=state.waste.filter(w=>w.date.startsWith(mon));const wasteAmt=wasteMon.reduce((s,w)=>s+(im[w.name]?calcIngCost(im[w.name],w.lossQty||0,w.unit||im[w.name].unit):0),0);
 
 // 🆕 庫存警示開關按鈕
 pg.appendChild(dv({style:'margin-bottom:10px;text-align:right'},
@@ -4027,7 +4090,7 @@ window.findIdleIngs=function(){
   (state.recipes||[]).forEach(function(r){
     (r.ings||[]).forEach(function(i){usedNames.add(i.name)});
   });
-  (state.menu||[]).forEach(function(m){if(m.ing1)usedNames.add(m.ing1)});
+  (state.menu||[]).forEach(function(m){(m.components||[]).forEach(function(c){if(c.sourceType==='ing'&&c.name)usedNames.add(c.name)});if(m.ing1)usedNames.add(m.ing1)});
   return (state.ings||[]).filter(function(i){
     return !usedNames.has(i.name)&&i.cat!=='包材';
   });
@@ -4484,14 +4547,407 @@ window.openStockAdj=function(id){const ing=state.ings.find(x=>x.id===id);if(!ing
 window.saveStockAdj=function(id){const ing=state.ings.find(x=>x.id===id);if(!ing)return;const tp=$('adj-type')?.value;const q=parseFloat($('adj-qty')?.value);if(isNaN(q)||q<0){alert('請輸入有效數量');return}const old=ing.stock;if(tp==='set')ing.stock=q;else if(tp==='add')ing.stock=(ing.stock||0)+q;else ing.stock=Math.max(0,(ing.stock||0)-q);ing.updatedAt=toDay();addAudit('庫存調整',ing.name+'：'+fmt(old,2)+'→'+fmt(ing.stock,2));saveState();closeModal();renderPage();toast('✅ '+ing.name+' 庫存已更新')};
 
 // ── MENU ───
-function renderMenuPage(){const pg=dv({});const sw=sopBox('menu');if(sw)pg.appendChild(sw);const im=imap();const tgt=state.meta.targetMargin;const rows=state.menu.map(m=>{const inv=im[m.ing1];const c=inv?calcIngCost(inv,m.qty1||0,m.unit1||inv.unit):0;return{...m,cost:c,margin:m.price>0?(m.price-c)/m.price:null}});
-pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px'},dv({cls:'page-title',style:'margin:0'},'🍽️ 菜單成本管理'),btn('btn btn-primary','＋ 新增菜單',()=>openMenuModal(''))));
-pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>代碼</th><th>菜品</th><th>主食材</th><th>食材成本</th><th>售價</th><th>毛利率</th><th>狀態</th><th style="min-width:110px">操作</th></tr></thead><tbody>'+rows.map(m=>`<tr><td style="font-family:monospace;font-size:0.78rem;color:#706E68">${esc(m.code)}</td><td style="font-weight:600">${esc(m.name)}</td><td style="font-size:0.78rem;color:#706E68">${esc(m.ing1)}</td><td>${CUR()} ${fmt(m.cost,2)}</td><td style="font-weight:600">${m.price>0?CUR()+' '+fmt(m.price,0):'<span style="color:#e67e22">待填入</span>'}</td><td style="color:${m.margin!=null&&m.margin>=tgt?'#0A5A46':'#B82525'};font-weight:600">${pct(m.margin)}</td><td>${mbadge(m.margin)}</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openMenuModal('${m.id}')">編輯</button><button class="btn btn-sm btn-danger" onclick="delMenu('${m.id}')">刪除</button></div></td></tr>`).join('')+'</tbody></table></div>'}));return pg}
+// 🆕 菜品成本計算引擎:每個成分依類型查單價,套損耗率
+window.calcMenuItemCost=function(menuItem){
+  if(!menuItem||!menuItem.components||!menuItem.components.length)return 0;
+  var total=0;
+  menuItem.components.forEach(function(c){
+    if(!c||!c.qty)return;
+    var unitCost=0;
+    if(c.sourceType==='recipe'){
+      // 自製配方:取 perFull (每包成本,含人事水電) 或 per (純食材)
+      var rec=(state.recipes||[]).find(function(r){return r.id===c.sourceId||r.name===c.name});
+      if(rec){var rc=calcCost(rec);unitCost=rc.perFull||rc.per||0}
+      // 配方單位通常是「包」,如果用 g/份 等,要視為「全包成本」攤分
+    }else if(c.sourceType==='ing'){
+      var inv=(state.ings||[]).find(function(x){return x.id===c.sourceId||x.name===c.name});
+      if(inv)unitCost=calcIngCost(inv,c.qty,c.unit||inv.unit,{skipYield:true})/Math.max(1,c.qty);  // 取每單位成本 (skipYield 避免重複可食率)
+      // 上面除以 qty 抽出單位成本,等下會再乘 qty,但這做法繞;簡化:直接 calcIngCost 算總成本
+      var totalIng=inv?calcIngCost(inv,c.qty,c.unit||inv.unit,{skipYield:true}):0;
+      // 套損耗率: 總成本 / (1-lossRate)
+      var lr=+c.lossRate||0;if(lr<0)lr=0;if(lr>=1)lr=0.99;
+      total+=totalIng/(1-lr);
+      return;  // 食材已直接加,跳過後面
+    }else if(c.sourceType==='internal'){
+      var ip=(state.internalProducts||[]).find(function(x){return x.id===c.sourceId||x.name===c.name});
+      if(ip)unitCost=+ip.cost||0;
+    }
+    var lr=+c.lossRate||0;if(lr<0)lr=0;if(lr>=1)lr=0.99;
+    var raw=unitCost*(+c.qty||0);
+    total+=raw/(1-lr);
+  });
+  return total;
+};
 
-function openMenuModal(id){const def={id:nxtId(state.menu,'M'),code:'M'+String(Math.max(0,...state.menu.map(x=>parseInt(x.code.replace('M',''))||0))+1).padStart(3,'0'),name:'',price:0,ing1:'',qty1:1,unit1:'公斤'};const mn=id?state.menu.find(x=>x.id===id):def;if(!mn)return;
-modal(mH(id?'編輯菜單':'新增菜單')+`<div class="form-row c3"><div class="fg"><label>代碼</label><input id="mu-code" value="${esc(mn.code)}"></div><div class="fg"><label>菜品名稱 *</label><input id="mu-name" value="${esc(mn.name)}"></div><div class="fg"><label>售價 ${CUR()}</label><input id="mu-price" type="number" min="0" value="${mn.price||0}" style="background:#FFF4E0"></div></div><div class="form-row c3"><div class="fg"><label>主食材</label><select id="mu-ing1"><option value="">— 請選擇 —</option>${state.ings.map(i=>`<option value="${esc(i.name)}"${i.name===mn.ing1?' selected':''}>${esc(i.name)}</option>`).join('')}</select></div><div class="fg"><label>用量</label><input id="mu-qty" type="number" min="0" step="0.001" value="${mn.qty1||1}"></div><div class="fg"><label>單位</label><input id="mu-unit1" value="${esc(mn.unit1||'公斤')}"></div></div>${mF("saveMenu('"+id+"')")}`)}
-window.saveMenu=function(eid){const name=$('mu-name')?.value?.trim();if(!name){alert('請填入菜品名稱');return}const obj={id:eid||nxtId(state.menu,'M'),code:$('mu-code')?.value||'',name,price:+$('mu-price')?.value||0,ing1:$('mu-ing1')?.value||'',qty1:+$('mu-qty')?.value||1,unit1:$('mu-unit1')?.value||'公斤'};if(eid)state.menu=state.menu.map(x=>x.id===eid?obj:x);else state.menu.push(obj);addAudit(eid?'編輯菜單':'新增菜單',name);saveState();closeModal();renderPage();toast('✅ '+name+' 已儲存')};
-window.delMenu=function(id){if(!confirm('確定刪除？'))return;state.menu=state.menu.filter(m=>m.id!==id);saveState();renderPage()};
+function renderMenuPage(){
+  const pg=dv({});
+  const sw=sopBox('menu');if(sw)pg.appendChild(sw);
+  // 標題列 + 新增按鈕
+  pg.appendChild(dv({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px'},
+    dv({cls:'page-title',style:'margin:0'},'🍽️ 菜單成本管理'),
+    btn('btn btn-primary','＋ 新增菜品',function(){openMenuModal('')})
+  ));
+  // 篩選列:門市 + 版本 + 搜尋
+  var filterBar=dv({cls:'card',style:'padding:10px 14px;margin-bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap'});
+  if(!state._menuStoreFilter)state._menuStoreFilter=(state.stores&&state.stores[0]?state.stores[0].id:'HQ');
+  if(!state._menuVersionFilter)state._menuVersionFilter='v1';
+  var storeOpts=(state.stores||[]).map(function(s){return '<option value="'+esc(s.id)+'"'+(s.id===state._menuStoreFilter?' selected':'')+'>'+esc(s.name)+'</option>'}).join('');
+  // 🆕 動態版本選項 (從該門市的菜單抓所有版本)
+  var versions=window.getMenuVersions(state._menuStoreFilter,false);
+  if(!versions.length)versions=[{version:'v1',count:0,active:0,archived:0}];
+  // 確保當前選擇的版本在清單,否則切到第一個
+  if(!versions.some(function(v){return v.version===state._menuVersionFilter}))state._menuVersionFilter=versions[0].version;
+  var verOpts=versions.map(function(v){return '<option value="'+esc(v.version)+'"'+(v.version===state._menuVersionFilter?' selected':'')+'>'+esc(v.version)+' ('+v.active+'項)</option>'}).join('');
+  filterBar.innerHTML='<span style="font-size:0.84rem;font-weight:600;color:#555">門市:</span><select id="menu-store-filter" onchange="setMenuFilter(\'store\',this.value)" style="padding:6px 10px;border:1px solid #C8C6BE;border-radius:6px;font-size:0.88rem">'+storeOpts+'</select>'+
+    '<span style="font-size:0.84rem;font-weight:600;color:#555">版本:</span><select id="menu-ver-filter" onchange="setMenuFilter(\'version\',this.value)" style="padding:6px 10px;border:1px solid #C8C6BE;border-radius:6px;font-size:0.88rem">'+verOpts+'</select>'+
+    '<button class="btn btn-sm btn-outline" onclick="openMenuVersionManager()" style="padding:6px 12px">🗂 版本管理</button>'+
+    '<input id="menu-search-q" placeholder="🔍 搜尋菜名/成分,或注音(ㄐ→雞)" oninput="setMenuFilter(\'q\',this.value)" style="flex:1;min-width:200px;padding:7px 12px;border:1px solid #C8C6BE;border-radius:6px;font-size:0.88rem" value="'+esc(state._menuSearchQ||'')+'">';
+  pg.appendChild(filterBar);
+  // 篩選資料
+  var im=imap();
+  var allItems=(state.menu||[]).filter(function(m){return m.storeId===state._menuStoreFilter&&(m.version||'v1')===state._menuVersionFilter&&m.status!=='archived'});
+  var kw=state._menuSearchQ||'';
+  if(kw){
+    allItems=allItems.filter(function(m){
+      var hay=[(m.name||''),(m.code||''),(m.category||''),(m.components||[]).map(function(c){return c.name}).join(' ')].join(' ');
+      return window.zhuyinMatch?window.zhuyinMatch(hay,kw):hay.toLowerCase().indexOf(kw.toLowerCase())>=0;
+    });
+  }
+  // 按類別分組
+  var byCat={};
+  allItems.forEach(function(m){var cat=m.category||'其他';if(!byCat[cat])byCat[cat]=[];byCat[cat].push(m)});
+  var cats=(state.menuCategories||['其他']).filter(function(c){return byCat[c]&&byCat[c].length});
+  // 算每類成本/毛利
+  var tgt=state.meta.targetMargin||0.6;
+  if(allItems.length===0){
+    pg.appendChild(dv({cls:'card',style:'text-align:center;padding:40px;color:#706E68'},
+      kw?'查無符合「'+esc(kw)+'」的菜品':'尚無此門市/版本的菜品,點「＋ 新增菜品」開始建立'
+    ));
+    return pg;
+  }
+  var listHtml='';
+  cats.forEach(function(cat){
+    var items=byCat[cat];
+    listHtml+='<div style="background:#F3F1EB;padding:6px 12px;font-weight:700;font-size:0.88rem;color:#1E1E1C;border-radius:6px;margin-top:10px;margin-bottom:4px">'+esc(cat)+' <span style="color:#706E68;font-weight:500">('+items.length+'項)</span></div>';
+    listHtml+='<table class="tbl" style="margin-bottom:8px"><thead><tr><th>代碼</th><th>菜品</th><th>主要成分</th><th>食材成本</th><th>售價</th><th>毛利率</th><th>狀態</th><th style="min-width:110px">操作</th></tr></thead><tbody>';
+    items.forEach(function(m){
+      var cost=window.calcMenuItemCost(m);
+      var margin=m.price>0?(m.price-cost)/m.price:null;
+      var mainIngs=(m.components||[]).slice(0,2).map(function(c){return esc(c.name)}).join('、')+((m.components||[]).length>2?'…':'');
+      listHtml+='<tr id="menu-row-'+esc(m.id)+'" data-name="'+esc(m.name)+' '+esc(m.code||'')+' '+mainIngs.replace(/<[^>]+>/g,'')+'"><td style="font-family:monospace;font-size:0.78rem;color:#706E68">'+esc(m.code||'')+'</td><td style="font-weight:600">'+esc(m.name)+'</td><td style="font-size:0.78rem;color:#706E68">'+mainIngs+'</td><td>'+CUR()+fmt(cost,2)+'</td><td style="font-weight:600">'+(m.price>0?CUR()+' '+fmt(m.price,0):'<span style="color:#e67e22">待填入</span>')+'</td><td style="color:'+(margin!=null&&margin>=tgt?'#0A5A46':'#B82525')+';font-weight:600">'+pct(margin)+'</td><td>'+mbadge(margin)+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openMenuModal(\''+m.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delMenu(\''+m.id+'\')">刪除</button></div></td></tr>';
+    });
+    listHtml+='</tbody></table>';
+  });
+  pg.appendChild(dv({cls:'card',style:'padding:8px 14px',html:listHtml}));
+  return pg;
+}
+
+// 篩選函式 (改 state + 重畫)
+window.setMenuFilter=function(field,value){
+  if(field==='store')state._menuStoreFilter=value;
+  else if(field==='version')state._menuVersionFilter=value;
+  else if(field==='q')state._menuSearchQ=value;
+  renderPage();
+  // 保持搜尋框焦點
+  if(field==='q')setTimeout(function(){var el=document.getElementById('menu-search-q');if(el){el.focus();el.setSelectionRange(value.length,value.length)}},20);
+};
+
+window.openMenuModal=function(id){
+  var def={
+    id:'M'+Date.now(),
+    storeId:state._menuStoreFilter||'HQ',
+    version:state._menuVersionFilter||'v1',
+    category:'主食類',
+    code:'M'+String(Math.max(0,...(state.menu||[]).map(x=>parseInt((x.code||'').replace(/\D/g,''))||0))+1).padStart(3,'0'),
+    name:'',price:0,components:[],status:'active'
+  };
+  var mn=id?(state.menu||[]).find(function(x){return x.id===id}):def;
+  if(!mn)mn=def;
+  // 儲存到 window._editMn 供成分增刪操作
+  window._editMn=JSON.parse(JSON.stringify(mn));
+  if(!window._editMn.components)window._editMn.components=[];
+  
+  var storeOpts=(state.stores||[]).map(function(s){return '<option value="'+esc(s.id)+'"'+(s.id===window._editMn.storeId?' selected':'')+'>'+esc(s.name)+'</option>'}).join('');
+  var catOpts=(state.menuCategories||['其他']).map(function(c){return '<option value="'+esc(c)+'"'+(c===window._editMn.category?' selected':'')+'>'+esc(c)+'</option>'}).join('');
+  
+  var html=mH(id?'編輯菜品':'新增菜品');
+  html+='<div class="form-row c3"><div class="fg"><label>門市</label><select id="mu-store">'+storeOpts+'</select></div><div class="fg"><label>類別</label><select id="mu-category">'+catOpts+'</select></div><div class="fg"><label>代碼</label><input id="mu-code" value="'+esc(window._editMn.code)+'"></div></div>';
+  html+='<div class="form-row c2"><div class="fg"><label>菜品名稱 *</label><input id="mu-name" value="'+esc(window._editMn.name)+'" placeholder="例:打拋豬飯"></div><div class="fg"><label>售價 '+CUR()+'</label><input id="mu-price" type="number" min="0" value="'+(window._editMn.price||0)+'" style="background:#FFF4E0" oninput="updateMenuCostPreview()"></div></div>';
+  // 成分區
+  html+='<div style="background:#F3F1EB;padding:10px 14px;border-radius:8px;margin-top:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:700;font-size:0.92rem">📋 成分清單</span><button type="button" class="btn btn-sm btn-outline" onclick="addMenuComp()">＋ 新增成分</button></div><div id="mu-comp-list">'+renderMenuComps()+'</div></div>';
+  // 預覽
+  html+='<div id="mu-cost-preview" style="background:#DFF5EC;border-radius:8px;padding:10px 14px;margin-top:10px;font-size:0.88rem;color:#0A5A46;font-weight:600"></div>';
+  html+=mF("saveMenu('"+id+"')");
+  modal(html);
+  setTimeout(function(){updateMenuCostPreview();if(window._bindEnterSave)window._bindEnterSave(function(){saveMenu(id||'')})},150);
+};
+
+window.renderMenuComps=function(){
+  var comps=(window._editMn&&window._editMn.components)||[];
+  if(!comps.length)return '<div style="color:#999;text-align:center;padding:14px;font-size:0.84rem">尚無成分,點「＋ 新增成分」開始</div>';
+  var html='<table style="width:100%;font-size:0.84rem"><thead><tr style="background:#fff"><th style="text-align:left;padding:6px 4px;font-size:0.78rem">類型</th><th style="text-align:left;padding:6px 4px;font-size:0.78rem">品項</th><th style="padding:6px 4px;font-size:0.78rem;width:70px">用量</th><th style="padding:6px 4px;font-size:0.78rem;width:60px">單位</th><th style="padding:6px 4px;font-size:0.78rem;width:70px">損耗%</th><th style="text-align:right;padding:6px 4px;font-size:0.78rem;width:70px">成本</th><th style="width:32px"></th></tr></thead><tbody>';
+  comps.forEach(function(c,i){
+    var typeOpts='<option value="recipe"'+(c.sourceType==='recipe'?' selected':'')+'>自製配方</option><option value="ing"'+(c.sourceType==='ing'?' selected':'')+'>食材</option><option value="internal"'+(c.sourceType==='internal'?' selected':'')+'>轉售品</option>';
+    // 依類型列出該類所有品項
+    var itemOpts='<option value="">— 選擇 —</option>';
+    if(c.sourceType==='recipe'){
+      itemOpts+=(state.recipes||[]).map(function(r){return '<option value="'+esc(r.id)+'"'+(r.id===c.sourceId?' selected':'')+'>'+esc(r.name)+'</option>'}).join('');
+    }else if(c.sourceType==='ing'){
+      itemOpts+=(state.ings||[]).map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===c.sourceId?' selected':'')+'>'+esc(x.name)+'</option>'}).join('');
+    }else if(c.sourceType==='internal'){
+      itemOpts+=(state.internalProducts||[]).map(function(x){return '<option value="'+esc(x.id)+'"'+(x.id===c.sourceId?' selected':'')+'>'+esc(x.name)+' ('+esc(x.category||'')+')</option>'}).join('');
+    }
+    // 算這行成本
+    var oneCost=window.calcMenuItemCost({components:[c]});
+    html+='<tr><td style="padding:4px 2px"><select onchange="updateMenuComp('+i+',\'sourceType\',this.value)" style="width:90px;padding:4px;font-size:0.82rem">'+typeOpts+'</select></td><td style="padding:4px 2px"><select onchange="updateMenuComp('+i+',\'sourceId\',this.value)" style="width:100%;padding:4px;font-size:0.82rem">'+itemOpts+'</select></td><td style="padding:4px 2px"><input type="number" min="0" step="0.01" value="'+(c.qty||0)+'" onchange="updateMenuComp('+i+',\'qty\',+this.value)" style="width:100%;padding:4px;font-size:0.82rem"></td><td style="padding:4px 2px"><input value="'+esc(c.unit||'')+'" onchange="updateMenuComp('+i+',\'unit\',this.value)" style="width:100%;padding:4px;font-size:0.82rem"></td><td style="padding:4px 2px"><input type="number" min="0" max="99" step="1" value="'+Math.round(((+c.lossRate)||0)*100)+'" onchange="updateMenuComp('+i+',\'lossRate\',(+this.value)/100)" style="width:100%;padding:4px;font-size:0.82rem"></td><td style="padding:4px 2px;text-align:right;font-weight:600;color:#0A5A46">'+CUR()+fmt(oneCost,2)+'</td><td style="padding:4px 2px"><button class="btn btn-sm btn-danger" style="padding:2px 6px;font-size:0.74rem" onclick="delMenuComp('+i+')">✕</button></td></tr>';
+  });
+  html+='</tbody></table>';
+  return html;
+};
+
+window.addMenuComp=function(){
+  if(!window._editMn)return;
+  if(!window._editMn.components)window._editMn.components=[];
+  window._editMn.components.push({sourceType:'ing',sourceId:'',name:'',qty:0,unit:'公斤',lossRate:0});
+  var el=document.getElementById('mu-comp-list');if(el)el.innerHTML=renderMenuComps();
+  updateMenuCostPreview();
+};
+window.delMenuComp=function(i){
+  if(!window._editMn||!window._editMn.components)return;
+  window._editMn.components.splice(i,1);
+  var el=document.getElementById('mu-comp-list');if(el)el.innerHTML=renderMenuComps();
+  updateMenuCostPreview();
+};
+window.updateMenuComp=function(i,field,value){
+  if(!window._editMn||!window._editMn.components||!window._editMn.components[i])return;
+  var c=window._editMn.components[i];
+  c[field]=value;
+  // 改 sourceId 時同步 name (查對應品項名)
+  if(field==='sourceId'){
+    var item=null;
+    if(c.sourceType==='recipe')item=(state.recipes||[]).find(function(x){return x.id===value});
+    else if(c.sourceType==='ing')item=(state.ings||[]).find(function(x){return x.id===value});
+    else if(c.sourceType==='internal')item=(state.internalProducts||[]).find(function(x){return x.id===value});
+    if(item){c.name=item.name;if(item.unit&&!c.unit)c.unit=item.unit}
+  }
+  // 改 sourceType 時清空 sourceId/name
+  if(field==='sourceType'){c.sourceId='';c.name=''}
+  var el=document.getElementById('mu-comp-list');if(el)el.innerHTML=renderMenuComps();
+  updateMenuCostPreview();
+};
+window.updateMenuCostPreview=function(){
+  if(!window._editMn)return;
+  var price=+(document.getElementById('mu-price')||{}).value||0;
+  var cost=window.calcMenuItemCost(window._editMn);
+  var margin=price>0?(price-cost)/price:0;
+  var tgt=state.meta.targetMargin||0.6;
+  var sug=cost>0?cost/(1-tgt):0;
+  var color=margin>=tgt?'#0A5A46':(price>0?'#B82525':'#9A6210');
+  var el=document.getElementById('mu-cost-preview');
+  if(el){el.style.color=color;el.innerHTML='食材成本 <b>'+CUR()+fmt(cost,2)+'</b> ｜ 售價 <b>'+CUR()+fmt(price,0)+'</b> ｜ 毛利率 <b>'+pct(margin)+'</b> ｜ 建議售價(達 '+Math.round(tgt*100)+'% 毛利) <b>'+CUR()+fmt(sug,0)+'</b>'}
+};
+
+window.saveMenu=function(eid){
+  var name=$('mu-name')?.value?.trim();
+  if(!name){alert('請填入菜品名稱');return}
+  if(!window._editMn){alert('資料異常,請重新開啟');return}
+  var obj={
+    id:eid||window._editMn.id,
+    storeId:$('mu-store')?.value||'HQ',
+    version:window._editMn.version||'v1',
+    category:$('mu-category')?.value||'其他',
+    code:$('mu-code')?.value||'',
+    name:name,
+    price:+$('mu-price')?.value||0,
+    components:window._editMn.components||[],
+    status:'active'
+  };
+  if(!state.menu)state.menu=[];
+  if(eid)state.menu=state.menu.map(function(x){return x.id===eid?obj:x});
+  else state.menu.push(obj);
+  window._lastEditMenuId=obj.id;
+  addAudit(eid?'編輯菜品':'新增菜品',name+' ('+obj.storeId+'/'+obj.version+')');
+  saveState();closeModal();renderPage();
+  if(window._scrollToEdited)window._scrollToEdited('menu-row-',obj.id);
+  toast('✅ '+name+' 已儲存');
+};
+
+window.delMenu=function(id){
+  if(!confirm('確定刪除此菜品？'))return;
+  state.menu=(state.menu||[]).filter(function(m){return m.id!==id});
+  addAudit('刪除菜品',id);
+  saveState();renderPage();
+  toast('✅ 已刪除');
+};
+
+// 🆕 菜單版本管理 ─────────────────────────────────
+// 取得門市的所有版本 (含 archived)
+window.getMenuVersions=function(storeId,includeArchived){
+  var vers={};
+  (state.menu||[]).forEach(function(m){
+    if(m.storeId!==storeId)return;
+    if(!includeArchived&&m.status==='archived')return;
+    var v=m.version||'v1';
+    if(!vers[v])vers[v]={version:v,count:0,active:0,archived:0};
+    vers[v].count++;
+    if(m.status==='archived')vers[v].archived++;else vers[v].active++;
+  });
+  return Object.values(vers).sort(function(a,b){return a.version.localeCompare(b.version)});
+};
+
+// 新建版本 (從現有版本複製所有菜品)
+window.createMenuVersion=function(storeId,fromVersion,toVersion){
+  if(!storeId||!toVersion){alert('參數錯誤');return false}
+  // 檢查目標版本是否已存在
+  var existing=(state.menu||[]).some(function(m){return m.storeId===storeId&&(m.version||'v1')===toVersion});
+  if(existing){alert('版本「'+toVersion+'」已存在,請換個版本號');return false}
+  // 複製來源版本所有 active 菜品
+  var source=(state.menu||[]).filter(function(m){return m.storeId===storeId&&(m.version||'v1')===fromVersion&&m.status!=='archived'});
+  if(!source.length){alert('來源版本「'+fromVersion+'」無菜品可複製');return false}
+  var copies=source.map(function(m){return Object.assign({},JSON.parse(JSON.stringify(m)),{id:'M'+Date.now()+'_'+Math.random().toString(36).slice(2,6),version:toVersion,status:'active'})});
+  state.menu=state.menu.concat(copies);
+  addAudit('新建菜單版本',storeId+' '+fromVersion+'→'+toVersion+' ('+copies.length+'項)');
+  saveState();
+  toast('✅ 已建立版本 '+toVersion+' (複製 '+copies.length+' 項菜品)');
+  return true;
+};
+
+// 封存版本 (該版本所有菜品 status='archived')
+window.archiveMenuVersion=function(storeId,version){
+  var items=(state.menu||[]).filter(function(m){return m.storeId===storeId&&(m.version||'v1')===version&&m.status!=='archived'});
+  if(!items.length){alert('此版本無作用中菜品');return}
+  if(!confirm('確定封存「'+(state.stores.find(function(s){return s.id===storeId})||{}).name+'」的版本 '+version+'？\n\n將封存 '+items.length+' 項菜品 (不會刪除,日後可還原)'))return;
+  items.forEach(function(m){m.status='archived'});
+  addAudit('封存菜單版本',storeId+' '+version+' ('+items.length+'項)');
+  saveState();renderPage();
+  toast('✅ 版本 '+version+' 已封存');
+};
+
+// 還原封存版本
+window.restoreMenuVersion=function(storeId,version){
+  var items=(state.menu||[]).filter(function(m){return m.storeId===storeId&&(m.version||'v1')===version&&m.status==='archived'});
+  if(!items.length){alert('無封存菜品可還原');return}
+  items.forEach(function(m){m.status='active'});
+  addAudit('還原菜單版本',storeId+' '+version+' ('+items.length+'項)');
+  saveState();renderPage();
+  toast('✅ 版本 '+version+' 已還原');
+};
+
+// 跨門市複製
+window.copyMenuToStore=function(fromStoreId,fromVersion,toStoreId,toVersion){
+  if(fromStoreId===toStoreId&&fromVersion===toVersion){alert('來源與目標相同');return false}
+  var existing=(state.menu||[]).some(function(m){return m.storeId===toStoreId&&(m.version||'v1')===toVersion});
+  if(existing){if(!confirm('目標「'+toStoreId+' '+toVersion+'」已有菜品,複製過去會新增(不覆蓋)。繼續?'))return false}
+  var source=(state.menu||[]).filter(function(m){return m.storeId===fromStoreId&&(m.version||'v1')===fromVersion&&m.status!=='archived'});
+  if(!source.length){alert('來源無菜品');return false}
+  var copies=source.map(function(m){return Object.assign({},JSON.parse(JSON.stringify(m)),{id:'M'+Date.now()+'_'+Math.random().toString(36).slice(2,6),storeId:toStoreId,version:toVersion,status:'active'})});
+  state.menu=state.menu.concat(copies);
+  addAudit('跨門市複製菜單',fromStoreId+'/'+fromVersion+' → '+toStoreId+'/'+toVersion+' ('+copies.length+'項)');
+  saveState();
+  toast('✅ 已複製 '+copies.length+' 項菜品到 '+toStoreId+' '+toVersion);
+  return true;
+};
+
+// 比較兩版本差異
+window.compareMenuVersions=function(storeId,verA,verB){
+  var listA=(state.menu||[]).filter(function(m){return m.storeId===storeId&&(m.version||'v1')===verA&&m.status!=='archived'});
+  var listB=(state.menu||[]).filter(function(m){return m.storeId===storeId&&(m.version||'v1')===verB&&m.status!=='archived'});
+  var mapB={};listB.forEach(function(m){mapB[m.name]=m});
+  var mapA={};listA.forEach(function(m){mapA[m.name]=m});
+  var added=[],removed=[],priceChanged=[],compChanged=[];
+  listA.forEach(function(a){
+    var b=mapB[a.name];
+    if(!b){removed.push(a)}
+    else{
+      if((a.price||0)!==(b.price||0))priceChanged.push({name:a.name,fromPrice:a.price,toPrice:b.price});
+      var aComp=JSON.stringify((a.components||[]).map(function(c){return c.name+':'+c.qty+c.unit}));
+      var bComp=JSON.stringify((b.components||[]).map(function(c){return c.name+':'+c.qty+c.unit}));
+      if(aComp!==bComp)compChanged.push({name:a.name,a:a.components,b:b.components});
+    }
+  });
+  listB.forEach(function(b){if(!mapA[b.name])added.push(b)});
+  return {added:added,removed:removed,priceChanged:priceChanged,compChanged:compChanged};
+};
+
+// 版本管理 modal
+window.openMenuVersionManager=function(){
+  var storeId=state._menuStoreFilter||'HQ';
+  var store=(state.stores||[]).find(function(s){return s.id===storeId})||{name:storeId};
+  var versions=window.getMenuVersions(storeId,true);
+  var html='<div style="font-size:1.05rem;font-weight:700;margin-bottom:10px">🗂 版本管理 - '+esc(store.name)+'</div>';
+  // 操作區
+  html+='<div style="background:#F3F1EB;padding:12px 14px;border-radius:8px;margin-bottom:14px"><div style="font-size:0.86rem;font-weight:600;margin-bottom:8px">操作</div>';
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="promptNewMenuVersion(\''+storeId+'\')">＋ 新建版本</button>';
+  html+='<button class="btn btn-sm btn-outline" onclick="promptCopyMenuToStore(\''+storeId+'\')">📋 複製到其他門市</button>';
+  html+=versions.length>=2?'<button class="btn btn-sm btn-outline" onclick="promptCompareMenu(\''+storeId+'\')">📊 比較版本</button>':'';
+  html+='</div></div>';
+  // 版本清單
+  html+='<div style="font-size:0.86rem;font-weight:600;margin-bottom:6px">所有版本</div>';
+  if(!versions.length){html+='<div style="color:#999;text-align:center;padding:20px">尚無版本</div>'}
+  else{
+    html+='<table class="tbl"><thead><tr><th>版本</th><th>菜品數</th><th>狀態</th><th>操作</th></tr></thead><tbody>';
+    versions.forEach(function(v){
+      var allArchived=v.active===0&&v.archived>0;
+      html+='<tr><td style="font-family:monospace;font-weight:700">'+esc(v.version)+'</td>';
+      html+='<td>'+v.count+' 項 <span style="font-size:0.78rem;color:#706E68">('+v.active+' 作用中'+(v.archived>0?', '+v.archived+' 封存':'')+')</span></td>';
+      html+='<td>'+(allArchived?'<span class="badge badge-gray">已封存</span>':'<span class="badge badge-green">作用中</span>')+'</td>';
+      html+='<td><div style="display:flex;gap:4px">';
+      if(allArchived){html+='<button class="btn btn-sm btn-outline" onclick="restoreMenuVersion(\''+storeId+'\',\''+v.version+'\')">還原</button>'}
+      else if(v.active>0){html+='<button class="btn btn-sm btn-outline" onclick="archiveMenuVersion(\''+storeId+'\',\''+v.version+'\')">封存</button>'}
+      html+='</div></td></tr>';
+    });
+    html+='</tbody></table>';
+  }
+  html+='<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
+  modal(html,true);
+};
+window.promptNewMenuVersion=function(storeId){
+  var versions=window.getMenuVersions(storeId,true);
+  var existing=versions.map(function(v){return v.version});
+  var nums=existing.map(function(v){return parseInt((v||'').replace(/\D/g,''))||0});
+  var nextNum=Math.max(0,...nums)+1;
+  var defaultVer='v'+nextNum;
+  var fromVer=prompt('從哪個版本複製? (現有版本: '+existing.join(', ')+')',existing[existing.length-1]||'v1');
+  if(!fromVer)return;
+  var toVer=prompt('新版本名稱:',defaultVer);
+  if(!toVer)return;
+  if(window.createMenuVersion(storeId,fromVer,toVer)){
+    state._menuVersionFilter=toVer;closeModal();renderPage();
+  }
+};
+window.promptCopyMenuToStore=function(fromStoreId){
+  var stores=(state.stores||[]).filter(function(s){return s.id!==fromStoreId});
+  if(!stores.length){alert('沒有其他門市可複製');return}
+  var versions=window.getMenuVersions(fromStoreId,false);
+  if(!versions.length){alert('當前門市沒有作用中版本');return}
+  var fromVer=prompt('來源版本: (現有: '+versions.map(function(v){return v.version}).join(', ')+')',versions[0].version);
+  if(!fromVer)return;
+  var storeList=stores.map(function(s,i){return (i+1)+'. '+s.name+' ('+s.id+')'}).join('\n');
+  var toIdx=prompt('複製到哪個門市?\n'+storeList+'\n\n輸入編號:','1');
+  if(!toIdx)return;
+  var toStore=stores[+toIdx-1];if(!toStore){alert('編號錯誤');return}
+  var toVer=prompt('目標門市的版本名稱:',fromVer);
+  if(!toVer)return;
+  if(window.copyMenuToStore(fromStoreId,fromVer,toStore.id,toVer)){closeModal();renderPage()}
+};
+window.promptCompareMenu=function(storeId){
+  var versions=window.getMenuVersions(storeId,false);
+  if(versions.length<2){alert('需要至少 2 個作用中版本才能比較');return}
+  var verList=versions.map(function(v){return v.version}).join(', ');
+  var verA=prompt('比較版本 A: ('+verList+')',versions[0].version);
+  if(!verA)return;
+  var verB=prompt('比較版本 B:',versions[versions.length-1].version);
+  if(!verB||verA===verB){alert('需要兩個不同版本');return}
+  var diff=window.compareMenuVersions(storeId,verA,verB);
+  var html='<div style="font-size:1.05rem;font-weight:700;margin-bottom:10px">📊 版本比較: '+verA+' vs '+verB+'</div>';
+  if(diff.added.length){html+='<div style="margin-bottom:8px"><div style="font-weight:600;color:#0A5A46;margin-bottom:4px">➕ 新增 ('+diff.added.length+' 項,在 '+verB+' 才有)</div><ul style="font-size:0.84rem;padding-left:20px">'+diff.added.map(function(m){return '<li>'+esc(m.name)+' ($'+m.price+')</li>'}).join('')+'</ul></div>'}
+  if(diff.removed.length){html+='<div style="margin-bottom:8px"><div style="font-weight:600;color:#B82525;margin-bottom:4px">➖ 移除 ('+diff.removed.length+' 項,在 '+verA+' 才有)</div><ul style="font-size:0.84rem;padding-left:20px">'+diff.removed.map(function(m){return '<li>'+esc(m.name)+' ($'+m.price+')</li>'}).join('')+'</ul></div>'}
+  if(diff.priceChanged.length){html+='<div style="margin-bottom:8px"><div style="font-weight:600;color:#9A6210;margin-bottom:4px">💰 售價變動 ('+diff.priceChanged.length+' 項)</div><ul style="font-size:0.84rem;padding-left:20px">'+diff.priceChanged.map(function(p){var diff=p.toPrice-p.fromPrice;return '<li>'+esc(p.name)+': $'+p.fromPrice+' → $'+p.toPrice+' <b style="color:'+(diff>0?'#B82525':'#0A5A46')+'">('+(diff>0?'+':'')+diff+')</b></li>'}).join('')+'</ul></div>'}
+  if(diff.compChanged.length){html+='<div style="margin-bottom:8px"><div style="font-weight:600;color:#1455A0;margin-bottom:4px">📝 成分變動 ('+diff.compChanged.length+' 項)</div><ul style="font-size:0.84rem;padding-left:20px">'+diff.compChanged.map(function(c){return '<li>'+esc(c.name)+'</li>'}).join('')+'</ul></div>'}
+  if(!diff.added.length&&!diff.removed.length&&!diff.priceChanged.length&&!diff.compChanged.length){html+='<div style="text-align:center;padding:20px;color:#0A5A46">✅ 兩版本完全相同</div>'}
+  html+='<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
+  modal(html,true);
+};
 
 // ── WASTE ───
 function renderWaste(){
@@ -7781,7 +8237,7 @@ var monthlyData=monthKeys.map(function(mk){
 var maxV=Math.max.apply(null,monthlyData.map(function(d){return Math.max(d.budget,d.actual)}).concat([1]));
 pg.appendChild(dv({cls:'card',html:'<div class="card-title">📈 6 個月預算執行趨勢</div><div style="height:220px;display:flex;align-items:flex-end;gap:14px;padding:10px 0">'+monthlyData.map(function(d,i){var bH=maxV>0?Math.max(d.budget/maxV*180,5):5;var aH=maxV>0?Math.max(d.actual/maxV*180,5):5;var aColor=d.budget>0&&d.actual>d.budget?'#B82525':'#0A5A46';return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="display:flex;gap:3px;align-items:flex-end;height:180px"><div style="background:#9CA3AF;width:18px;height:'+bH+'px;border-radius:3px 3px 0 0" title="預算"></div><div style="background:'+aColor+';width:18px;height:'+aH+'px;border-radius:3px 3px 0 0" title="實際"></div></div><div style="font-size:0.7rem;color:#706E68">'+months[i].label+'</div><div style="font-size:0.65rem;color:#999">'+CUR()+fmt(d.actual/1000,0)+'K</div></div>'}).join('')+'</div><div style="display:flex;justify-content:center;gap:14px;font-size:0.74rem;margin-top:6px"><span><span style="display:inline-block;width:12px;height:12px;background:#9CA3AF;margin-right:4px;vertical-align:middle"></span>預算</span><span><span style="display:inline-block;width:12px;height:12px;background:#0A5A46;margin-right:4px;vertical-align:middle"></span>實際 (正常)</span><span><span style="display:inline-block;width:12px;height:12px;background:#B82525;margin-right:4px;vertical-align:middle"></span>實際 (超支)</span></div>'}));
 
-var im=imap();var tgt=state.meta.targetMargin||0.65;var menuItems=(state.menu||[]).map(function(m){var inv=im[m.ing1];var c=inv?calcIngCost(inv,m.qty1||0,m.unit1||inv.unit):0;return{name:m.name,cost:c,price:m.price,margin:m.price>0?(m.price-c)/m.price:null}});
+var im=imap();var tgt=state.meta.targetMargin||0.65;var menuItems=(state.menu||[]).map(function(m){var c=window.calcMenuItemCost?window.calcMenuItemCost(m):0;return{name:m.name,cost:c,price:m.price,margin:m.price>0?(m.price-c)/m.price:null}});
 var avgMargin=menuItems.filter(function(m){return m.margin!==null}).reduce(function(s,m){return s+m.margin},0)/(menuItems.filter(function(m){return m.margin!==null}).length||1);
 var invVal=state.ings.reduce(function(s,i){return s+(i.stock||0)*(i.price||0)},0);
 var lowCount=state.ings.filter(function(i){return i.stock>0&&i.stock<=i.safety}).length;
@@ -7934,7 +8390,8 @@ window.clearOldAlertHistory=function(){
 var DEFAULT_PERMS={
   '老闆':['dash','sup','contract','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','label','menu','allergen','waste','ap','budget','qc','trace','schedule','equip','alert-center','ar','count','rtn','tax','cost-analysis','wo','customer','asset','sales','internal','cloud','users','ref'],
   '店長':['dash','order','buy','batch','ing','store-inv','transfer','prod','label','waste','schedule','alert-center'],
-  '員工':['dash','order','store-inv','prod','label','batch','schedule']
+  '員工':['dash','order','store-inv','prod','label','batch','schedule'],
+  '示範訪客':['dash','sup','po','order','buy','batch','ing','store-inv','transfer','recipe','prod','label','menu','waste','ap','schedule','ar','count','tax','cost-analysis','wo','customer','sales','internal','ref']
 };
 
 // === v2.1.0 fix: fixPermissions moved here ===
@@ -7977,7 +8434,7 @@ function showLoginScreen(){
     '<label style="display:flex;align-items:center;gap:6px;font-size:0.84rem;color:#555350;cursor:pointer;user-select:none"><input type="checkbox" id="login-remember-pass" style="width:16px;height:16px;cursor:pointer"> 記住密碼</label>'+
     '</div>'+
     '<button onclick="doLogin()" style="width:100%;background:#0A5A46;color:#fff;border:none;border-radius:8px;padding:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s">登入系統</button>'+
-    '<div style="text-align:center;margin-top:16px;font-size:0.78rem;color:#B0AEA6">預設帳號 admin / 密碼 admin123</div>'+
+    '<div style="text-align:center;margin-top:16px;font-size:0.78rem;color:#B0AEA6">老闆登入: admin / admin123<br>示範訪客: <b style="color:#9A6210">demo / demo1234</b> (虛構資料,試用功能)</div>'+
     '<div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" onclick="showForgotPassword()" style="font-size:0.84rem;color:#1455A0;text-decoration:none">忘記密碼？</a></div>'+
     '</div>';
   document.body.appendChild(overlay);
@@ -8005,10 +8462,39 @@ window.doLogin=function(){
   var pw=(document.getElementById('login-pass')||{}).value||'';
   var errEl=document.getElementById('login-err');
   if(!un||!pw){if(errEl){errEl.textContent='請輸入帳號和密碼';errEl.style.display='block'}return}
+  
+  // 🆕 階段二:優先查 HR accounts (共用人資系統帳號)
+  var hrUser=null;
+  try{
+    var cache=JSON.parse(localStorage.getItem('hm_hr_accounts_cache')||'{}');
+    if(cache.accounts&&Array.isArray(cache.accounts)){
+      hrUser=cache.accounts.find(function(a){return a.user===un&&window.verifyPass(pw,a.pass)});
+    }
+  }catch(e){}
+  if(hrUser){
+    // HR 角色映射到 ERP 角色
+    var erpRole='員工';
+    var hrRole=hrUser.role||'';
+    if(hrRole==='管理員'||hrRole==='老闆'||hrUser.user==='boss')erpRole='老闆';
+    else if(hrRole==='店長'||hrRole==='主管')erpRole='店長';
+    else if(hrRole==='示範訪客')erpRole='示範訪客';
+    state.currentUser={id:hrUser.empId||('HR-'+hrUser.user),username:un,name:hrUser.name||un,role:erpRole,hrAccount:true};
+    if(erpRole==='示範訪客')enterDemoMode();
+    // 共用流程處理 (記憶帳密等)
+    _doLoginCommonFlow(un,pw,erpRole,hrUser.name||un);
+    return;
+  }
+  
+  // 回退:查 ERP 自有 state.users (admin/demo 等內建帳號)
   var user=(state.users||[]).find(function(u){return u.username===un&&u.password===pw&&u.active});
   if(!user){if(errEl){errEl.textContent='帳號或密碼錯誤，或帳號已停用';errEl.style.display='block'}return}
   state.currentUser={id:user.id,username:user.username,name:user.name,role:user.role};
-  // 儲存記憶帳密
+  if(user.role==='示範訪客')enterDemoMode();
+  _doLoginCommonFlow(un,pw,user.role,user.name);
+};
+
+// 🆕 登入後共用流程 (記憶帳密、saveState、套權限、toast)
+function _doLoginCommonFlow(un,pw,role,name){
   try{
     var remUser=document.getElementById('login-remember-user');
     var remPass=document.getElementById('login-remember-pass');
@@ -8022,15 +8508,156 @@ window.doLogin=function(){
   var overlay=document.getElementById('login-overlay');
   if(overlay)overlay.remove();
   applyPermissions();
-  addAudit('登入系統',user.name+' ('+user.role+')');
+  addAudit('登入系統',name+' ('+role+')');
   saveState();
+  if(role==='示範訪客')setTimeout(applyDemoModeBadge,200);
   renderPage();
-  toast('✅ 歡迎，'+user.name);
+  toast(role==='示範訪客'?'📍 已進入示範模式 (虛構資料,可自由試用)':'✅ 歡迎，'+name);
+  // 登入後在背景同步 HR accounts cache
+  if(role!=='示範訪客')setTimeout(syncHRAccountsCache,1000);
+}
+
+// 🆕 密碼雜湊 (與 HR 系統一致)
+window.hashPass=function(plain){
+  if(!plain)return'';
+  var h=0;
+  for(var i=0;i<plain.length;i++){var ch=plain.charCodeAt(i);h=((h<<5)-h)+ch;h=h&h}
+  return'hm$'+Math.abs(h).toString(36)+'$'+plain.length;
+};
+window.verifyPass=function(plain,hashed){
+  if(!hashed||hashed.indexOf('hm$')!==0)return plain===hashed;  // 舊明碼相容
+  return window.hashPass(plain)===hashed;
+};
+
+// 🆕 從 HR 系統同步帳號 cache 到 localStorage
+window.syncHRAccountsCache=function(){
+  if(typeof _fbDb==='undefined'||!_fbDb){
+    if(typeof initFirebaseSDK==='function'&&initFirebaseSDK()){/*成功初始化*/}
+    else return;
+  }
+  if(!_fbDb)return;
+  try{
+    _fbDb.collection('prod_hrdata').doc('accounts').get().then(function(doc){
+      if(!doc.exists)return;
+      var accounts=(doc.data()||{}).userAccounts||[];
+      if(!accounts.length)return;
+      localStorage.setItem('hm_hr_accounts_cache',JSON.stringify({accounts:accounts,ts:Date.now()}));
+      console.log('🔄 HR accounts 已同步 ('+accounts.length+' 個)');
+    }).catch(function(e){console.log('HR accounts 同步失敗:',e.message)});
+  }catch(e){}
+};
+
+// 🆕 進入示範模式:切換 localStorage key + 禁用 Firebase + 載入示範資料 (首次)
+window.enterDemoMode=function(){
+  window._isDemoMode=true;
+  // 切換 storage key 到隔離區
+  localStorage.setItem('hm_erp_demo_active','1');
+  // 禁用雲端同步 (不寫 Firebase)
+  if(state.cloudConfig){state.cloudConfig.enabled=false}
+  // 載入示範資料(首次或載入隔離區的)
+  try{
+    var demoSaved=localStorage.getItem('hm_erp_state_demo');
+    if(demoSaved){
+      // 已有示範區資料,直接覆蓋當前 state
+      var d=JSON.parse(demoSaved);
+      Object.keys(d).forEach(function(k){if(k!=='currentUser')state[k]=d[k]});
+    }else{
+      // 首次進示範模式,把當前資料替換成示範模板
+      loadDemoTemplate();
+    }
+    state.currentUser={id:'UDEMO',username:'demo',name:'示範訪客',role:'示範訪客'};
+  }catch(e){console.error('enterDemoMode err',e)}
+};
+
+// 🆕 示範模式 topbar 紅色標示
+window.applyDemoModeBadge=function(){
+  if(document.getElementById('demo-mode-banner'))return;  // 已存在
+  var bar=document.createElement('div');
+  bar.id='demo-mode-banner';
+  bar.style.cssText='position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg,#B82525,#D43838);color:#fff;text-align:center;padding:6px;font-size:0.84rem;font-weight:700;letter-spacing:1px;z-index:9998;box-shadow:0 2px 8px rgba(184,37,37,.3)';
+  bar.innerHTML='📍 示範模式 ─ 此頁所有資料為虛構,僅供功能展示 ─ 您的任何操作不會影響真實系統';
+  document.body.appendChild(bar);
+  // 推 topbar 下移
+  var tb=document.getElementById('topbar');
+  if(tb)tb.style.marginTop='32px';
+};
+
+// 🆕 載入示範模板資料 (覆蓋當前 state)
+window.loadDemoTemplate=function(){
+  // 保留結構,改名為虛構,清空敏感
+  state.ings=[
+    {id:'D001',name:'示範食材-肉類A',cat:'肉品',unit:'公斤',price:180,stock:50,safety:20,sup:'供應商甲',yieldRate:1},
+    {id:'D002',name:'示範食材-蔬菜A',cat:'蔬菜',unit:'公斤',price:45,stock:30,safety:15,sup:'供應商乙',yieldRate:1},
+    {id:'D003',name:'示範食材-調味A',cat:'調味料',unit:'公斤',price:60,stock:20,safety:10,sup:'供應商丙',yieldRate:1},
+    {id:'D004',name:'示範食材-海鮮A',cat:'海鮮',unit:'公斤',price:320,stock:25,safety:10,sup:'供應商甲',yieldRate:1},
+    {id:'D005',name:'示範包材-真空袋',cat:'包材',unit:'張',price:1.5,stock:500,safety:200,sup:'供應商丁',yieldRate:1}
+  ];
+  state.recipes=[
+    {id:'R001',name:'示範配方 A',code:'DEMO-A',cat:'醬料',perBatch:9,sellPrice:280,ings:[{id:'D001',name:'示範食材-肉類A',qty:2000,unit:'g'},{id:'D003',name:'示範食材-調味A',qty:500,unit:'g'},{id:'D005',name:'示範包材-真空袋',qty:9,unit:'張'}]},
+    {id:'R002',name:'示範配方 B',code:'DEMO-B',cat:'肉品',perBatch:12,sellPrice:350,ings:[{id:'D001',name:'示範食材-肉類A',qty:3000,unit:'g'},{id:'D002',name:'示範食材-蔬菜A',qty:1000,unit:'g'},{id:'D005',name:'示範包材-真空袋',qty:12,unit:'張'}]},
+    {id:'R003',name:'示範配方 C',code:'DEMO-C',cat:'海鮮',perBatch:6,sellPrice:420,ings:[{id:'D004',name:'示範食材-海鮮A',qty:2000,unit:'g'},{id:'D003',name:'示範食材-調味A',qty:200,unit:'g'},{id:'D005',name:'示範包材-真空袋',qty:6,unit:'張'}]}
+  ];
+  state.sups=[
+    {id:'S001',name:'供應商甲',type:'肉品',contact:'王經理',phone:'02-1234-5678',pay:'月結30天',score:9},
+    {id:'S002',name:'供應商乙',type:'蔬果',contact:'李經理',phone:'02-2345-6789',pay:'月結30天',score:8},
+    {id:'S003',name:'供應商丙',type:'調味料',contact:'陳經理',phone:'02-3456-7890',pay:'月結60天',score:8},
+    {id:'S004',name:'供應商丁',type:'包材',contact:'張經理',phone:'02-4567-8901',pay:'月結30天',score:9}
+  ];
+  state.customers=[
+    {id:'C001',code:'C001',name:'示範客戶 A',contact:'張先生',phone:'0912-345-678',type:'餐廳',pay:'月結30天'},
+    {id:'C002',code:'C002',name:'示範客戶 B',contact:'李小姐',phone:'0923-456-789',type:'飯店',pay:'月結30天'}
+  ];
+  state.internalProducts=[
+    {id:'IP001',name:'示範轉售品 A',category:'食材',type:'分裝品',unit:'包',cost:80,sellPrice:100,supplier:'S001',targetMarkup:25},
+    {id:'IP002',name:'示範轉售品 B',category:'食材',type:'加工品',unit:'包',cost:120,sellPrice:160,supplier:'S001',targetMarkup:30},
+    {id:'IP003',name:'示範包材 C',category:'包材',type:'原裝轉售',unit:'箱',cost:1500,sellPrice:1800,supplier:'S004',targetMarkup:20}
+  ];
+  // 🆕 示範菜單 (含三類來源、有損耗率)
+  state.stores=[
+    {id:'HQ',name:'總公司/中央廚房',code:'HQ'},
+    {id:'NCTU',name:'交大店',code:'NCTU'},
+    {id:'TSMC',name:'台積電店',code:'TSMC'}
+  ];
+  state.menuCategories=['主食類','湯品類','配菜類','飲料類','小菜類','前菜類','甜點類','其他'];
+  state.menu=[
+    {id:'DM001',storeId:'NCTU',version:'v1',category:'主食類',code:'M001',name:'示範餐點 A',price:280,status:'active',components:[
+      {sourceType:'recipe',sourceId:'R001',name:'示範配方 A',qty:100,unit:'g',lossRate:0},
+      {sourceType:'ing',sourceId:'D001',name:'示範食材-肉類A',qty:0.08,unit:'公斤',lossRate:0.05},
+      {sourceType:'internal',sourceId:'IP003',name:'示範包材 C',qty:1,unit:'個',lossRate:0}
+    ]},
+    {id:'DM002',storeId:'NCTU',version:'v1',category:'主食類',code:'M002',name:'示範餐點 B',price:320,status:'active',components:[
+      {sourceType:'ing',sourceId:'D004',name:'示範食材-海鮮A',qty:0.1,unit:'公斤',lossRate:0.1},
+      {sourceType:'ing',sourceId:'D003',name:'示範食材-調味A',qty:0.02,unit:'公斤',lossRate:0},
+      {sourceType:'internal',sourceId:'IP003',name:'示範包材 C',qty:1,unit:'個',lossRate:0}
+    ]},
+    {id:'DM003',storeId:'NCTU',version:'v1',category:'湯品類',code:'M003',name:'示範湯品',price:80,status:'active',components:[
+      {sourceType:'recipe',sourceId:'R003',name:'示範配方 C',qty:200,unit:'g',lossRate:0},
+      {sourceType:'ing',sourceId:'D002',name:'示範食材-蔬菜A',qty:0.05,unit:'公斤',lossRate:0}
+    ]},
+    {id:'DM004',storeId:'HQ',version:'v1',category:'主食類',code:'HQ001',name:'示範中央廚房菜品',price:250,status:'active',components:[
+      {sourceType:'recipe',sourceId:'R002',name:'示範配方 B',qty:150,unit:'g',lossRate:0},
+      {sourceType:'internal',sourceId:'IP001',name:'示範轉售品 A',qty:1,unit:'包',lossRate:0}
+    ]}
+  ];
+  state.buyLog=[];state.poList=[];state.apList=[];state.arList=[];state.custOrders=[];
+  state.prodLog=[];state.prodSchedule=[];state.batchList=[];state.waste=[];
+  state.auditLog=[{ts:new Date().toISOString(),action:'進入示範模式',detail:'載入示範模板',user:'示範訪客'}];
 };
 
 window.doLogout=function(){
   if(!confirm('確定要登出？'))return;
   addAudit('登出系統',(state.currentUser||{}).name||'');
+  // 🆕 若離開示範模式,清示範 flag (但保留示範區資料以便下次登入續用)
+  var wasDemo=window._isDemoMode||(state.currentUser&&state.currentUser.role==='示範訪客');
+  if(wasDemo){
+    localStorage.removeItem('hm_erp_demo_active');
+    window._isDemoMode=false;
+    // 重整頁面回到正式資料 (state.currentUser=null 後 reload 觸發 loadState 載正式區)
+    var banner=document.getElementById('demo-mode-banner');if(banner)banner.remove();
+    var tb=document.getElementById('topbar');if(tb)tb.style.marginTop='';
+    location.reload();
+    return;
+  }
   state.currentUser=null;
   // 登出時保留帳號記憶但清除密碼記憶（安全考量）
   try{
@@ -11836,6 +12463,17 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(id==='order'||allowed.indexOf(id)>=0){_origGP(id)}
     else{toast('⛔ 權限不足，請聯繫管理員','err')}
   };
+  
+  // 🆕 強制登入:沒有登入就顯示登入畫面
+  if(!state.currentUser){
+    setTimeout(function(){showLoginScreen()},100);
+    return;  // 跳過後續 Firebase 載入,登入後才載
+  }
+  // 🆕 示範模式視覺標示
+  if(state.currentUser&&state.currentUser.role==='示範訪客'){
+    setTimeout(function(){applyDemoModeBadge()},500);
+  }
+  
   // Firebase 優先載入
 (function loadFromFirestore(){
   if(!initFirebaseSDK()){console.log('Firestore not ready, using localStorage');return}
@@ -11864,8 +12502,12 @@ document.addEventListener('DOMContentLoaded',()=>{
       else{admin.active=true;admin.role='老闆'}
     })();
     renderPage();
+    // 🆕 階段二:背景同步 HR accounts cache
+    if(typeof window.syncHRAccountsCache==='function')setTimeout(window.syncHRAccountsCache,500);
   }).catch(function(e){console.log('Firestore load failed, using localStorage:',e)});
 })();
+// 🆕 即使 Firestore 沒成功,也試一次 (用 localStorage 模式下,Firebase 仍可能能連)
+setTimeout(function(){if(typeof window.syncHRAccountsCache==='function')window.syncHRAccountsCache()},2000);
 pushUndo(); // 初始快照
   if(state.currentUser){applyPermissions();_origGP('dash')}
   else{showLoginScreen()}
@@ -12997,7 +13639,11 @@ pushUndo(); // 初始快照
           '🏪 轉售品項「依加成定價」工具 (成本×加成→售價,顯示對應毛利率)',
           '🔍 轉售品項管理大升級:食材/包材分類+供應商+注音搜尋+多層排序+Enter儲存+編輯定位',
           '⌨️ 通用操作習慣套用全系統 (食材庫/配方卡/供應商/客戶):注音搜尋+Enter儲存+編輯後捲動定位',
-          '🔧 可食率校正一鍵工具 (掃描可食率<100%食材,一鍵改回100%或保留淨重,避免成本虛增)'
+          '🔧 可食率校正一鍵工具 (掃描可食率<100%食材,一鍵改回100%或保留淨重,避免成本虛增)',
+          '🔐 強制登入 + 示範訪客模式 (demo/demo1234,虛構資料隔離,完整功能展示)',
+          '🍽️ 菜單成本管理大重構:多門市/分類/三類成分來源/個別損耗率/注音搜尋 (階段1)',
+          '🗂 菜單版本管理 (階段2):新建版本/封存/還原/跨門市複製/跨版本比較',
+          '🔑 共用 HR 帳號 (階段二):ERP 登入優先查人資系統 prod_hrdata/accounts (verifyPass 雜湊比對),HR 改密碼 ERP 即同步'
         ]
       });
     }
