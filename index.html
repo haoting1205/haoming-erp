@@ -2217,7 +2217,7 @@ window.showProductOverview=function(){
     
     var sugCell=(r.noPrice||r.margin<tgt)&&r.cost>0?'<span style="color:#1455A0;font-weight:600">'+CUR()+fmt(r.sugPrice,0)+'</span>':'<span style="color:#999">—</span>';
     
-    return '<tr style="cursor:pointer" onclick="closeModal();setTimeout(function(){toggleRecipeDetail(\''+r.id+'\')},150)">'+
+    return '<tr style="cursor:pointer" onclick="closeModal();setTimeout(function(){showRecipeDetail(\''+r.id+'\')},150)">'+
       '<td style="font-family:monospace;font-size:0.78rem;color:#888">'+esc(r.code)+'</td>'+
       '<td style="font-weight:700">'+esc(r.name)+'</td>'+
       '<td><span class="badge badge-gray" style="font-size:0.7rem">'+esc(r.cat)+'</span></td>'+
@@ -13643,7 +13643,8 @@ pushUndo(); // 初始快照
           '🔐 強制登入 + 示範訪客模式 (demo/demo1234,虛構資料隔離,完整功能展示)',
           '🍽️ 菜單成本管理大重構:多門市/分類/三類成分來源/個別損耗率/注音搜尋 (階段1)',
           '🗂 菜單版本管理 (階段2):新建版本/封存/還原/跨門市複製/跨版本比較',
-          '🔑 共用 HR 帳號 (階段二):ERP 登入優先查人資系統 prod_hrdata/accounts (verifyPass 雜湊比對),HR 改密碼 ERP 即同步'
+          '🔑 共用 HR 帳號 (階段二):ERP 登入優先查人資系統 prod_hrdata/accounts (verifyPass 雜湊比對),HR 改密碼 ERP 即同步',
+          '🐛 修正:毛利分析表格點擊任一列無法開啟配方詳情 (函式名 toggleRecipeDetail→showRecipeDetail,部署前 7 層驗收發現)'
         ]
       });
     }
