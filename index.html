@@ -9649,7 +9649,7 @@ window.openExcelCenter=function(){
     html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid #E8E6E0"><div><span style="font-weight:600;font-size:0.88rem">'+cat.name+'</span><span style="font-size:0.78rem;color:#706E68;margin-left:8px">'+count+' 筆</span>'+(cat.note?'<span style="font-size:0.72rem;color:#9A6210;margin-left:6px">'+cat.note+'</span>':'')+'</div><button class="btn btn-sm btn-outline" onclick="exportSingleExcel(\''+cat.key+'\')">匯出</button></div>';
   });
   html+='</div>';
-  html+='<div style="background:#F3F1EB;border-radius:8px;padding:12px 14px;margin-top:14px;font-size:0.82rem;color:#555350;line-height:1.7"><b>📖 使用說明</b><br>1. 點「匯出」下載 Excel（第一行中文欄位名、第二行英文欄位代碼）<br>2. 用 Excel 開啟，有下拉選單的欄位直接點選<br>3. 新增資料：在最下方新增行，<b>編號欄留空</b>（系統自動產生）<br>4. 修改資料：直接改對應欄位的值<br>5. 儲存後點「📥 匯入」選擇檔案<br>6. 匯入會<b>取代</b>該類別的全部資料<br>7. <b>不要修改第二行的英文代碼</b>，系統靠它辨識欄位</div>';
+  html+='<div style="background:#F3F1EB;border-radius:8px;padding:12px 14px;margin-top:14px;font-size:0.82rem;color:#555350;line-height:1.7"><b>📖 使用說明</b><br>1. 點「匯出」下載 Excel（第1行中文欄名、第2行英文代碼，前兩行已凍結）<br>2. 有下拉的欄位<b>點儲存格直接選</b>（選項來自最後一張「選項」分頁）<br>3. 新增資料：最下方新增行，<b>編號欄留空</b>（系統自動產生）<br>4. 空白範本會附 1 列<b>「範例-請刪除」</b>，匯入時自動忽略，可參考格式<br>5. 儲存後點「📥 匯入」選檔，匯入前會<b>跳出確認</b><br>6. 匯入會<b>整批取代</b>該類別全部資料（非合併）<br>7. <b>不要改第2行英文代碼，也不要刪「選項」分頁</b></div>';
   html+='<div class="save-btns"><button class="btn btn-outline" onclick="closeModal()">關閉</button></div>';
   modal(html,true);
 };
@@ -9857,90 +9857,57 @@ function addDataValidations(wb,sheetName,catDef){
   if(validations.length)ws['!dataValidation']=validations;
 }
 
+// ══════════════════════════════════════════════════════
+// 📊 匯出引擎：ExcelJS（真·儲存格下拉 + 範例列 + 凍結表頭）
+// 匯入仍走 SheetJS（importExcelFile 不動，僅加防呆）
+// ══════════════════════════════════════════════════════
+function _xlColLetter(n){var s='';n++;while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s}
+function _ddSetName(c){if(c.dd)return 'dd_'+c.dd;if(c.ddList&&c.ddList.length)return 'list_'+c.ddList.join('|');return null}
+// 規劃下拉選項：收集這批表單用到的所有下拉集合(去重)，回傳欄位配置(不建工作表)
+function _planOptions(keys){var sets={},order=[];keys.forEach(function(key){var def=getCatDef(key);if(!def)return;def.cols.forEach(function(c){var nm=_ddSetName(c);if(!nm||sets[nm])return;var vals=(c.dd?getDropdownValues(c.dd):c.ddList)||[];vals=vals.filter(function(v){return v!==undefined&&v!==null&&v!==''}).map(function(v){return String(v)});if(!vals.length)return;sets[nm]=vals;order.push(nm)})});var meta={};order.forEach(function(nm,idx){meta[nm]={col:idx+1,len:sets[nm].length}});return{meta:meta,order:order,sets:sets}}
+// 把選項集合寫成一張「選項」工作表(供下拉公式參照，也供人對照)
+function _writeOptionsWS(wb,plan){if(!plan.order.length)return;var ws=wb.addWorksheet('選項');plan.order.forEach(function(nm,idx){var label=nm.indexOf('dd_')===0?nm.slice(3):nm.slice(5).replace(/\|/g,'/');var hc=ws.getCell(1,idx+1);hc.value=label;hc.font={bold:true,color:{argb:'FF4C4948'}};hc.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF6CE37'}};plan.sets[nm].forEach(function(v,r){ws.getCell(r+2,idx+1).value=v});ws.getColumn(idx+1).width=18});ws.views=[{state:'frozen',ySplit:1}]}
+// 建立單一資料工作表（中文表頭 + 英文key + 資料 + 範例列 + 下拉 + 凍結）
+function _buildDataWS(wb,key,data,plan){var def=getCatDef(key);if(!def)return false;var cols=def.cols;var ws=wb.addWorksheet((SHEET_CN[key]||key).slice(0,31));
+  ws.addRow(cols.map(function(c){return c.n}));
+  ws.addRow(cols.map(function(c){return c.k}));
+  var hasData=!!(data&&data.length);
+  (data||[]).forEach(function(item){ws.addRow(cols.map(function(c){var v=item[c.k];if(typeof v==='object'&&v!==null)return JSON.stringify(v);if(v===undefined||v===null)return '';return v}))});
+  // 範例列(僅當無資料時)：編號=範例-請刪除，匯入會自動忽略
+  if(!hasData){ws.addRow(cols.map(function(c){if(c.k==='id')return '範例-請刪除';if(c.ddList&&c.ddList.length)return c.ddList[0];if(c.dd){var vv=getDropdownValues(c.dd);return(vv&&vv[0])||''}if(c.k==='date'||/Date$/.test(c.k))return toDay();if(['name','itemName','ingName','recipeName'].indexOf(c.k)>=0)return '範例品名(可刪)';return ''}))}
+  // 樣式
+  ws.getRow(1).eachCell(function(cell){cell.font={bold:true,color:{argb:'FF4C4948'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF6CE37'}};cell.alignment={horizontal:'center',vertical:'middle'};cell.border={bottom:{style:'thin',color:{argb:'FFCCCCCC'}}}});
+  ws.getRow(2).eachCell(function(cell){cell.font={italic:true,size:9,color:{argb:'FF999999'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF0F0F0'}}});
+  ws.views=[{state:'frozen',ySplit:2}];
+  // 欄寬
+  cols.forEach(function(c,i){var w=Math.max(String(c.n).length*2+4,9);if(['name','itemName','ingName','addr','items','note','sourceItems','recipeName'].indexOf(c.k)>=0)w=24;if(c.k==='id')w=14;ws.getColumn(i+1).width=w});
+  // 下拉(資料驗證)：套到第3列~預留列
+  if(plan&&plan.order.length){var endRow=Math.max(300,(hasData?data.length:0)+60)+2;cols.forEach(function(c,i){var nm=_ddSetName(c);if(!nm||!plan.meta[nm]||!plan.meta[nm].len)return;var ol=_xlColLetter(plan.meta[nm].col-1);var formula="'選項'!$"+ol+"$2:$"+ol+"$"+(plan.meta[nm].len+1);var dl=_xlColLetter(i);var rng=dl+'3:'+dl+endRow;var model={type:'list',allowBlank:true,showErrorMessage:false,formulae:[formula]};try{ws.dataValidations.add(rng,model)}catch(e){try{for(var rr=3;rr<=endRow;rr++){ws.getCell(dl+rr).dataValidation=model}}catch(e2){}}})}
+  return true}
+function _downloadExcelJS(wb,fname){return wb.xlsx.writeBuffer().then(function(buf){var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=fname;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove()},1500)})}
+
 window.exportSingleExcel=function(key){
-  if(typeof XLSX==='undefined'){toast('⛔ XLSX 函式庫未載入，請重新整理','err');return}
+  if(typeof ExcelJS==='undefined'){toast('⛔ Excel 引擎載入中，請稍候再試','err');return}
+  if(!getCatDef(key)){toast('⛔ 不支援的類別','err');return}
   var data=state[key]||[];
-  var ws=buildExcelSheet(key,data);
-  if(!ws){toast('⛔ 不支援的類別','err');return}
-  if(!data.length){toast('📋 匯出空白範本，填入資料後可匯入');}
-  var wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,SHEET_CN[key]||key);
-  
-  // Add options sheet for this category
-  var catDef=getCatDef(key);
-  if(catDef){
-    var optAoa=[['📋 選項清單 — 填寫時請參考']];optAoa.push([]);
-    catDef.cols.forEach(function(c){
-      var vals=c.ddList||(c.dd?getDropdownValues(c.dd):null);
-      if(!vals||!vals.length)return;
-      optAoa.push([c.n+' ('+c.k+')']);
-      vals.forEach(function(v){optAoa.push(['',v])});
-      optAoa.push([]);
-    });
-    if(optAoa.length>2){
-      var optWs=XLSX.utils.aoa_to_sheet(optAoa);
-      optWs['!cols']=[{wch:30},{wch:25}];
-      XLSX.utils.book_append_sheet(wb,optWs,'選項清單');
-    }
-  }
-  
-  XLSX.writeFile(wb,'好洺ERP_'+key+'_'+toDay()+'.xlsx');
-  toast('✅ 已匯出 '+data.length+' 筆');
+  var wb=new ExcelJS.Workbook();
+  var plan=_planOptions([key]);
+  _buildDataWS(wb,key,data,plan);
+  _writeOptionsWS(wb,plan);
+  if(!data.length)toast('📋 匯出空白範本（含下拉＋範例列）');
+  _downloadExcelJS(wb,'好洺ERP_'+key+'_'+toDay()+'.xlsx').then(function(){toast('✅ 已匯出 '+data.length+' 筆')}).catch(function(e){toast('❌ 匯出失敗：'+e.message,'err')});
 };
 
 window.exportAllExcel=function(){
-  if(typeof XLSX==='undefined'){toast('⛔ XLSX 函式庫未載入','err');return}
-  var wb=XLSX.utils.book_new();var exported=0;
+  if(typeof ExcelJS==='undefined'){toast('⛔ Excel 引擎載入中，請稍候再試','err');return}
   var keys=['sups','ings','storeInv','buyLog','menu','waste','poList','apList','batchList','contracts','qcRecords','equipment','transfers','prodLog','prodSchedule','users','haccpLogs','internalProducts','internalOrders','arList','countList','returnList','workOrders','customers','custOrders','assets','salesData'];
-  keys.forEach(function(key){
-    var data=state[key]||[];
-    var ws=buildExcelSheet(key,data);
-    if(!ws)return;
-    var sheetName=(SHEET_CN[key]||key);XLSX.utils.book_append_sheet(wb,ws,sheetName.length>31?sheetName.slice(0,31):sheetName);
-    exported++;
-  });
+  var wb=new ExcelJS.Workbook();
+  var plan=_planOptions(keys);
+  var exported=0;
+  keys.forEach(function(key){if(_buildDataWS(wb,key,state[key]||[],plan))exported++});
   if(!exported){toast('尚無資料可匯出');return}
-  
-  // Add options reference sheet
-  var optAoa=[['📋 選項清單 — 下方列出各欄位的可選值，填寫資料時請參考此表','','','']];
-  optAoa.push([]);
-  
-  var allOpts=[
-    {label:'供應商類別 (sups.type)',vals:getDropdownValues('supTypes')},
-    {label:'付款條件 (sups.pay)',vals:getDropdownValues('payTerms')},
-    {label:'門市 (store)',vals:getDropdownValues('_stores')},
-    {label:'食材類別 (ings.cat)',vals:getDropdownValues('cats')},
-    {label:'計量單位 (ings.unit)',vals:getDropdownValues('units')},
-    {label:'食材型態 (ings.form)',vals:getDropdownValues('forms')},
-    {label:'損耗原因 (waste.reason)',vals:getDropdownValues('lossReasons')},
-    {label:'損耗處理 (waste.handle)',vals:getDropdownValues('lossHandles')},
-    {label:'採購單狀態 (poList.status)',vals:['申請中','已核准','已下單','已到貨','已取消']},
-    {label:'帳款狀態 (apList.status)',vals:['未付款','已付款']},
-    {label:'批號狀態 (batchList.status)',vals:['庫存中','使用中','已用完']},
-    {label:'合約類型 (contracts.type)',vals:['合約','報價單']},
-    {label:'合約狀態 (contracts.status)',vals:['有效','草稿','已到期']},
-    {label:'品管結果 (qcRecords.result)',vals:['合格','條件合格','不合格']},
-    {label:'品管項目 (qcRecords.checkItems)',vals:['外觀/包裝完整','溫度合規','效期確認','數量核對','氣味/色澤','重量抽驗','全項檢驗']},
-    {label:'調撥狀態 (transfers.status)',vals:['待確認','已完成','已取消']},
-    {label:'排程時段 (prodSchedule.timeSlot)',vals:['06:00-09:00 早班','09:00-12:00 上午','13:00-17:00 下午','17:00-21:00 晚班']},
-    {label:'排程狀態 (prodSchedule.status)',vals:['待生產','生產中','已完成','已取消']},
-    {label:'帳號角色 (users.role)',vals:['老闆','店長','員工']},
-    {label:'HACCP管制點',vals:['CCP1-原料驗收','CCP2-冷藏溫度','CCP3-烹調中心溫度','CCP4-冷卻速度','CCP5-成品保存','CCP6-運輸溫度']},
-    {label:'HACCP判定',vals:['符合','偏離','不符合']}
-  ];
-  
-  allOpts.forEach(function(opt){
-    optAoa.push([opt.label]);
-    opt.vals.forEach(function(v){optAoa.push(['',v])});
-    optAoa.push([]);
-  });
-  
-  var optWs=XLSX.utils.aoa_to_sheet(optAoa);
-  optWs['!cols']=[{wch:35},{wch:25}];
-  XLSX.utils.book_append_sheet(wb,optWs,'📋選項清單');
-  
-  XLSX.writeFile(wb,'好洺ERP_全部資料_'+toDay()+'.xlsx');
-  toast('✅ 已匯出 '+exported+' 個類別 + 選項清單');
+  _writeOptionsWS(wb,plan);
+  _downloadExcelJS(wb,'好洺ERP_全部資料_'+toDay()+'.xlsx').then(function(){toast('✅ 已匯出 '+exported+' 個類別（含下拉選單）')}).catch(function(e){toast('❌ 匯出失敗：'+e.message,'err')});
 };
 
 window.importExcelFile=function(input){
@@ -9953,6 +9920,10 @@ window.importExcelFile=function(input){
       var wb=XLSX.read(e.target.result,{type:'array'});
       var validKeys=['sups','ings','storeInv','buyLog','recipes','menu','waste','poList','apList','batchList','contracts','qcRecords','equipment','transfers','prodLog','prodSchedule','users','haccpLogs','internalProducts','internalOrders','arList','countList','returnList','workOrders','customers','custOrders','assets','salesData'];
       var imported=[];var skipped=[];
+      // 🛡 防呆：匯入前確認「整批取代」
+      var _affected=[];
+      wb.SheetNames.forEach(function(nm){var sk=SHEET_EN[nm]||nm;if(validKeys.indexOf(sk)>=0)_affected.push('・'+(SHEET_CN[sk]||sk)+'（目前 '+((state[sk]||[]).length)+' 筆 → 整批取代）')});
+      if(_affected.length){if(!confirm('⚠️ 匯入會「整批取代」以下類別的全部資料：\n\n'+_affected.join('\n')+'\n\n（編號為「範例」的列會自動忽略）\n\n確定要匯入嗎？')){input.value='';return}}
       
       wb.SheetNames.forEach(function(origName){
         // origName = Excel 工作表名稱(中文或英文皆可),用於拿 wb.Sheets[]
@@ -9991,6 +9962,10 @@ window.importExcelFile=function(input){
         }
 
         if(!data.length){skipped.push(origName+' (空)');return}
+
+        // 🛡 防呆：自動忽略範例列（編號以「範例」開頭）
+        data=data.filter(function(row){return String(row.id!=null?row.id:'').indexOf('範例')!==0});
+        if(!data.length){skipped.push(origName+' (僅範例列,略過)');return}
 
         // Parse JSON strings, auto-generate IDs
         data=data.map(function(row){
@@ -12514,6 +12489,7 @@ pushUndo(); // 初始快照
 });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-app-compat.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js"></script>
 
@@ -13644,7 +13620,8 @@ pushUndo(); // 初始快照
           '🍽️ 菜單成本管理大重構:多門市/分類/三類成分來源/個別損耗率/注音搜尋 (階段1)',
           '🗂 菜單版本管理 (階段2):新建版本/封存/還原/跨門市複製/跨版本比較',
           '🔑 共用 HR 帳號 (階段二):ERP 登入優先查人資系統 prod_hrdata/accounts (verifyPass 雜湊比對),HR 改密碼 ERP 即同步',
-          '🐛 修正:毛利分析表格點擊任一列無法開啟配方詳情 (函式名 toggleRecipeDetail→showRecipeDetail,部署前 7 層驗收發現)'
+          '🐛 修正:毛利分析表格點擊任一列無法開啟配方詳情 (函式名 toggleRecipeDetail→showRecipeDetail,部署前 7 層驗收發現)',
+          '📊 Excel 匯出全面升級:改用 ExcelJS,全 27 張表單支援「真·儲存格下拉選單」+ 範例列 + 凍結表頭 + 選項分頁;匯入維持 SheetJS 並加「整批取代確認」「範例列自動忽略」防呆'
         ]
       });
     }
