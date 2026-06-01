@@ -10886,6 +10886,21 @@ window.nextCustCode=function(){
   for(var i=1;i<=999;i++){if(nums.indexOf(i)<0)return String(i).padStart(3,'0')}
   return '999';
 };
+window.delCustomer=function(id){
+  var c=(state.customers||[]).find(function(x){return x.id===id});if(!c)return;
+  var hasOrders=(state.custOrders||[]).some(function(o){return o.custId===id});
+  if(hasOrders){alert('「'+c.name+'」已有訂單記錄，不能刪除（會讓帳對不到）。\n\n請改用「停用」。');return}
+  if(!confirm('確定刪除客戶「'+c.name+'」？\n\n刪除後，其餘客戶代碼會自動往前重排（例如 003→002）。\n若該客戶用代碼登入下單，請記得告知新代碼。\n（訂單與帳務不受影響）'))return;
+  state.customers=(state.customers||[]).filter(function(x){return x.id!==id});
+  renumberCustCodes();
+  if(typeof addAudit==='function')addAudit('刪除客戶',c.name);
+  saveState();renderPage();
+  if(typeof toast==='function')toast('已刪除並重新排序代碼');
+};
+function renumberCustCodes(){
+  var list=(state.customers||[]).slice().sort(function(a,b){return (parseInt(a.code)||999)-(parseInt(b.code)||999)});
+  list.forEach(function(c,i){c.code=String(i+1).padStart(3,'0')});
+}
 
 // Migrate 舊客戶資料 - 補上新欄位的預設值
 window.migrateCustomers=function(){
@@ -10976,7 +10991,7 @@ pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style
   var pct=c.creditLimit?Math.round(used/c.creditLimit*100):0;
   var stColor=c.status==='active'?'badge-green':c.status==='suspended'?'badge-red':'badge-gray';
   var stText=c.status==='active'?'啟用中':c.status==='suspended'?'已停用':'已封存';
-  return '<tr id="cust-row-'+c.id+'" data-name="'+esc(c.name)+' '+esc(c.code||'')+' '+esc(c.contact||'')+' '+esc(c.taxId||'')+'"><td style="font-family:monospace;font-weight:700;font-size:1rem;color:#0A5A46">'+esc(c.code||'—')+'</td><td style="font-weight:700">'+esc(c.name)+'</td><td>'+esc(c.contact||'')+'</td><td>'+esc(c.phone||'')+'</td><td style="font-family:monospace;font-size:0.82rem">'+esc(c.taxId||'—')+'</td><td>'+CUR()+fmt(c.creditLimit||0,0)+'</td><td style="color:'+(pct>80?'#B82525':'#444')+'">'+CUR()+fmt(used,0)+(pct>0?' <span style="font-size:0.76rem;color:#999">('+pct+'%)</span>':'')+'</td><td style="color:#0A5A46">'+CUR()+fmt(avail,0)+'</td><td><span class="badge '+stColor+'">'+stText+'</span></td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="openCustModal(\''+c.id+'\')">編輯</button><button class="btn btn-sm btn-outline" onclick="copyCustLink(\''+c.id+'\')">📋 連結</button>'+(c.status==='active'?'<button class="btn btn-sm btn-outline" style="color:#B82525" onclick="toggleCustStatus(\''+c.id+'\',\'suspended\')">停用</button>':'<button class="btn btn-sm btn-primary" onclick="toggleCustStatus(\''+c.id+'\',\'active\')">啟用</button>')+'</div></td></tr>'
+  return '<tr id="cust-row-'+c.id+'" data-name="'+esc(c.name)+' '+esc(c.code||'')+' '+esc(c.contact||'')+' '+esc(c.taxId||'')+'"><td style="font-family:monospace;font-weight:700;font-size:1rem;color:#0A5A46">'+esc(c.code||'—')+'</td><td style="font-weight:700">'+esc(c.name)+'</td><td>'+esc(c.contact||'')+'</td><td>'+esc(c.phone||'')+'</td><td style="font-family:monospace;font-size:0.82rem">'+esc(c.taxId||'—')+'</td><td>'+CUR()+fmt(c.creditLimit||0,0)+'</td><td style="color:'+(pct>80?'#B82525':'#444')+'">'+CUR()+fmt(used,0)+(pct>0?' <span style="font-size:0.76rem;color:#999">('+pct+'%)</span>':'')+'</td><td style="color:#0A5A46">'+CUR()+fmt(avail,0)+'</td><td><span class="badge '+stColor+'">'+stText+'</span></td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="openCustModal(\''+c.id+'\')">編輯</button><button class="btn btn-sm btn-outline" onclick="copyCustLink(\''+c.id+'\')">📋 連結</button>'+(c.status==='active'?'<button class="btn btn-sm btn-outline" style="color:#B82525" onclick="toggleCustStatus(\''+c.id+'\',\'suspended\')">停用</button>':'<button class="btn btn-sm btn-primary" onclick="toggleCustStatus(\''+c.id+'\',\'active\')">啟用</button>')+'<button class="btn btn-sm btn-danger" onclick="delCustomer(\''+c.id+'\')">🗑 刪除</button></div></td></tr>'
 }).join('')+'</tbody></table></div>'}));
 
 pg.appendChild(dv({cls:'card',style:'background:#FFF8ED;border:1px solid #E8D58A;margin-top:14px',html:'<div style="font-size:0.88rem;line-height:1.7"><b>💡 客戶下單流程</b><br>1. 老闆建立客戶資料,系統自動產生 3 位代碼<br>2. 點「📋 連結」複製客戶下單網址,傳給客戶 (例:LINE/Email)<br>3. 客戶用代碼登入下單,系統會檢查額度跟時間窗<br>4. 切到「🛒 訂單管理」分頁審核並出貨</div>'}));
@@ -13694,7 +13709,9 @@ pushUndo(); // 初始快照
           '🐛 修正:毛利分析表格點擊任一列無法開啟配方詳情 (函式名 toggleRecipeDetail→showRecipeDetail,部署前 7 層驗收發現)',
           '📊 Excel 匯出全面升級:改用 ExcelJS,全 27 張表單支援「真·儲存格下拉選單」+ 範例列 + 凍結表頭 + 選項分頁;匯入維持 SheetJS 並加「整批取代確認」「範例列自動忽略」防呆',
           '🏷️ 層級定價 Phase 0:新增層級主檔(門市內部/加盟店/VIP客戶/一般客戶/新顧客,折數可調)+客戶層級欄(表單+Excel匯入下拉)+混合定價函式 getTierPrice(基準價×折數,可個別覆寫)。設定頁→資料管理→🏷️層級管理',
-          '🛒 商品池 Phase 1:轉售品項 + 配方皆可設「各層級覆寫價」(留空=自動折數,即時試算);配方新增「✅ 納入轉售商品池」開關;轉售品項列表新增「🛒 可轉售商品池」總覽(轉售品項 + 已標記自製品,顯示各層級價,Phase 2/3 叫貨下單將讀此池)'
+          '🛒 商品池 Phase 1:轉售品項 + 配方皆可設「各層級覆寫價」(留空=自動折數,即時試算);配方新增「✅ 納入轉售商品池」開關;轉售品項列表新增「🛒 可轉售商品池」總覽(轉售品項 + 已標記自製品,顯示各層級價,Phase 2/3 叫貨下單將讀此池)',
+          '📥 轉售品項列表新增「匯入叫貨表商品」:一鍵把現有 4 張叫貨表 231 項匯入商品清單(價格沿用,已存在自動略過)',
+          '👥 客戶資料新增「🗑 刪除」:刪除後其餘代碼自動往前重排(001/002/003…無空號);有訂單記錄的客戶禁止刪除(請改停用),保護帳務'
         ]
       });
     }
