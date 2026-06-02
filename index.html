@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.3.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.4.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -240,7 +240,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.3.0</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.4.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -638,19 +638,36 @@ window.openTierManager=function(){
 window.addTierRow=function(){var list=document.getElementById('tier-list');if(!list)return;var div=document.createElement('div');div.className='tier-row';div.setAttribute('data-id','TIER'+Date.now());div.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:8px';div.innerHTML='<input class="tr-name" value="" placeholder="層級名稱" style="flex:2;padding:8px;border:1px solid #ddd;border-radius:6px"><input class="tr-rate" type="number" min="0" max="3" step="0.01" value="1" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px"><button class="btn btn-sm btn-danger" onclick="this.closest(\'.tier-row\').remove()">✕</button>';list.appendChild(div)};
 window.saveTiers=function(){var rows=document.querySelectorAll('#tier-list .tier-row');var newTiers=[];var names={};for(var i=0;i<rows.length;i++){var nm=(rows[i].querySelector('.tr-name').value||'').trim();var rt=parseFloat(rows[i].querySelector('.tr-rate').value);if(!nm)continue;if(names[nm]){alert('層級名稱重複：'+nm);return}names[nm]=1;if(isNaN(rt)||rt<0){alert('「'+nm+'」折數不正確');return}newTiers.push({id:rows[i].getAttribute('data-id')||('TIER'+Date.now()+i),name:nm,rate:rt,order:i+1})}if(!newTiers.length){alert('至少需要一個層級');return}state.tiers=newTiers;if(typeof addAudit==='function')addAudit('更新層級設定',newTiers.map(function(t){return t.name+'×'+t.rate}).join(', '));saveState();closeModal();renderPage();if(typeof toast==='function')toast('✅ 層級已更新')};
 // ══ 🛒 商品池 / 各層級覆寫價 (Phase 1) ══
-window.buildTierPriceBlock=function(baseP,overrides){
-  var tiers=getTiers();var base=(+baseP)||0;
+window._tierCalcHtml=function(price,cost,isOv){
+  var pfx=(isOv?'':'預設 ')+CUR()+price;
+  if(!(cost>0))return '<span style="color:#888">'+pfx+'</span>';
+  var profit=Math.round((price-cost)*10)/10;
+  var markup=Math.round((price-cost)/cost*1000)/10;
+  var margin=price>0?Math.round((price-cost)/price*1000)/10:0;
+  var ok=price>=cost;var col=ok?'#0A5A46':'#B82525';
+  return '<span style="color:#888">'+pfx+'</span><br><span style="color:'+col+';font-weight:600">加成'+(markup>=0?'+':'')+markup+'% 毛利'+margin+'% ｜ 利潤'+CUR()+profit+(ok?'':' ⚠️')+'</span>';
+};
+window.buildTierPriceBlock=function(baseP,overrides,cost){
+  var tiers=getTiers();var base=(+baseP)||0;var c=(+cost)||0;
   var rows=tiers.map(function(t){
     var rate=(+t.rate)||1;var def=Math.round(base*rate*100)/100;
-    var ov=(overrides&&overrides[t.name]!=null&&overrides[t.name]!=='')?overrides[t.name]:'';
-    return '<div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span style="flex:1;font-size:0.82rem;font-weight:600">'+esc(t.name)+'</span><span class="tier-def" data-rate="'+rate+'" style="width:100px;font-size:0.76rem;color:#888;text-align:right">預設 '+CUR()+def+'</span><input class="tier-ov" data-tier="'+esc(t.name)+'" type="number" min="0" step="0.5" value="'+ov+'" placeholder="覆寫價" style="width:96px;padding:5px;border:1px solid #ddd;border-radius:5px;text-align:right"></div>';
+    var ovRaw=(overrides&&overrides[t.name]!=null&&overrides[t.name]!=='')?overrides[t.name]:'';
+    var isOv=ovRaw!=='';var price=isOv?(+ovRaw):def;
+    return '<div class="tier-row2" data-tier="'+esc(t.name)+'" data-rate="'+rate+'" style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><span style="flex:1;font-size:0.82rem;font-weight:600">'+esc(t.name)+'</span><span class="tier-calc" style="flex:1.7;font-size:0.72rem;text-align:right;line-height:1.35">'+window._tierCalcHtml(price,c,isOv)+'</span><input class="tier-ov" data-tier="'+esc(t.name)+'" type="number" min="0" step="0.5" value="'+ovRaw+'" placeholder="覆寫價" oninput="if(window.refreshTierHints)refreshTierHints()" style="width:80px;padding:5px;border:1px solid #ddd;border-radius:5px;text-align:right;flex-shrink:0"></div>';
   }).join('');
-  return '<div style="background:#F0F9FF;border:1px solid #7dd3fc;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#0369a1;margin-bottom:6px">🏷️ 各層級售價 (留空 = 基準售價 × 層級折數)</div>'+rows+'<div style="font-size:0.72rem;color:#999;margin-top:4px">「預設」依目前基準售價即時試算;填了「覆寫價」該層級就固定用覆寫價 (混合定價)</div></div>';
+  return '<div id="tier-price-block" data-cost="'+c+'" style="background:#F0F9FF;border:1px solid #7dd3fc;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#0369a1;margin-bottom:6px">🏷️ 各層級售價 (留空 = 基準售價 × 層級折數)</div>'+rows+'<div style="font-size:0.72rem;color:#999;margin-top:4px">紅字 ⚠️ = 售價低於成本(虧本);填「覆寫價」該層級固定用覆寫價</div></div>';
 };
 window.refreshTierHints=function(){
-  var baseEl=document.getElementById('ip-sell')||document.getElementById('rf-sellprice');if(!baseEl)return;
-  var base=(+baseEl.value)||0;
-  document.querySelectorAll('.tier-def').forEach(function(sp){var rate=(+sp.dataset.rate)||1;sp.textContent='預設 '+CUR()+(Math.round(base*rate*100)/100)});
+  var baseEl=document.getElementById('ip-sell')||document.getElementById('rf-sellprice');
+  var base=baseEl?((+baseEl.value)||0):0;
+  var costEl=document.getElementById('ip-cost');var block=document.getElementById('tier-price-block');
+  var cost=costEl?((+costEl.value)||0):(block?((+block.dataset.cost)||0):0);
+  document.querySelectorAll('.tier-row2').forEach(function(row){
+    var rate=(+row.dataset.rate)||1;var ovInp=row.querySelector('.tier-ov');
+    var ovRaw=ovInp?ovInp.value.trim():'';var isOv=ovRaw!=='';
+    var price=isOv?(parseFloat(ovRaw)||0):Math.round(base*rate*100)/100;
+    var calc=row.querySelector('.tier-calc');if(calc)calc.innerHTML=window._tierCalcHtml(price,cost,isOv);
+  });
 };
 window.collectTierOverrides=function(){var o={};document.querySelectorAll('.tier-ov').forEach(function(inp){var v=(inp.value||'').trim();if(v!==''){var n=parseFloat(v);if(!isNaN(n)&&n>=0)o[inp.dataset.tier]=n}});return o};
 // 統一可轉售商品池 = 轉售品項(全部) + 配方(標記 resale)
@@ -2669,7 +2686,7 @@ const bld=()=>(window._editR.ings||[]).map((ing,i)=>{
 // riSearch / riPick / riQuickAdd 函式定義在後面
 
 
-modal(mH(id?'編輯配方卡':'新增配方卡')+'<div class="form-row c5"><div class="fg"><label>配方ID</label><input id="rf-id" value="'+esc(rec.id)+'" disabled></div><div class="fg"><label>代碼</label><input id="rf-code" value="'+esc(rec.code)+'"></div><div class="fg" style="grid-column:span 2"><label>配方名稱 *</label><input id="rf-name" value="'+esc(rec.name)+'"></div><div class="fg"><label>分類</label><select id="rf-cat">'+opts(['醬料','主食','配料','湯品','甜點','飲品','其他'],rec.cat||'醬料')+'</select></div></div><div class="form-row c4"><div class="fg"><label>成品單位</label><select id="rf-unit">'+opts(state.refs.units||[],rec.unit)+'</select></div><div class="fg"><label>批次倍數</label><input id="rf-mult" type="number" min="0.1" step="0.5" value="'+rec.multiplier+'"></div><div class="fg"><label>每批產出</label><input id="rf-batch" type="number" min="1" value="'+rec.perBatch+'"></div><div class="fg" style="background:#E8F4EE;padding:4px 6px;border-radius:6px;margin:-4px -2px"><label style="color:#0A5A46;font-weight:700">💰 對外售價 (未稅,每'+esc(rec.unit||'包')+')</label><input id="rf-sellprice" type="number" min="0" step="1" value="'+(rec.sellPrice||0)+'" placeholder="0=未設定" style="background:#fff;border:1px solid #0A5A46" oninput="updateRecipeMarginHint();if(window.refreshTierHints)refreshTierHints()"><div id="rf-margin-hint" style="font-size:0.7rem;color:#0A5A46;margin-top:2px;font-weight:600"></div></div></div><div style="background:#E8F4EE;border:1px solid #b5d4c5;border-radius:8px;padding:10px 12px;margin:6px 0"><label style="display:flex;align-items:center;gap:6px;font-weight:600;color:#0A5A46;font-size:0.86rem;cursor:pointer"><input type="checkbox" id="rf-resale"'+(rec.resale?' checked':'')+'>✅ 納入轉售商品池 (門市/客戶可叫此自製品)</label></div>'+window.buildTierPriceBlock(rec.sellPrice,rec.tierOverrides)+'<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:6px">📦 包裝規格 (每一'+esc(rec.unit||'包')+'重量)</div><div class="form-row c3"><div class="fg"><label style="font-size:0.78rem">每包淨重</label><input id="rf-pack-w" type="number" min="0" step="0.1" value="'+(rec.packWeight||'')+'" placeholder="如 1000"></div><div class="fg"><label style="font-size:0.78rem">單位</label><select id="rf-pack-u">'+opts(['g','ml','公斤','公升'],rec.packUnit||'g')+'</select></div><div class="fg"><label style="font-size:0.78rem">說明 (選填)</label><input id="rf-pack-note" value="'+esc(rec.packNote||'')+'" placeholder="如 4支/包"></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:4px">💡 影響:標籤淨重自動帶入、營養標示計算每份用量、成品標籤格式</div></div><div style="background:#FCE8E8;border:1px solid #f5b5b5;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#B82525;margin-bottom:6px">♻️ 操作損耗率 (廚房失誤+過期+員工偷吃 等預估損失)</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">操作損耗率 (%)</label><input id="rf-oploss" type="number" min="0" max="50" step="0.5" value="'+((+rec.opLossRate||0)*100).toFixed(1)+'" placeholder="如 5"></div><div class="fg" style="display:flex;align-items:flex-end;font-size:0.78rem;color:#B82525;line-height:1.5">📊 系統建議:依過去 90 天損耗 ÷ 進貨自動算<br>📌 留 0% 表示不計入(用其他方式管控)</div></div><div style="font-size:0.74rem;color:#B82525;margin-top:4px">💡 影響:配方詳情會顯示「全成本」(含可食率 + 操作損耗),建議用全成本計毛利</div></div>'+window.buildPackagingPicker(rec)+'<div style="display:flex;justify-content:space-between;align-items:center;border-top:.5px solid #eee;padding-top:10px;margin:4px 0 8px"><span style="font-size:0.92rem;font-weight:600">🍽️ 食材明細 (不含包材)</span><button class="btn btn-sm btn-success" onclick="addRI()">＋ 新增食材</button></div><div id="ings-c" style="max-height:280px;overflow-y:auto">'+bld()+'</div>'+mF("saveRecipe('"+id+"')"),true);
+modal(mH(id?'編輯配方卡':'新增配方卡')+'<div class="form-row c5"><div class="fg"><label>配方ID</label><input id="rf-id" value="'+esc(rec.id)+'" disabled></div><div class="fg"><label>代碼</label><input id="rf-code" value="'+esc(rec.code)+'"></div><div class="fg" style="grid-column:span 2"><label>配方名稱 *</label><input id="rf-name" value="'+esc(rec.name)+'"></div><div class="fg"><label>分類</label><select id="rf-cat">'+opts(['醬料','主食','配料','湯品','甜點','飲品','其他'],rec.cat||'醬料')+'</select></div></div><div class="form-row c4"><div class="fg"><label>成品單位</label><select id="rf-unit">'+opts(state.refs.units||[],rec.unit)+'</select></div><div class="fg"><label>批次倍數</label><input id="rf-mult" type="number" min="0.1" step="0.5" value="'+rec.multiplier+'"></div><div class="fg"><label>每批產出</label><input id="rf-batch" type="number" min="1" value="'+rec.perBatch+'"></div><div class="fg" style="background:#E8F4EE;padding:4px 6px;border-radius:6px;margin:-4px -2px"><label style="color:#0A5A46;font-weight:700">💰 對外售價 (未稅,每'+esc(rec.unit||'包')+')</label><input id="rf-sellprice" type="number" min="0" step="1" value="'+(rec.sellPrice||0)+'" placeholder="0=未設定" style="background:#fff;border:1px solid #0A5A46" oninput="updateRecipeMarginHint();if(window.refreshTierHints)refreshTierHints()"><div id="rf-margin-hint" style="font-size:0.7rem;color:#0A5A46;margin-top:2px;font-weight:600"></div></div></div><div style="background:#E8F4EE;border:1px solid #b5d4c5;border-radius:8px;padding:10px 12px;margin:6px 0"><label style="display:flex;align-items:center;gap:6px;font-weight:600;color:#0A5A46;font-size:0.86rem;cursor:pointer"><input type="checkbox" id="rf-resale"'+(rec.resale?' checked':'')+'>✅ 納入轉售商品池 (門市/客戶可叫此自製品)</label></div>'+window.buildTierPriceBlock(rec.sellPrice,rec.tierOverrides,(typeof calcCost==='function'?(calcCost(rec).per||0):0))+'<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#9A6210;margin-bottom:6px">📦 包裝規格 (每一'+esc(rec.unit||'包')+'重量)</div><div class="form-row c3"><div class="fg"><label style="font-size:0.78rem">每包淨重</label><input id="rf-pack-w" type="number" min="0" step="0.1" value="'+(rec.packWeight||'')+'" placeholder="如 1000"></div><div class="fg"><label style="font-size:0.78rem">單位</label><select id="rf-pack-u">'+opts(['g','ml','公斤','公升'],rec.packUnit||'g')+'</select></div><div class="fg"><label style="font-size:0.78rem">說明 (選填)</label><input id="rf-pack-note" value="'+esc(rec.packNote||'')+'" placeholder="如 4支/包"></div></div><div style="font-size:0.74rem;color:#9A6210;margin-top:4px">💡 影響:標籤淨重自動帶入、營養標示計算每份用量、成品標籤格式</div></div><div style="background:#FCE8E8;border:1px solid #f5b5b5;border-radius:8px;padding:10px 12px;margin:6px 0"><div style="font-size:0.82rem;font-weight:600;color:#B82525;margin-bottom:6px">♻️ 操作損耗率 (廚房失誤+過期+員工偷吃 等預估損失)</div><div class="form-row c2"><div class="fg"><label style="font-size:0.78rem">操作損耗率 (%)</label><input id="rf-oploss" type="number" min="0" max="50" step="0.5" value="'+((+rec.opLossRate||0)*100).toFixed(1)+'" placeholder="如 5"></div><div class="fg" style="display:flex;align-items:flex-end;font-size:0.78rem;color:#B82525;line-height:1.5">📊 系統建議:依過去 90 天損耗 ÷ 進貨自動算<br>📌 留 0% 表示不計入(用其他方式管控)</div></div><div style="font-size:0.74rem;color:#B82525;margin-top:4px">💡 影響:配方詳情會顯示「全成本」(含可食率 + 操作損耗),建議用全成本計毛利</div></div>'+window.buildPackagingPicker(rec)+'<div style="display:flex;justify-content:space-between;align-items:center;border-top:.5px solid #eee;padding-top:10px;margin:4px 0 8px"><span style="font-size:0.92rem;font-weight:600">🍽️ 食材明細 (不含包材)</span><button class="btn btn-sm btn-success" onclick="addRI()">＋ 新增食材</button></div><div id="ings-c" style="max-height:280px;overflow-y:auto">'+bld()+'</div>'+mF("saveRecipe('"+id+"')"),true);
 window._rebuildRI=()=>{const c=$('ings-c');if(c){c.innerHTML=bld();setTimeout(function(){if(typeof autoUpgradeSelects==='function')autoUpgradeSelects()},30)}}
 if(window._bindEnterSave)window._bindEnterSave(function(){saveRecipe(id||'')});}
 
@@ -10298,10 +10315,10 @@ var supOpts='<option value="">— 選擇供應商 —</option>'+(state.sups||[])
 modal(mH(id?'編輯轉售品項':'新增轉售品項')+
 '<div class="form-row c3"><div class="fg"><label>品名 *</label><input id="ip-name" value="'+esc(p.name)+'" placeholder="例：醃製雞腿排"></div><div class="fg"><label>分類 *</label><select id="ip-category"><option value="食材"'+((p.category||'食材')==='食材'?' selected':'')+'>🥬 食材</option><option value="包材"'+(p.category==='包材'?' selected':'')+'>📦 包材</option></select></div><div class="fg"><label>類型</label><select id="ip-type"><option value="加工品"'+(p.type==='加工品'?' selected':'')+'>🔪 加工品（醃製/調理）</option><option value="分裝品"'+(p.type==='分裝品'?' selected':'')+'>📦 分裝品（拆包/秤重）</option><option value="原裝轉售"'+(p.type==='原裝轉售'?' selected':'')+'>📋 原裝轉售</option></select></div></div>'+
 '<div class="form-row c3"><div class="fg"><label>供應商</label><select id="ip-supplier">'+supOpts+'</select></div><div class="fg"><label>規格</label><input id="ip-spec" value="'+esc(p.spec||'')+'" placeholder="例：500g/包、1kg/盒"></div><div class="fg"><label>單位</label><select id="ip-unit">'+unitOpts+'</select></div></div>'+
-'<div class="form-row c2"><div class="fg"><label>成本（中央廚房）</label><input id="ip-cost" type="number" min="0" step="0.1" value="'+(p.cost||0)+'" oninput="calcIPMarkup();calcIPSuggestPrice()"></div><div class="fg"><label>售價（賣給門市）</label><input id="ip-sell" type="number" min="0" step="0.1" value="'+(p.sellPrice||0)+'" oninput="calcIPMarkup();if(window.refreshTierHints)refreshTierHints()"></div></div>'+
+'<div class="form-row c2"><div class="fg"><label>成本（中央廚房）</label><input id="ip-cost" type="number" min="0" step="0.1" value="'+(p.cost||0)+'" oninput="calcIPMarkup();calcIPSuggestPrice();if(window.refreshTierHints)refreshTierHints()"></div><div class="fg"><label>售價（賣給門市）</label><input id="ip-sell" type="number" min="0" step="0.1" value="'+(p.sellPrice||0)+'" oninput="calcIPMarkup();if(window.refreshTierHints)refreshTierHints()"></div></div>'+
 '<div id="ip-margin" style="background:#DFF5EC;border-radius:8px;padding:8px 14px;margin-bottom:10px;font-size:0.88rem;color:#0A5A46;font-weight:600"></div>'+
 '<div style="background:#FCEFE5;border:1px solid #E8C098;border-radius:8px;padding:10px 12px;margin-bottom:10px"><div style="font-size:0.84rem;font-weight:600;color:#9A6210;margin-bottom:8px">💡 依加成定價 (成本 × 加成率 → 建議售價，批發轉售標準作法)</div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><span style="font-size:0.82rem;color:#9A6210">快選加成:</span>'+[20,30,40,50].map(function(m){return '<button type="button" class="btn btn-sm btn-outline" style="padding:2px 10px;font-size:0.78rem" onclick="setIPMarkup('+m+')">'+m+'%</button>'}).join('')+'</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="font-size:0.82rem">加成率</span><input id="ip-target-markup" type="number" min="1" max="500" step="1" value="'+(p.targetMarkup||p.targetMargin||30)+'" style="width:70px;padding:4px 8px" oninput="calcIPSuggestPrice()"><span style="font-size:0.82rem">%</span><span id="ip-suggest-price" style="font-weight:700;color:#0A5A46;font-size:0.92rem"></span><button type="button" class="btn btn-sm" style="background:#9A6210;color:#fff;margin-left:auto;padding:4px 14px;font-size:0.8rem" onclick="applyIPSuggestPrice()">📥 套用到售價</button></div></div>'+
-window.buildTierPriceBlock(p.sellPrice,p.tierOverrides)+'<div class="fg"><label>原料組成（備註用）</label><input id="ip-source" value="'+esc(p.sourceItems||'')+'" placeholder="例：雞腿排+醃料+真空袋"></div>'+
+window.buildTierPriceBlock(p.sellPrice,p.tierOverrides,p.cost)+'<div class="fg"><label>原料組成（備註用）</label><input id="ip-source" value="'+esc(p.sourceItems||'')+'" placeholder="例：雞腿排+醃料+真空袋"></div>'+
 '<div class="fg"><label>備註</label><input id="ip-note" value="'+esc(p.note||'')+'" placeholder="保存條件、注意事項..."></div>'+
 mF("saveInternalProduct('"+id+"')"));
 setTimeout(function(){
@@ -13639,7 +13656,7 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.3.0';
+      window.SYSTEM_VERSION = '2.4.0';
       window.BUILD_NUMBER = '20260523-erp';
     } catch(e){}
 
@@ -13679,9 +13696,9 @@ pushUndo(); // 初始快照
           '🎯 異常偵測優化 + 閾值放寬到中央廚房規模'
         ]
       });
-      // v2.3.0 (本次更新 — 最新)
+      // v2.4.0 (本次更新 — 最新)
       VERSION_HISTORY.unshift({
-        ver: '2.3.0',
+        ver: '2.4.0',
         build: '20260523-erp',
         date: '2026-05-23',
         changes: [
@@ -13709,7 +13726,7 @@ pushUndo(); // 初始快照
           '🐛 修正:毛利分析表格點擊任一列無法開啟配方詳情 (函式名 toggleRecipeDetail→showRecipeDetail,部署前 7 層驗收發現)',
           '📊 Excel 匯出全面升級:改用 ExcelJS,全 27 張表單支援「真·儲存格下拉選單」+ 範例列 + 凍結表頭 + 選項分頁;匯入維持 SheetJS 並加「整批取代確認」「範例列自動忽略」防呆',
           '🏷️ 層級定價 Phase 0:新增層級主檔(門市內部/加盟店/VIP客戶/一般客戶/新顧客,折數可調)+客戶層級欄(表單+Excel匯入下拉)+混合定價函式 getTierPrice(基準價×折數,可個別覆寫)。設定頁→資料管理→🏷️層級管理',
-          '🛒 商品池 Phase 1:轉售品項 + 配方皆可設「各層級覆寫價」(留空=自動折數,即時試算);配方新增「✅ 納入轉售商品池」開關;轉售品項列表新增「🛒 可轉售商品池」總覽(轉售品項 + 已標記自製品,顯示各層級價,Phase 2/3 叫貨下單將讀此池)',
+          '🛒 商品池 Phase 1:轉售品項 + 配方皆可設「各層級覆寫價」(留空=自動折數,即時試算);配方新增「✅ 納入轉售商品池」開關;轉售品項列表新增「🛒 可轉售商品池」總覽(轉售品項 + 已標記自製品,顯示各層級價,Phase 2/3 叫貨下單將讀此池);各層級售價即時顯示加成%/毛利%,低於成本以紅字⚠️標示',
           '📥 轉售品項列表新增「匯入叫貨表商品」:一鍵把現有 4 張叫貨表 231 項匯入商品清單(價格沿用,已存在自動略過)',
           '👥 客戶資料新增「🗑 刪除」:刪除後其餘代碼自動往前重排(001/002/003…無空號);有訂單記錄的客戶禁止刪除(請改停用),保護帳務'
         ]
@@ -13719,14 +13736,14 @@ pushUndo(); // 初始快照
     // 更新 topbar logo 版本顯示
     const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
     if(verSpan && /v2\.[0-9]/.test(verSpan.textContent)){
-      verSpan.textContent = 'v2.3.0';
+      verSpan.textContent = 'v2.4.0';
       verSpan.style.color = 'rgba(212,149,15,.85)';
       verSpan.style.fontWeight = '600';
     }
     // 更新瀏覽器標題
-    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.3.0'}catch(e){}
+    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.4.0'}catch(e){}
 
-    console.log('  ✅ 版本升級至 v2.3.0 (Build 20260523-erp)');
+    console.log('  ✅ 版本升級至 v2.4.0 (Build 20260523-erp)');
 
     // ═══════════════════════════════════════════════════════════
     // 完成
