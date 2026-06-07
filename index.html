@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.12.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.14.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -240,7 +240,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.12.0</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.14.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -690,6 +690,15 @@ window.getResalePool=function(){
   (state.recipes||[]).forEach(function(r){if(r.resale){var per=0;try{per=(typeof calcCost==='function')?(calcCost(r).per||0):0}catch(e){per=0}pool.push({id:r.id,name:r.name,source:'recipe',unit:r.unit||'',cost:per,sellPrice:(+r.sellPrice)||0,tierOverrides:r.tierOverrides||{},cat:r.cat||'自製品'})}});
   return pool;
 };
+window._custOrderableList=function(){
+  var g={'自製品':[],'轉售食材':[],'轉售包材':[]};
+  (state.recipes||[]).forEach(function(r){if(r.resale){g['自製品'].push({id:r.id,name:r.name})}});
+  (state.internalProducts||[]).forEach(function(p){var pk=(p.category==='包材'||p.type==='包材');(pk?g['轉售包材']:g['轉售食材']).push({id:p.id,name:p.name})});
+  (state.ings||[]).forEach(function(i){if(i.customerSell===true){(i.cat==='包材'?g['轉售包材']:g['轉售食材']).push({id:i.id,name:i.name})}});
+  return g;
+};
+window._supplyModeToggle=function(){var m=(document.querySelector('input[name="cu-supply"]:checked')||{}).value;var b=document.getElementById('cu-supply-box');if(b)b.style.display=(m==='list')?'':'none'};
+window._supplyGroupToggle=function(grp,on){document.querySelectorAll('label[data-grp="'+grp+'"] .cu-supply-ck').forEach(function(cb){cb.checked=on})};
 var SHEET_IMPORT_SEED=[["紐澳良雞腿排(4支/包)","包",200,"義早食材"],["蒜香雞肉(1kg/包)","包",210,"義早食材"],["綜合鮮菇(1kg/包)","包",180,"義早食材"],["炭香燒肉(1kg/包)","包",260,"義早食材"],["鮪魚醬(1kg/包)","包",290,"義早食材"],["凱撒醬(1kg/包)","包",275,"義早食材"],["蜂蜜芥末醬(1kg/包)","包",180,"義早食材"],["塔塔醬(1kg/包)","包",180,"義早食材"],["藍莓優格醬(1kg/包)","包",270,"義早食材"],["大蒜醬(500g/盒)","盒",230,"義早食材"],["杏仁奶酥醬(500g/盒)","盒",245,"義早食材"],["紅醬(1kg/包)","包",160,"義早食材"],["白醬(1kg/包)","包",160,"義早食材"],["青醬(1kg/包)","包",210,"義早食材"],["肉醬(1kg/包)","包",180,"義早食材"],["泰式打拋豬(1kg/包)","包",195,"義早食材"],["麻辣醬(1kg/包)","包",270,"義早食材"],["辣椒醬(500g/包)","包",140,"義早食材"],["醬油膏(1kg/包)","包",95,"義早食材"],["料理調味粉(1kg/包)","包",130,"義早食材"],["義大利直麵(熟)(200g/包)","包",10,"義早食材"],["蜜汁鴨胸(500g/23包/箱)","包",315,"義早食材"],["青花菜(1kg/10包/箱)","包",70,"義早食材"],["玉米筍(1kg/10包/箱)","包",126,"義早食材"],["紅蘿蔔片(1kg/10包/箱)","包",58,"義早食材"],["大魚排(60片/箱)(5片為單位)","包",75,"義早食材"],["日式雪花豬排(130g/45片/6kg箱)(5片為單位)","包",175,"義早食材"],["鯰魚排(5片/10包/箱)","包",179,"義早食材"],["鯰魚排(3片/10包/箱)","包",95,"義早食材"],["韓式泡菜(3kg/桶)","包",480,"義早食材"],["優質雞塊(1kg/12包)","包",142,"義早食材"],["紅皮熟栗地瓜(1kg/12包/箱)","包",116,"義早食材"],["玉米粒易開罐(285g/24罐/箱)","罐",22,"義早食材"],["義大利直麵(生)(500g/20包/箱)","包",26,"義早食材"],["鮮奶油23.3%(12罐/箱)","罐",105,"義早食材"],["原味乳酪醬(500g/盒)","盒",194,"義早食材"],["藍莓乳酪醬(500g/盒)","盒",200,"義早食材"],["青蘋果餡(2.7g/6罐/箱)","罐",683,"義早食材"],["美乃滋(600g/包)","包",76,"義早食材"],["美式鬆餅(2片/50包/箱)","包",12,"義早食材"],["乳酪燒餅(10片/3盒/箱)","箱",320,"義早食材"],["光頭堡(30顆/籃)","顆",7,"義早食材"],["帕尼尼(30顆/籃)","顆",13,"義早食材"],["帕瑪森熱狗堡(12入/包)","包",164,"義早食材"],["泰式紅茶葉(600g*/30包/箱)","包",157,"義早食材"],["奶香金萱(600g/30包/箱)","包",224,"義早食材"],["白葡萄風味烏龍茶包(6.5g*50入/20包/箱)","包",242,"義早食材"],["南非國寶茶(7g*50入/20包/箱)","包",453,"義早食材"],["南非綠國寶茶(3.5g*50入/20包/箱)","包",389,"義早食材"],["南非紫蘇綠國寶茶(4.5g*50入/20包/箱)","包",389,"義早食材"],["專用奶精粉(1kg/20包/箱)","包",173,"義早食材"],["什穀芝麻飲粉(500g/40包/箱)","包",168,"義早食材"],["比利時風味巧克力粉(1kg/20包/箱)","包",420,"義早食材"],["PET8OZ透明沙拉碗(25個/20包/箱)","包",44,"義早包材"],["PET8OZ透明沙拉蓋(50個/10包/箱)","包",53,"義早包材"],["PET24OZ花型沙拉碗、蓋(50個/3組/箱)","組",273,"義早包材"],["500空白紙杯(50個/20包/箱)","包",60,"義早包材"],["400空白紙杯(50個/20包/箱)","包",55,"義早包材"],["360空白紙杯(50個/20包/箱)","包",53,"義早包材"],["8OZ空白紙杯(50個/20包/箱)","包",54,"義早包材"],["凸杯蓋 90mm(50個/20包/箱)","包",49,"義早包材"],["凸杯蓋 78mm(50個/20包/箱)","包",57,"義早包材"],["90熱杯套(25個/40包/箱)","串",20,"義早包材"],["1.5OZ PET塑膠杯蓋(100個/25包/箱)","包",92,"義早包材"],["902塑膠內襯(50個/12包/箱)","包",63,"義早包材"],["902空白紙湯碗(50個/12包/箱)","包",81,"義早包材"],["902凸蓋(50個/12包/箱)","包",66,"義早包材"],["850透明塑膠湯碗(50個/12包/箱)","包",103,"義早包材"],["850空白紙湯碗(50個/12包/箱)","包",60,"義早包材"],["850平蓋(50個/12包/箱)","包",29,"義早包材"],["L300(50個/10包/箱)","包",276,"義早包材"],["L500(50個/10包/箱)","包",171,"義早包材"],["9吋披薩盒(50個/箱)","箱",630,"義早包材"],["3號內折牛皮方形餐盒(50個/4包/箱)","包",315,"義早包材"],["空白一體小(60個/10包/箱)","包",83,"義早包材"],["空白點心盒(100個/10包/箱)","包",95,"義早包材"],["20*20CM防油牛皮L袋(100個/40包/箱)","包",88,"義早包材"],["#70平口金色三角袋(100只/包)","包",91,"義早包材"],["鐵炮竹竹籤9cm(250支/80包)","包",58,"義早包材"],["黑色西餐匙(100支/40包/箱)","包",46,"義早包材"],["黑色西餐叉(100支/30包/2箱)","包",45,"義早包材"],["單支膠裝斜口6*18透明吸管(200支/20包/箱)","包",26,"義早包材"],["單支膠裝斜口12*21透明吸管(50支/40包/箱)","包",14,"義早包材"],["單支紙包斜口6*21透明吸管(100支/40包/箱)","包",40,"義早包材"],["單支紙包斜口6*21透明吸管(100支/50包/箱)","包",46,"義早包材"],["單支紙包斜口12*21透明吸管(50支/40包/箱)","包",47,"義早包材"],["免洗筷(80雙/30包/袋)","包",21,"義早包材"],["環保餐巾紙23cm單層(100張/60包/箱)","包",22,"義早包材"],["平邊牛皮色-四折扇形紙(100張/100包/箱)","包",16,"義早包材"],["空白封口膜(350m/6捲/箱)","捲",352,"義早包材"],["感熱紙80*80mm(60捲/箱)","捲",22,"義早包材"],["標籤貼紙40*30mm(5捲/20包/箱)","包",139,"義早包材"],["保鮮膜30公分 X 500公尺","盒",399,"義早包材"],["透明1號提袋(1kg/包)","包",120,"義早包材"],["透明2號提袋(1kg/包)","包",120,"義早包材"],["透明3號提袋(1kg/包)","包",120,"義早包材"],["透明1號提袋(2kg/包)","包",240,"義早包材"],["透明2號提袋(2kg/包)","包",240,"義早包材"],["透明3號提袋(2kg/包)","包",240,"義早包材"],["PS黑色雙杯座(100個/20包/箱)","包",56,"義早包材"],["PS黑色四杯座(50個/20包/箱)","包",49,"義早包材"],["煎板清潔劑","瓶",303,"義早包材"],["塑膠垃圾袋66*80(10包/箱)","包",97,"義早包材"],["義早logo圓貼(5000張)(約1~4天)","包",1380,"義早包材"],["收入傳票","本",25,"義早包材"],["支出傳票","本",25,"義早包材"],["二聯收據(50組/本)","本",35,"義早包材"],["透明膠帶18mm(8入/捆)","捆",95,"義早包材"],["BUNN12.75*5.25濾紙(500pcs/箱)","箱",1102.5,"義早包材"],["NBR無粉手套紫S號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫M號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫L號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫XL號(100入/盒)","盒",185,"義早包材"],["立領長袖反摺-淺灰襯衫(M) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(L) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(XL) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(2L) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(3L) 義早","件",700,"義早包材"],["雙肩銅鈎耐磨咖啡色背心圍裙","件",600,"義早包材"],["深麻灰打鳥帽 義早","件",200,"義早包材"],["蒜香雞肉(1kg/包)","包",210,"咕咕食材"],["綜合鮮菇(1kg/包)","包",180,"咕咕食材"],["炭香燒肉(1kg/包)","包",260,"咕咕食材"],["鮪魚醬(1kg/包)","包",290,"咕咕食材"],["肉醬(1kg/包)","包",180,"咕咕食材"],["泰式打拋豬(1kg/包)","包",195,"咕咕食材"],["辣椒醬(500g/包)","包",140,"咕咕食材"],["醬油膏(1kg/包)","包",95,"咕咕食材"],["酸菜(1kg/包)","包",110,"咕咕食材"],["菜脯(1kg/包)","包",90,"咕咕食材"],["焢肉(1kg/包)","包",185,"咕咕食材"],["料理調味粉(1kg/包)","包",130,"咕咕食材"],["小熱狗(50支/20包/箱)","包",120,"咕咕食材"],["起司片(90片/12包)","包",265,"咕咕食材"],["乳酪絲(1kg/10包/箱)","包",245,"咕咕食材"],["薯餅(20片/12包/箱)","包",150,"咕咕食材"],["脆皮薯條(2kg/6包/箱)","包",210,"咕咕食材"],["鮮奶油23.3%(12罐/箱)","罐",105,"咕咕食材"],["美乃滋(600g/包)","包",76,"咕咕食材"],["老麵饅頭(6入/包)","包",78,"咕咕食材"],["黑糖饅頭(6入/包)","包",92,"咕咕食材"],["蔥捲(6入/包)","包",135,"咕咕食材"],["芋頭捲(6入/包)","包",143,"咕咕食材"],["雜糧堅果饅頭(6入/包)","包",168,"咕咕食材"],["鮮蔥黑豚包(6入/包)","包",152,"咕咕食材"],["金沙包(6入/包)","包",152,"咕咕食材"],["芝麻包(6入/包)","包",143,"咕咕食材"],["刈包(20入/8包/箱)","包",150,"咕咕食材"],["蛋餅皮(30片/12包/箱)","包",65,"咕咕食材"],["厚切蔥抓餅(10片/10包/箱)","包",90,"咕咕食材"],["河粉皮(10片/10包/箱)","包",50,"咕咕食材"],["乳酪燒餅(10片/3盒/箱)","箱",320,"咕咕食材"],["蘿蔔糕(10片/10包/箱)","包",60,"咕咕食材"],["鍋貼(50入/12包/箱)","包",100,"咕咕食材"],["生煎包(50入/12包/箱)","包",100,"咕咕食材"],["肉粽(10入/12包/箱)","包",250,"咕咕食材"],["老油條(300入/3kg/箱)","箱",650,"咕咕食材"],["肉鬆(3kg/桶)","包",400,"咕咕食材"],["優質雞塊(1kg/12包/箱)","包",142,"咕咕食材"],["黃金脆皮雞排(30片/箱)(5片/包)","包",105,"咕咕食材"],["玉米粒易開罐(285g/24罐/箱)","罐",22,"咕咕食材"],["滷蛋(30粒/8包/箱)","包",240,"咕咕食材"],["豆皮菜鬆(600g/包)","包",110,"咕咕食材"],["豆棗(3kg/包)","包",320,"咕咕食材"],["牛蒡絲(3kg/包)","包",425,"咕咕食材"],["飯糰米(5kg/1包)","包",260,"咕咕食材"],["紅藜麥(1kg/1包)","包",165,"咕咕食材"],["花生粉(600g/包)","包",100,"咕咕食材"],["低筋麵粉(3kg/包)","包",110,"咕咕食材"],["鹽(1kg/1包)","包",20,"咕咕食材"],["二砂(1kg/1包)","包",40,"咕咕食材"],["胡椒鹽(600g/包)","包",120,"咕咕食材"],["番茄醬(3.15kg/桶)","桶",200,"咕咕食材"],["醬油膏(6kg/桶)","桶",235,"咕咕食材"],["沙拉油(18L/桶)","桶",865,"咕咕食材"],["耐炸油(18L/桶)","桶",875,"咕咕食材"],["泰式紅茶葉(600g*/30包/箱)","包",157,"咕咕食材"],["蔗糖液(3kg/8包/箱)","包",125,"咕咕食材"],["專用奶精粉(1kg/20包/箱)","包",173,"咕咕食材"],["400空白紙杯(50個/20包/箱)","包",53,"咕咕包材"],["凸杯蓋 90mm(50個/20包/箱)","包",49,"咕咕包材"],["90熱杯套(25個/40包/箱)","串",20,"咕咕包材"],["1.5OZ PET塑膠杯蓋(100個/25包/箱)","包",92,"咕咕包材"],["850空白紙湯碗(50個/12包/箱)","包",60,"咕咕包材"],["850平蓋(50個/12包/箱)","包",29,"咕咕包材"],["260空白紙湯碗(50個/40包/箱)","包",30,"咕咕包材"],["空白一體小(60個/10包/箱)","包",83,"咕咕包材"],["空白點心盒(100個/10包/箱)","包",95,"咕咕包材"],["20*20CM防油牛皮L袋(100張/40包/箱)","包",88,"咕咕包材"],["20*20CM防油牛皮L袋(200張/25包/箱)","包",172,"咕咕包材"],["30*30CM空白淋膜紙(1000張/4包/箱)","包",900,"咕咕包材"],["4兩防油紙袋(100入/束)","束",40,"咕咕包材"],["薯條袋","束",35,"咕咕包材"],["橡皮筋小","包",50,"咕咕包材"],["0號夾鏈袋","包",15,"咕咕包材"],["擦手紙(120抽/20包/箱)","箱",410,"咕咕包材"],["黑色西餐匙(100支/40包/箱)","包",46,"咕咕包材"],["黑色西餐叉(100支/30包/2箱)","包",45,"咕咕包材"],["單支膠裝斜口6*18透明吸管(200支/20包/箱)","包",26,"咕咕包材"],["單支紙包斜口6*21透明吸管(100支/50包/箱)","包",46,"咕咕包材"],["免洗筷(80雙/30包/袋)","包",21,"咕咕包材"],["環保餐巾紙23cm單層(100張/60包/箱)","包",22,"咕咕包材"],["空白封口膜(350m/6捲/箱)","捲",352,"咕咕包材"],["感熱紙80*80mm(60捲/箱)","捲",22,"咕咕包材"],["標籤貼紙40*30mm(5捲/20包/箱)","包",139,"咕咕包材"],["保鮮膜30公分 X 500公尺","盒",399,"咕咕包材"],["4兩耐熱袋","包",40,"咕咕包材"],["6兩耐熱袋","包",40,"咕咕包材"],["6兩耐熱袋(捲)","捲",180,"咕咕包材"],["1斤耐熱袋","捲",180,"咕咕包材"],["3斤耐熱袋","捲",180,"咕咕包材"],["10斤耐熱袋","捲",180,"咕咕包材"],["煎板清潔劑","瓶",303,"咕咕包材"],["水槽濾網(50入/包)","包",35,"咕咕包材"],["沙拉脫","桶",50,"咕咕包材"],["漂白水","桶",50,"咕咕包材"],["除油劑","桶",210,"咕咕包材"],["酒精","桶",505,"咕咕包材"],["3M菜瓜布(2入/包)","包",45,"咕咕包材"],["3M綠菜瓜布(2入/包)","包",45,"咕咕包材"],["好神拖布盤","個",230,"咕咕包材"],["塑膠垃圾袋66*80(10包/箱)","包",97,"咕咕包材"],["咕咕logo圓貼(5000張)(約1~4天)","包",1380,"咕咕包材"],["收入傳票","本",25,"咕咕包材"],["支出傳票","本",25,"咕咕包材"],["二聯收據(50組/本)","本",35,"咕咕包材"],["透明膠帶18mm(8入/捆)","捆",95,"咕咕包材"],["NBR無粉手套紫S號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫M號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫L號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫XL號(100入/盒)","盒",185,"咕咕包材"]];
 
 window.importSheetProducts=function(){
@@ -1112,7 +1121,7 @@ const SOP_DATA={
   tax:{badge:'稅務管理',flow:['進貨記錄','自動計算稅額','查看月報','申報參考'],sections:[{title:'說明',steps:['系統自動從進貨記錄計算 5% 營業稅','含稅金額÷1.05＝未稅金額','進項稅額可作為申報扣抵參考']}]},
   'cost-analysis':{badge:'成本分析',flow:['資料累積','自動計算','查看報表','下載匯出'],sections:[{title:'報表內容',steps:['月度進貨成本趨勢（長條圖）','供應商成本佔比分析','門市進貨成本比較']}]},
   wo:{badge:'生產工單',flow:['建立工單','領料扣庫存','開始生產','完成入庫'],sections:[{title:'操作流程',steps:['選擇配方和倍數建立工單','點「領料」自動扣減食材庫存','點「開始生產」記錄生產時間','完成後點「完成入庫」'],warn:'領料後庫存即刻扣減，請確認配方正確'}]},
-  customer:{badge:'客戶訂購系統 v1.0',flow:['建立客戶資料','客戶下單','老闆審核','出貨/開發票','收款/結案'],sections:[{title:'1️⃣ 客戶資料管理 (📋 客戶資料)',steps:['點「＋ 新增客戶」開啟 4 區塊表單','基本資料：名稱、聯絡人、電話、類型','發票資訊：統編、發票抬頭、發票地址（三聯式 B2B 必填）','信用額度：授信額度（單次/累積最大可下單）+ 專屬折扣率（0.9 = 9折，1.0 = 原價）+ 付款方式','接單時間窗：勾選允許下單的星期 + 設定下單時段（時起~時迄）','系統自動產生 3 位客戶代碼（001、002...）','點「📋 連結」複製客戶下單網址，貼到 LINE / Email 給客戶','客戶用代碼登入下單，老闆停用後即無法下單'],tip:'代碼可手動指定（限 001~999），留空系統自動補空號'},{title:'2️⃣ 食材對外可賣設定 (🥬 食材庫存)',steps:['編輯食材時勾選「🛒 對外可賣 (B2B 客戶可訂購)」','勾選後出現「對外售價」欄位 + 即時毛利率提示','售價會顯示在客戶下單頁；客戶若有專屬折扣，會自動套用','轉售品項（🏭→🏪 轉售）預設都對外賣，使用品項本身的 sellPrice'],warn:'食材的 price 是進價，sellPrice 才是對外賣價。沒設 sellPrice 會用 price 當預設'},{title:'3️⃣ 訂單管理 (🛒 訂單管理)',steps:['客戶下單後出現在「⏳ 待審核」filter','點「✅ 核准」直接核准（按確定 = 用原價，按取消 = 進入改價模式）','改價模式可以調每個品項單價，按「確認並核准」儲存','已核准 → 點「🚚 出貨」標記出貨','已出貨 → 點「🧾 開發票」輸入發票號碼，或點「💰 直接收款」（不開發票）','已開發票 → 點「💰 收款」標記已收款','已付款 → 點「✔ 結案」完成訂單','已完成的訂單可點「↩️ 退貨」進入退貨流程','已取消 / 已退款狀態無操作'],warn:'核准時若超過授信額度會跳警告，可選擇強制核准'},{title:'4️⃣ 對帳單 (💰 對帳單)',steps:['按客戶分組顯示未結金額（已核准/出貨/開發票但未收款）','3 個統計卡：未結金額、本月已收、本月總額','點「📊 詳細對帳」看單一客戶完整訂單明細','點「📤 匯出對帳單」下載 CSV (Excel 可直接開啟)','對帳單可拿給客戶確認月底結帳金額']},{title:'5️⃣ 發票記錄 (🧾 發票記錄)',steps:['列出所有已開發票的訂單','搜尋功能：可用發票號碼、客戶名稱、統編搜尋','顯示發票號碼、開立日期、客戶、統編、金額、狀態','點「📋 訂單」可查看完整訂單明細']},{title:'6️⃣ 退貨管理 (↩️ 退貨管理)',steps:['客戶從 APP 申請退貨後出現在「⏳ 待審核」','點「✅ 核准」→ 若需折讓單會要求輸入折讓單號','核准後額度自動回補（原訂單從 paid 改為 refunded 狀態）','點「💸 完成退款」標記實際退款給客戶','點「駁回」可拒絕退貨並填寫原因','老闆也可主動退貨：在訂單管理「✔ 已完成」訂單點「↩️ 退貨」'],warn:'若原訂單已開發票，必須開折讓單（不能作廢原發票）',tip:'退貨原因：商品瑕疵 / 送錯貨 / 客戶反悔 / 過期 / 包裝破損 / 其他'},{title:'⚠️ 風險控管機制',steps:['授信額度：客戶累積未結金額不能超過授信額度','時間窗：客戶只能在勾選的星期 + 時段內下單','下單時系統會檢查當下時間 + 已用額度，不通過會擋下','停用客戶：點「停用」按鈕後客戶無法新下單，已有訂單不受影響','專屬折扣率：每個客戶可設不同折扣（VIP 9 折、新客原價）','老闆審核時可改最終售價（特價、量大優惠等）']}]},
+  customer:{badge:'客戶訂購系統 v1.0',flow:['建立客戶資料','客戶下單','老闆審核','出貨/開發票','收款/結案'],sections:[{title:'1️⃣ 客戶資料管理 (📋 客戶資料)',steps:['點「＋ 新增客戶」開啟 4 區塊表單','基本資料：名稱、聯絡人、電話、類型','發票資訊：統編、發票抬頭、發票地址（三聯式 B2B 必填）','信用額度：授信額度（單次/累積最大可下單）+ 專屬折扣率（0.9 = 9折，1.0 = 原價）+ 付款方式','接單時間窗：勾選允許下單的星期 + 設定下單時段（時起~時迄）','🛒 可訂購品項：選「全部」＝看得到所有品項；選「只開放指定品項」並勾選後，該客戶下單頁只顯示勾的品項（用來精簡叫貨表、避免客戶點到沒備貨的品項）','系統自動產生 3 位客戶代碼（001、002...）','點「📋 連結」複製客戶下單網址，貼到 LINE / Email 給客戶','客戶用代碼登入下單，老闆停用後即無法下單'],tip:'代碼可手動指定（限 001~999），留空系統自動補空號'},{title:'2️⃣ 食材對外可賣設定 (🥬 食材庫存)',steps:['編輯食材時勾選「🛒 對外可賣 (B2B 客戶可訂購)」','勾選後出現「對外售價」欄位 + 即時毛利率提示','售價會顯示在客戶下單頁；客戶若有專屬折扣，會自動套用','轉售品項（🏭→🏪 轉售）預設都對外賣，使用品項本身的 sellPrice'],warn:'食材的 price 是進價，sellPrice 才是對外賣價。沒設 sellPrice 會用 price 當預設'},{title:'3️⃣ 訂單管理 (🛒 訂單管理)',steps:['客戶下單後出現在「⏳ 待審核」filter','點「✅ 核准」直接核准（按確定 = 用原價，按取消 = 進入改價模式）','改價模式可以調每個品項單價，按「確認並核准」儲存','已核准 → 點「🚚 出貨」標記出貨','已出貨 → 點「🧾 開發票」輸入發票號碼，或點「💰 直接收款」（不開發票）','已開發票 → 點「💰 收款」標記已收款','已付款 → 點「✔ 結案」完成訂單','已完成的訂單可點「↩️ 退貨」進入退貨流程','已取消 / 已退款狀態無操作'],warn:'核准時若超過授信額度會跳警告，可選擇強制核准'},{title:'4️⃣ 對帳單 (💰 對帳單)',steps:['按客戶分組顯示未結金額（已核准/出貨/開發票但未收款）','3 個統計卡：未結金額、本月已收、本月總額','點「📊 詳細對帳」看單一客戶完整訂單明細','點「📤 匯出對帳單」下載 CSV (Excel 可直接開啟)','對帳單可拿給客戶確認月底結帳金額']},{title:'5️⃣ 發票記錄 (🧾 發票記錄)',steps:['列出所有已開發票的訂單','搜尋功能：可用發票號碼、客戶名稱、統編搜尋','顯示發票號碼、開立日期、客戶、統編、金額、狀態','點「📋 訂單」可查看完整訂單明細']},{title:'6️⃣ 退貨管理 (↩️ 退貨管理)',steps:['客戶從 APP 申請退貨後出現在「⏳ 待審核」','點「✅ 核准」→ 若需折讓單會要求輸入折讓單號','核准後額度自動回補（原訂單從 paid 改為 refunded 狀態）','點「💸 完成退款」標記實際退款給客戶','點「駁回」可拒絕退貨並填寫原因','老闆也可主動退貨：在訂單管理「✔ 已完成」訂單點「↩️ 退貨」'],warn:'若原訂單已開發票，必須開折讓單（不能作廢原發票）',tip:'退貨原因：商品瑕疵 / 送錯貨 / 客戶反悔 / 過期 / 包裝破損 / 其他'},{title:'⚠️ 風險控管機制',steps:['授信額度：客戶累積未結金額不能超過授信額度','時間窗：客戶只能在勾選的星期 + 時段內下單','下單時系統會檢查當下時間 + 已用額度，不通過會擋下','停用客戶：點「停用」按鈕後客戶無法新下單，已有訂單不受影響','專屬折扣率：每個客戶可設不同折扣（VIP 9 折、新客原價）','老闆審核時可改最終售價（特價、量大優惠等）']}]},
   sales:{badge:'銷售資料管理',flow:['POS匯出','匯入系統','銷售分析','成本比對'],sections:[{title:'匯入方式',steps:['從 POS 後台匯出 CSV 或 Excel','點「📥 匯入 POS 資料」選擇檔案','系統自動辨識日期/品名/金額欄位','也可手動輸入單筆銷售'],tip:'支援多種 POS 格式，自動辨識欄位名稱'}]},
   asset:{badge:'固定資產管理',flow:['登錄資產','設定年限','自動折舊','報廢處理'],sections:[{title:'操作流程',steps:['新增資產填寫名稱、購入成本、耐用年限','系統按直線法自動計算累計折舊','資產淨值 = 成本 - 累計折舊','報廢時將狀態改為「已報廢」']}]},
   internal:{badge:'內部轉售作業',flow:['建立轉售品項','門市叫貨','建立出貨單','確認出貨','月底報表'],sections:[{title:'轉售品項設定',steps:['點「📦 轉售品項管理」建立中央廚房的轉售品項','設定類型（加工品/分裝品/原裝轉售）','填入成本與售價，系統自動計算加成和毛利率','原料組成欄填寫組成食材方便追溯'],tip:'售價建議加成 15~25% 涵蓋加工和人力成本'},{title:'出貨流程',steps:['點「＋ 建立出貨單」選擇門市','勾選品項並填入出貨數量','確認合計金額後儲存','可點「明細」查看或「Excel」匯出出貨單'],warn:'出貨單建立後無法修改，請確認數量正確'},{title:'月底結算',steps:['點「📊 門市成本報表」選擇月份','查看各門市進貨成本、售額、毛利','點「📤 匯出 Excel」將報表拋給財務系統']}]},
@@ -10306,7 +10315,7 @@ window.isIPComplete=function(p){return (+p.cost>0)&&(+p.sellPrice>0)};
 window.openInternalProductList=function(keepSearch){
 var prods=state.internalProducts||[];
 var kw=keepSearch&&window._ipSearchKw?window._ipSearchKw:'';
-var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:1.05rem;font-weight:700">📦 轉售品項管理</span><button class="btn btn-sm btn-outline" onclick="importSheetProducts()">📥 匯入叫貨表商品</button> <button class="btn btn-sm btn-outline" onclick="openResalePoolView()">🛒 可轉售商品池</button> <button class="btn btn-sm btn-primary" onclick="openInternalProductModal(\'\')">＋ 新增品項</button></div>';
+var html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px"><span style="font-size:1.05rem;font-weight:700">📦 轉售品項管理</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="exportIPExcel()">📊 匯出Excel</button><label class="btn btn-sm btn-outline" style="cursor:pointer;margin:0">📥 匯入Excel<input type="file" accept=".xlsx,.xls" style="display:none" onchange="importIPExcel(this)"></label><button class="btn btn-sm btn-outline" onclick="importSheetProducts()">📥 匯入叫貨表商品</button> <button class="btn btn-sm btn-outline" onclick="openResalePoolView()">🛒 可轉售商品池</button> <button class="btn btn-sm btn-primary" onclick="openInternalProductModal(\'\')">＋ 新增品項</button></span></div>';
 
 // 🆕 搜尋框 (關鍵字 + 注音首字母)
 html+='<div style="margin-bottom:10px;position:relative"><input id="ip-search-box" value="'+esc(kw)+'" placeholder="🔍 搜尋品名/編號/供應商,或注音首字母 (例:ㄐ → 雞/醬)" oninput="filterIPList(this.value)" style="width:100%;padding:8px 12px;border:1px solid #D6D4CC;border-radius:8px;font-size:0.9rem"><span style="position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:0.74rem;color:#999" id="ip-search-count"></span></div>';
@@ -10333,41 +10342,48 @@ window._renderIPListBody=function(prods,kw){
   if(!prods.length)return '<div style="text-align:center;color:#706E68;padding:20px">尚無轉售品項</div>';
   if(!filtered.length)return '<div style="text-align:center;color:#706E68;padding:20px">查無符合「'+esc(kw)+'」的品項</div>';
   
-  // 多層排序:1.分類(食材→包材) 2.完成狀態(完成→未完成) 3.供應商分組 4.品名
+  // 排序:有自訂「序」→ 依序號;否則 多層排序(食材→包材→完成→供應商→品名)
   var catOrder={'食材':0,'包材':1};
+  var customMode=filtered.some(function(p){return +p.sort>0});
   filtered.sort(function(a,b){
+    if(customMode){
+      var sa=+a.sort||9999,sb=+b.sort||9999;
+      if(sa!==sb)return sa-sb;
+      return (a.name||'').localeCompare(b.name||'');
+    }
     var ca=catOrder[a.category]==null?0:catOrder[a.category];
     var cb=catOrder[b.category]==null?0:catOrder[b.category];
-    if(ca!==cb)return ca-cb;  // 食材在前
+    if(ca!==cb)return ca-cb;
     var doneA=window.isIPComplete(a)?0:1,doneB=window.isIPComplete(b)?0:1;
-    if(doneA!==doneB)return doneA-doneB;  // 已完成在前
+    if(doneA!==doneB)return doneA-doneB;
     var supA=a.supplier||'zzz',supB=b.supplier||'zzz';
-    if(supA!==supB)return supA.localeCompare(supB);  // 同供應商相鄰
+    if(supA!==supB)return supA.localeCompare(supB);
     return (a.name||'').localeCompare(b.name||'');
   });
   
-  var html='<div style="overflow-x:auto;max-height:440px;overflow-y:auto"><table class="tbl"><thead style="position:sticky;top:0;background:#fff;z-index:1"><tr><th>分類</th><th>品名</th><th>類型</th><th>供應商</th><th>規格</th><th>成本</th><th>售價</th><th>加成%</th><th>狀態</th><th>操作</th></tr></thead><tbody>';
+  var html='<div style="overflow-x:auto;max-height:440px;overflow-y:auto"><table class="tbl"><thead style="position:sticky;top:0;background:#fff;z-index:1"><tr><th style="width:34px">序</th><th>分類</th><th>品名</th><th>類型</th><th>供應商</th><th>規格</th><th>成本</th><th>售價</th><th>加成%</th><th>狀態</th><th>操作</th></tr></thead><tbody>';
   var lastGroup='';
   filtered.forEach(function(p){
     var markup=p.cost>0?Math.round((p.sellPrice-p.cost)/p.cost*100):0;
     var supName='—';if(p.supplier){var s=(state.sups||[]).find(function(x){return x.id===p.supplier});if(s)supName=s.name}
     var done=window.isIPComplete(p);
     var cat=p.category||'食材';
-    // 分組標題 (分類 + 完成狀態變化時插入)
-    var groupKey=cat+'|'+(done?'完成':'未完成');
     var groupRow='';
-    if(groupKey!==lastGroup){
-      lastGroup=groupKey;
-      var catColor=cat==='包材'?'#9A6210':'#0A5A46';
-      groupRow='<tr style="background:#F3F1EB"><td colspan="10" style="font-weight:700;font-size:0.82rem;color:'+catColor+';padding:6px 10px">'+(cat==='包材'?'📦 包材':'🥬 食材')+' · '+(done?'✅ 已完成':'⏳ 未完成')+'</td></tr>';
+    if(!customMode){
+      var groupKey=cat+'|'+(done?'完成':'未完成');
+      if(groupKey!==lastGroup){
+        lastGroup=groupKey;
+        var catColor=cat==='包材'?'#9A6210':'#0A5A46';
+        groupRow='<tr style="background:#F3F1EB"><td colspan="11" style="font-weight:700;font-size:0.82rem;color:'+catColor+';padding:6px 10px">'+(cat==='包材'?'📦 包材':'🥬 食材')+' · '+(done?'✅ 已完成':'⏳ 未完成')+'</td></tr>';
+      }
     }
     var catBadge=cat==='包材'?'<span class="badge badge-warn">包材</span>':'<span class="badge badge-green">食材</span>';
     var typeBadge='<span class="badge '+(p.type==='加工品'?'badge-warn':p.type==='分裝品'?'badge-blue':'badge-gray')+'">'+esc(p.type||'')+'</span>';
     var statusBadge=done?'<span style="color:#0A5A46;font-weight:700;font-size:0.8rem">✅ 完成</span>':'<span style="color:#B82525;font-weight:700;font-size:0.8rem">⏳ 待補</span>';
-    html+=groupRow+'<tr id="ip-row-'+esc(p.id)+'"><td>'+catBadge+'</td><td style="font-weight:700">'+esc(p.name)+'</td><td>'+typeBadge+'</td><td style="font-size:0.82rem">'+esc(supName)+'</td><td style="font-size:0.84rem">'+esc(p.spec||'—')+'</td><td>'+CUR()+fmt(p.cost,1)+'</td><td style="font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td><td style="color:#0A5A46;font-weight:700">+'+markup+'%</td><td>'+statusBadge+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openInternalProductModal(\''+p.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delInternalProduct(\''+p.id+'\')">刪除</button></div></td></tr>';
+    html+=groupRow+'<tr id="ip-row-'+esc(p.id)+'"><td style="text-align:center;color:#999;font-size:0.8rem">'+(+p.sort||'')+'</td><td>'+catBadge+'</td><td style="font-weight:700">'+esc(p.name)+'</td><td>'+typeBadge+'</td><td style="font-size:0.82rem">'+esc(supName)+'</td><td style="font-size:0.84rem">'+esc(p.spec||'—')+'</td><td>'+CUR()+fmt(p.cost,1)+'</td><td style="font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td><td style="color:#0A5A46;font-weight:700">+'+markup+'%</td><td>'+statusBadge+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openInternalProductModal(\''+p.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delInternalProduct(\''+p.id+'\')">刪除</button></div></td></tr>';
   });
   html+='</tbody></table></div>';
-  html+='<div style="font-size:0.72rem;color:#999;margin-top:6px">共 '+filtered.length+' 項'+(kw?' (已過濾)':'')+' ｜ 排序:食材→包材,已完成→未完成,同供應商相鄰</div>';
+  html+='<div style="font-size:0.72rem;color:#999;margin-top:6px">共 '+filtered.length+' 項'+(kw?' (已過濾)':'')+' ｜ 排序:'+(customMode?'自訂序號(Excel匯入)':'食材→包材,已完成→未完成,同供應商相鄰')+'</div>';
   return html;
 };
 
@@ -10378,6 +10394,66 @@ window.filterIPList=function(kw){
   if(body)body.innerHTML=window._renderIPListBody(state.internalProducts||[],kw);
   var cnt=document.getElementById('ip-search-count');
   if(cnt){var n=(state.internalProducts||[]).filter(function(p){return window.matchIPSearch(p,kw)}).length;cnt.textContent=kw?(n+' 筆'):''}
+};
+
+// 🆕 轉售品項 Excel 匯出 (含排序+供應商,可在 Excel 編輯後匯回)
+window.exportIPExcel=function(){
+  if(typeof XLSX==='undefined'){toast('Excel 引擎尚未載入','err');return}
+  var sups=state.sups||[];
+  var rows=(state.internalProducts||[]).map(function(p,i){
+    var sName='';if(p.supplier){var s=sups.find(function(x){return x.id===p.supplier});sName=s?s.name:''}
+    return {'排序':(+p.sort||0)||(i+1),'編號':p.id,'品名':p.name||'','分類':p.category||'食材','類型':p.type||'','供應商':sName,'規格':p.spec||'','單位':p.unit||'','成本':+p.cost||0,'售價':+p.sellPrice||0,'原料組成':p.sourceItems||'','備註':p.note||''};
+  });
+  if(!rows.length){toast('尚無轉售品項','err');return}
+  var ws=XLSX.utils.json_to_sheet(rows);
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'轉售品項');
+  XLSX.writeFile(wb,'轉售品項_'+toDay()+'.xlsx');
+  toast('✅ 已匯出 '+rows.length+' 項\n在 Excel 改「排序」「供應商」後再匯入');
+};
+
+// 🆕 轉售品項 Excel 匯入 (依編號比對,更新排序/供應商等;空白欄不覆蓋)
+window.importIPExcel=function(input){
+  if(!input.files.length)return;
+  if(typeof XLSX==='undefined'){toast('Excel 引擎尚未載入','err');return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      var sups=state.sups||[];
+      var byId={},byName={};
+      (state.internalProducts||[]).forEach(function(p){byId[p.id]=p;byName[(p.name||'').trim()]=p});
+      var updated=0,supSet=0,supMiss=[],notFound=[];
+      rows.forEach(function(r){
+        var id=String(r['編號']||'').trim();
+        var p=byId[id]||byName[String(r['品名']||'').trim()];
+        if(!p){if(r['品名'])notFound.push(r['品名']);return}
+        if(String(r['排序'])!=='')p.sort=+r['排序']||0;
+        var sName=String(r['供應商']||'').trim();
+        if(sName){var s=sups.find(function(x){return x.name===sName||x.id===sName});if(s){p.supplier=s.id;supSet++}else{supMiss.push(sName)}}
+        if(String(r['成本'])!=='')p.cost=+r['成本']||0;
+        if(String(r['售價'])!=='')p.sellPrice=+r['售價']||0;
+        if(String(r['規格'])!=='')p.spec=String(r['規格']);
+        if(String(r['單位'])!=='')p.unit=String(r['單位']);
+        if(String(r['類型'])!=='')p.type=String(r['類型']);
+        if(String(r['分類'])!=='')p.category=String(r['分類']);
+        if(String(r['備註'])!=='')p.note=String(r['備註']);
+        if(String(r['原料組成'])!=='')p.sourceItems=String(r['原料組成']);
+        updated++;
+      });
+      saveState();
+      var body=document.getElementById('ip-list-body');
+      if(body)body.innerHTML=window._renderIPListBody(state.internalProducts||[],window._ipSearchKw||'');
+      var msg='✅ 更新 '+updated+' 項'+(supSet?'(設定供應商 '+supSet+')':'');
+      if(supMiss.length)msg+='\n⚠️ 找不到供應商:'+Array.from(new Set(supMiss)).slice(0,5).join('、')+'(請用供應商主檔的正確名稱)';
+      if(notFound.length)msg+='\n⚠️ 找不到品項:'+notFound.slice(0,5).join('、');
+      toast(msg);
+    }catch(err){toast('讀取失敗:'+err.message,'err')}
+  };
+  reader.readAsArrayBuffer(input.files[0]);
+  input.value='';
 };
 
 window.openInternalProductModal=function(id){
@@ -10431,7 +10507,7 @@ window.applyIPSuggestPrice=function(){
 };
 
 window.saveInternalProduct=function(eid){var name=$('ip-name')?$('ip-name').value.trim():'';if(!name){alert('請填入品名');return}
-var obj={id:eid||'IP'+Date.now(),name:name,category:$('ip-category')?$('ip-category').value:'食材',type:$('ip-type')?$('ip-type').value:'加工品',spec:$('ip-spec')?$('ip-spec').value:'',unit:$('ip-unit')?$('ip-unit').value:'包',cost:+($('ip-cost')?$('ip-cost').value:0)||0,sellPrice:+($('ip-sell')?$('ip-sell').value:0)||0,supplier:$('ip-supplier')?$('ip-supplier').value:'',targetMarkup:+($('ip-target-markup')?$('ip-target-markup').value:30)||30,sourceItems:$('ip-source')?$('ip-source').value:'',note:$('ip-note')?$('ip-note').value:'',tierOverrides:window.collectTierOverrides()};
+var obj={id:eid||'IP'+Date.now(),name:name,category:$('ip-category')?$('ip-category').value:'食材',type:$('ip-type')?$('ip-type').value:'加工品',spec:$('ip-spec')?$('ip-spec').value:'',unit:$('ip-unit')?$('ip-unit').value:'包',cost:+($('ip-cost')?$('ip-cost').value:0)||0,sellPrice:+($('ip-sell')?$('ip-sell').value:0)||0,supplier:$('ip-supplier')?$('ip-supplier').value:'',targetMarkup:+($('ip-target-markup')?$('ip-target-markup').value:30)||30,sourceItems:$('ip-source')?$('ip-source').value:'',note:$('ip-note')?$('ip-note').value:'',tierOverrides:window.collectTierOverrides(),sort:(function(){var o=(state.internalProducts||[]).find(function(x){return x.id===eid});return o&&o.sort?+o.sort:0})()};
 if(!state.internalProducts)state.internalProducts=[];
 if(eid){state.internalProducts=state.internalProducts.map(function(x){return x.id===eid?obj:x})}
 else{state.internalProducts.push(obj)}
@@ -11088,7 +11164,7 @@ pg.appendChild(dv({cls:'card',style:'padding:0;overflow:hidden',html:'<div style
   var pct=c.creditLimit?Math.round(used/c.creditLimit*100):0;
   var stColor=c.status==='active'?'badge-green':c.status==='suspended'?'badge-red':'badge-gray';
   var stText=c.status==='active'?'啟用中':c.status==='suspended'?'已停用':'已封存';
-  return '<tr id="cust-row-'+c.id+'" data-name="'+esc(c.name)+' '+esc(c.code||'')+' '+esc(c.contact||'')+' '+esc(c.taxId||'')+'"><td style="font-family:monospace;font-weight:700;font-size:1rem;color:#0A5A46">'+esc(c.code||'—')+'</td><td style="font-weight:700">'+esc(c.name)+'</td><td>'+esc(c.contact||'')+'</td><td>'+esc(c.phone||'')+'</td><td style="font-family:monospace;font-size:0.82rem">'+esc(c.taxId||'—')+'</td><td>'+CUR()+fmt(c.creditLimit||0,0)+'</td><td style="color:'+(pct>80?'#B82525':'#444')+'">'+CUR()+fmt(used,0)+(pct>0?' <span style="font-size:0.76rem;color:#999">('+pct+'%)</span>':'')+'</td><td style="color:#0A5A46">'+CUR()+fmt(avail,0)+'</td><td><span class="badge '+stColor+'">'+stText+'</span></td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="openCustModal(\''+c.id+'\')">編輯</button><button class="btn btn-sm btn-outline" onclick="copyCustLink(\''+c.id+'\')">📋 連結</button>'+(c.status==='active'?'<button class="btn btn-sm btn-outline" style="color:#B82525" onclick="toggleCustStatus(\''+c.id+'\',\'suspended\')">停用</button>':'<button class="btn btn-sm btn-primary" onclick="toggleCustStatus(\''+c.id+'\',\'active\')">啟用</button>')+'<button class="btn btn-sm btn-danger" onclick="delCustomer(\''+c.id+'\')">🗑 刪除</button></div></td></tr>'
+  return '<tr id="cust-row-'+c.id+'" data-name="'+esc(c.name)+' '+esc(c.code||'')+' '+esc(c.contact||'')+' '+esc(c.taxId||'')+'"><td style="font-family:monospace;font-weight:700;font-size:1rem;color:#0A5A46">'+esc(c.code||'—')+'</td><td style="font-weight:700">'+esc(c.name)+'</td><td>'+esc(c.contact||'')+'</td><td>'+esc(c.phone||'')+'</td><td style="font-family:monospace;font-size:0.82rem">'+esc(c.taxId||'—')+'</td><td>'+CUR()+fmt(c.creditLimit||0,0)+'</td><td style="color:'+(pct>80?'#B82525':'#444')+'">'+CUR()+fmt(used,0)+(pct>0?' <span style="font-size:0.76rem;color:#999">('+pct+'%)</span>':'')+'</td><td style="color:#0A5A46">'+CUR()+fmt(avail,0)+'</td><td><span class="badge '+stColor+'">'+stText+'</span>'+(c.supplyMode==='list'?'<br><span style="font-size:0.7rem;color:#0A5A46;white-space:nowrap">🛒 限'+((c.supplyItems||[]).length)+'項</span>':'')+'</td><td><div style="display:flex;gap:4px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="openCustModal(\''+c.id+'\')">編輯</button><button class="btn btn-sm btn-outline" onclick="copyCustLink(\''+c.id+'\')">📋 連結</button>'+(c.status==='active'?'<button class="btn btn-sm btn-outline" style="color:#B82525" onclick="toggleCustStatus(\''+c.id+'\',\'suspended\')">停用</button>':'<button class="btn btn-sm btn-primary" onclick="toggleCustStatus(\''+c.id+'\',\'active\')">啟用</button>')+'<button class="btn btn-sm btn-danger" onclick="delCustomer(\''+c.id+'\')">🗑 刪除</button></div></td></tr>'
 }).join('')+'</tbody></table></div>'}));
 
 pg.appendChild(dv({cls:'card',style:'background:#FFF8ED;border:1px solid #E8D58A;margin-top:14px',html:'<div style="font-size:0.88rem;line-height:1.7"><b>💡 客戶下單流程</b><br>1. 老闆建立客戶資料,系統自動產生 3 位代碼<br>2. 點「📋 連結」複製客戶下單網址,傳給客戶 (例:LINE/Email)<br>3. 客戶用代碼登入下單,系統會檢查額度跟時間窗<br>4. 切到「🛒 訂單管理」分頁審核並出貨</div>'}));
@@ -12047,6 +12123,19 @@ window.openCustModal=function(id){
   var dayNames=['日','一','二','三','四','五','六'];
   var dayChecks=dayNames.map(function(n,i){return '<label style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;cursor:pointer"><input type="checkbox" class="cu-day" value="'+i+'"'+(days.indexOf(i)>=0?' checked':'')+'><span>'+n+'</span></label>'}).join('');
   
+  var _supMode=c.supplyMode==='list'?'list':'all';
+  var _supSet={};(c.supplyItems||[]).forEach(function(x){_supSet[x]=1});
+  var _ol=window._custOrderableList();
+  var _supListHtml='';
+  ['自製品','轉售食材','轉售包材'].forEach(function(gn){var arr=_ol[gn]||[];if(!arr.length)return;_supListHtml+='<div style="margin-top:8px"><div style="font-size:0.78rem;font-weight:700;color:#0A5A46;margin-bottom:4px">'+gn+' <span style="font-weight:400;color:#999">('+arr.length+')</span> <button type="button" class="btn btn-sm btn-outline" style="padding:0 8px;font-size:0.7rem" onclick="_supplyGroupToggle(\''+gn+'\',true)">全選</button> <button type="button" class="btn btn-sm btn-outline" style="padding:0 8px;font-size:0.7rem" onclick="_supplyGroupToggle(\''+gn+'\',false)">清空</button></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1px 10px">';arr.forEach(function(it){_supListHtml+='<label data-grp="'+gn+'" style="display:flex;align-items:center;gap:5px;font-size:0.82rem;cursor:pointer;padding:1px 0"><input type="checkbox" class="cu-supply-ck" value="'+esc(it.id)+'"'+(_supSet[it.id]?' checked':'')+'>'+esc(it.name)+'</label>'});_supListHtml+='</div></div>'});
+  var _supSectionHtml='<div style="background:#FFF1F0;padding:12px;border-radius:6px;margin-bottom:12px">'+
+    '<div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🛒 可訂購品項（控制這個客戶下單頁看得到哪些）</div>'+
+    '<label style="display:inline-flex;align-items:center;gap:5px;margin-right:18px;cursor:pointer;font-size:0.86rem"><input type="radio" name="cu-supply" value="all"'+(_supMode==='all'?' checked':'')+' onchange="_supplyModeToggle()"> 全部品項（預設）</label>'+
+    '<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:0.86rem"><input type="radio" name="cu-supply" value="list"'+(_supMode==='list'?' checked':'')+' onchange="_supplyModeToggle()"> 只開放指定品項</label>'+
+    '<div id="cu-supply-box" style="margin-top:10px;'+(_supMode==='list'?'':'display:none')+'">'+
+    '<div style="font-size:0.74rem;color:#B82525;margin-bottom:6px">勾選此客戶可訂購的品項；沒勾的不會出現在他的下單頁</div>'+
+    _supListHtml+
+    '</div></div>';
   modal(mH(id?'編輯客戶':'新增客戶')+
     '<div style="background:#F3F1EB;padding:12px;border-radius:6px;margin-bottom:12px">'+
     '<div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📋 基本資料</div>'+
@@ -12095,6 +12184,7 @@ window.openCustModal=function(id){
     '<div style="font-size:0.74rem;color:#666;margin-top:6px">範例:週一三五 0-9 點才能下單,則勾選 一/三/五,起 0、迄 9</div>'+
     '</div>'+
     
+    _supSectionHtml+
     '<div class="fg"><label>備註</label><input id="cu-notes" value="'+esc(c.notes||c.note||'')+'"></div>'+
     
     mF("saveCust('"+id+"')"));
@@ -12132,6 +12222,10 @@ window.saveCust=function(eid){
   var orig=eid?(state.customers||[]).find(function(x){return x.id===eid}):null;
   var discRate=+($('cu-disc')?$('cu-disc').value:1)||1;
   if(discRate<0.1||discRate>1.5){alert('折扣率須介於 0.1 ~ 1.5 之間');return}
+  var supplyMode=(document.querySelector('input[name="cu-supply"]:checked')||{}).value||'all';
+  var supplyItems=[];
+  if(supplyMode==='list'){document.querySelectorAll('.cu-supply-ck:checked').forEach(function(cb){supplyItems.push(cb.value)})}
+  if(supplyMode==='list'&&supplyItems.length===0){if(!confirm('⚠️ 你選了「只開放指定品項」但一個都沒勾。\n\n這樣這個客戶下單頁會看不到任何品項。\n確定要這樣存嗎？'))return}
   var obj={
     id:eid||nxtId(state.customers||[],'C'),
     code:code||window.nextCustCode(),
@@ -12142,6 +12236,8 @@ window.saveCust=function(eid){
     type:$('cu-type')?$('cu-type').value:'B2B',
     taxId:$('cu-taxid')?$('cu-taxid').value.trim():'',
     needTax:$('cu-needtax')?$('cu-needtax').checked:false,
+    supplyMode:supplyMode,
+    supplyItems:supplyItems,
     invTitle:($('cu-invtitle')?$('cu-invtitle').value.trim():'')||name,
     invAddr:($('cu-invaddr')?$('cu-invaddr').value.trim():'')||($('cu-addr')?$('cu-addr').value.trim():''),
     creditLimit:+($('cu-clim')?$('cu-clim').value:0)||0,
@@ -13886,7 +13982,7 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.12.0';
+      window.SYSTEM_VERSION = '2.14.0';
       window.BUILD_NUMBER = '20260523-erp';
     } catch(e){}
 
@@ -13926,9 +14022,9 @@ pushUndo(); // 初始快照
           '🎯 異常偵測優化 + 閾值放寬到中央廚房規模'
         ]
       });
-      // v2.12.0 (本次更新 — 最新)
+      // v2.13.0
       VERSION_HISTORY.unshift({
-        ver: '2.12.0',
+        ver: '2.13.0',
         build: '20260523-erp',
         date: '2026-05-23',
         changes: [
@@ -13961,19 +14057,30 @@ pushUndo(); // 初始快照
           '👥 客戶資料新增「🗑 刪除」:刪除後其餘代碼自動往前重排(001/002/003…無空號);有訂單記錄的客戶禁止刪除(請改停用),保護帳務'
         ]
       });
+      // v2.14.0 (本次更新 — 最新)
+      VERSION_HISTORY.unshift({
+        ver: '2.14.0',
+        build: '20260607-erp',
+        date: '2026-06-07',
+        changes: [
+          '🛒 客戶可訂購品項限定:客戶資料新增「全部品項 / 只開放指定品項」,勾選後該客戶下單頁只顯示指定品項(精簡叫貨表、避免客戶點到沒備貨);預設全部,向後相容,各客戶獨立設定',
+          '📋 客戶列表顯示「🛒 限N項」標記,一眼看出哪些客戶有限定供貨',
+          '💡 設定即時生效:客戶下次重新整理下單頁即套用(同售價更新邏輯)'
+        ]
+      });
     }
 
     // 更新 topbar logo 版本顯示
     const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
     if(verSpan && /v2\.[0-9]/.test(verSpan.textContent)){
-      verSpan.textContent = 'v2.12.0';
+      verSpan.textContent = 'v2.14.0';
       verSpan.style.color = 'rgba(212,149,15,.85)';
       verSpan.style.fontWeight = '600';
     }
     // 更新瀏覽器標題
-    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.12.0'}catch(e){}
+    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.14.0'}catch(e){}
 
-    console.log('  ✅ 版本升級至 v2.12.0 (Build 20260523-erp)');
+    console.log('  ✅ 版本升級至 v2.14.0 (Build 20260607-erp)');
 
     // ═══════════════════════════════════════════════════════════
     // 完成
