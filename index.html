@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.14.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.16.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -240,7 +240,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.14.0</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.16.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -686,8 +686,8 @@ window.collectTierOverrides=function(){var o={};document.querySelectorAll('.tier
 // 統一可轉售商品池 = 轉售品項(全部) + 配方(標記 resale)
 window.getResalePool=function(){
   var pool=[];
-  (state.internalProducts||[]).forEach(function(p){pool.push({id:p.id,name:p.name,source:'internal',unit:p.unit||'',cost:(+p.cost)||0,sellPrice:(+p.sellPrice)||0,tierOverrides:p.tierOverrides||{},cat:p.category||p.type||'轉售品項'})});
-  (state.recipes||[]).forEach(function(r){if(r.resale){var per=0;try{per=(typeof calcCost==='function')?(calcCost(r).per||0):0}catch(e){per=0}pool.push({id:r.id,name:r.name,source:'recipe',unit:r.unit||'',cost:per,sellPrice:(+r.sellPrice)||0,tierOverrides:r.tierOverrides||{},cat:r.cat||'自製品'})}});
+  (state.internalProducts||[]).forEach(function(p){pool.push({id:p.id,name:p.name,source:'internal',unit:p.unit||'',cost:(+p.cost)||0,sellPrice:(+p.sellPrice)||0,tierOverrides:p.tierOverrides||{},cat:p.category||p.type||'轉售品項',sort:+p.sort||0})});
+  (state.recipes||[]).forEach(function(r){if(r.resale){var per=0;try{per=(typeof calcCost==='function')?(calcCost(r).per||0):0}catch(e){per=0}pool.push({id:r.id,name:r.name,source:'recipe',unit:r.unit||'',cost:per,sellPrice:(+r.sellPrice)||0,tierOverrides:r.tierOverrides||{},cat:r.cat||'自製品',sort:+r.sort||0})}});
   return pool;
 };
 window._custOrderableList=function(){
@@ -699,6 +699,30 @@ window._custOrderableList=function(){
 };
 window._supplyModeToggle=function(){var m=(document.querySelector('input[name="cu-supply"]:checked')||{}).value;var b=document.getElementById('cu-supply-box');if(b)b.style.display=(m==='list')?'':'none'};
 window._supplyGroupToggle=function(grp,on){document.querySelectorAll('label[data-grp="'+grp+'"] .cu-supply-ck').forEach(function(cb){cb.checked=on})};
+window._supplyCopyFrom=function(){
+  var sid=(document.getElementById('cu-supply-copy')||{}).value;if(!sid){alert('請先選要複製的客戶');return}
+  var src=(state.customers||[]).find(function(x){return x.id===sid});if(!src)return;
+  var mode=src.supplyMode==='list'?'list':'all';var set={};(src.supplyItems||[]).forEach(function(i){set[i]=1});
+  document.querySelectorAll('input[name="cu-supply"]').forEach(function(r){r.checked=(r.value===mode)});
+  document.querySelectorAll('.cu-supply-ck').forEach(function(cb){cb.checked=!!set[cb.value]});
+  window._supplyModeToggle();
+  if(typeof toast==='function')toast('✅ 已套用「'+src.name+'」的清單,可再微調後儲存');else alert('✅ 已套用「'+src.name+'」的清單');
+};
+window._supplyBulkPanel=function(){var p=document.getElementById('cu-supply-bulk');if(p)p.style.display=(p.style.display==='none'?'':'none')};
+window._supplyBulkApply=function(curId){
+  var mode=(document.querySelector('input[name="cu-supply"]:checked')||{}).value||'all';
+  var items=[];if(mode==='list'){document.querySelectorAll('.cu-supply-ck:checked').forEach(function(cb){items.push(cb.value)})}
+  var targets=[];document.querySelectorAll('.cu-bulk-ck:checked').forEach(function(cb){targets.push(cb.value)});
+  if(!targets.length){alert('請勾選要套用的客戶');return}
+  if(mode==='list'&&items.length===0){if(!confirm('目前是「只開放指定品項」但沒勾任何品項,套用後這些客戶會看不到任何品項。確定?'))return}
+  if(!confirm('確定把目前的清單套用到 '+targets.length+' 個客戶?\n(會覆寫他們原本的可訂購設定)'))return;
+  var n=0;(state.customers||[]).forEach(function(c){if(targets.indexOf(c.id)>=0){c.supplyMode=mode;c.supplyItems=items.slice();n++}});
+  if(typeof addAudit==='function')addAudit('批次設定可訂購品項',n+'個客戶');
+  saveState();alert('✅ 已套用到 '+n+' 個客戶');
+  var p=document.getElementById('cu-supply-bulk');if(p)p.style.display='none';
+};
+window._setIPSort=function(id,v){var p=(state.internalProducts||[]).find(function(x){return x.id===id});if(!p)return;p.sort=+v||0;saveState();if(typeof filterIPList==='function'){filterIPList()}else if(typeof renderPage==='function'){renderPage()}};
+window._setPoolSort=function(source,id,v){var arr=source==='recipe'?state.recipes:state.internalProducts;var o=(arr||[]).find(function(x){return x.id===id});if(!o)return;o.sort=+v||0;saveState();if(typeof toast==='function')toast('序號已儲存(關閉重開或按🔄可預覽排序)')};
 var SHEET_IMPORT_SEED=[["紐澳良雞腿排(4支/包)","包",200,"義早食材"],["蒜香雞肉(1kg/包)","包",210,"義早食材"],["綜合鮮菇(1kg/包)","包",180,"義早食材"],["炭香燒肉(1kg/包)","包",260,"義早食材"],["鮪魚醬(1kg/包)","包",290,"義早食材"],["凱撒醬(1kg/包)","包",275,"義早食材"],["蜂蜜芥末醬(1kg/包)","包",180,"義早食材"],["塔塔醬(1kg/包)","包",180,"義早食材"],["藍莓優格醬(1kg/包)","包",270,"義早食材"],["大蒜醬(500g/盒)","盒",230,"義早食材"],["杏仁奶酥醬(500g/盒)","盒",245,"義早食材"],["紅醬(1kg/包)","包",160,"義早食材"],["白醬(1kg/包)","包",160,"義早食材"],["青醬(1kg/包)","包",210,"義早食材"],["肉醬(1kg/包)","包",180,"義早食材"],["泰式打拋豬(1kg/包)","包",195,"義早食材"],["麻辣醬(1kg/包)","包",270,"義早食材"],["辣椒醬(500g/包)","包",140,"義早食材"],["醬油膏(1kg/包)","包",95,"義早食材"],["料理調味粉(1kg/包)","包",130,"義早食材"],["義大利直麵(熟)(200g/包)","包",10,"義早食材"],["蜜汁鴨胸(500g/23包/箱)","包",315,"義早食材"],["青花菜(1kg/10包/箱)","包",70,"義早食材"],["玉米筍(1kg/10包/箱)","包",126,"義早食材"],["紅蘿蔔片(1kg/10包/箱)","包",58,"義早食材"],["大魚排(60片/箱)(5片為單位)","包",75,"義早食材"],["日式雪花豬排(130g/45片/6kg箱)(5片為單位)","包",175,"義早食材"],["鯰魚排(5片/10包/箱)","包",179,"義早食材"],["鯰魚排(3片/10包/箱)","包",95,"義早食材"],["韓式泡菜(3kg/桶)","包",480,"義早食材"],["優質雞塊(1kg/12包)","包",142,"義早食材"],["紅皮熟栗地瓜(1kg/12包/箱)","包",116,"義早食材"],["玉米粒易開罐(285g/24罐/箱)","罐",22,"義早食材"],["義大利直麵(生)(500g/20包/箱)","包",26,"義早食材"],["鮮奶油23.3%(12罐/箱)","罐",105,"義早食材"],["原味乳酪醬(500g/盒)","盒",194,"義早食材"],["藍莓乳酪醬(500g/盒)","盒",200,"義早食材"],["青蘋果餡(2.7g/6罐/箱)","罐",683,"義早食材"],["美乃滋(600g/包)","包",76,"義早食材"],["美式鬆餅(2片/50包/箱)","包",12,"義早食材"],["乳酪燒餅(10片/3盒/箱)","箱",320,"義早食材"],["光頭堡(30顆/籃)","顆",7,"義早食材"],["帕尼尼(30顆/籃)","顆",13,"義早食材"],["帕瑪森熱狗堡(12入/包)","包",164,"義早食材"],["泰式紅茶葉(600g*/30包/箱)","包",157,"義早食材"],["奶香金萱(600g/30包/箱)","包",224,"義早食材"],["白葡萄風味烏龍茶包(6.5g*50入/20包/箱)","包",242,"義早食材"],["南非國寶茶(7g*50入/20包/箱)","包",453,"義早食材"],["南非綠國寶茶(3.5g*50入/20包/箱)","包",389,"義早食材"],["南非紫蘇綠國寶茶(4.5g*50入/20包/箱)","包",389,"義早食材"],["專用奶精粉(1kg/20包/箱)","包",173,"義早食材"],["什穀芝麻飲粉(500g/40包/箱)","包",168,"義早食材"],["比利時風味巧克力粉(1kg/20包/箱)","包",420,"義早食材"],["PET8OZ透明沙拉碗(25個/20包/箱)","包",44,"義早包材"],["PET8OZ透明沙拉蓋(50個/10包/箱)","包",53,"義早包材"],["PET24OZ花型沙拉碗、蓋(50個/3組/箱)","組",273,"義早包材"],["500空白紙杯(50個/20包/箱)","包",60,"義早包材"],["400空白紙杯(50個/20包/箱)","包",55,"義早包材"],["360空白紙杯(50個/20包/箱)","包",53,"義早包材"],["8OZ空白紙杯(50個/20包/箱)","包",54,"義早包材"],["凸杯蓋 90mm(50個/20包/箱)","包",49,"義早包材"],["凸杯蓋 78mm(50個/20包/箱)","包",57,"義早包材"],["90熱杯套(25個/40包/箱)","串",20,"義早包材"],["1.5OZ PET塑膠杯蓋(100個/25包/箱)","包",92,"義早包材"],["902塑膠內襯(50個/12包/箱)","包",63,"義早包材"],["902空白紙湯碗(50個/12包/箱)","包",81,"義早包材"],["902凸蓋(50個/12包/箱)","包",66,"義早包材"],["850透明塑膠湯碗(50個/12包/箱)","包",103,"義早包材"],["850空白紙湯碗(50個/12包/箱)","包",60,"義早包材"],["850平蓋(50個/12包/箱)","包",29,"義早包材"],["L300(50個/10包/箱)","包",276,"義早包材"],["L500(50個/10包/箱)","包",171,"義早包材"],["9吋披薩盒(50個/箱)","箱",630,"義早包材"],["3號內折牛皮方形餐盒(50個/4包/箱)","包",315,"義早包材"],["空白一體小(60個/10包/箱)","包",83,"義早包材"],["空白點心盒(100個/10包/箱)","包",95,"義早包材"],["20*20CM防油牛皮L袋(100個/40包/箱)","包",88,"義早包材"],["#70平口金色三角袋(100只/包)","包",91,"義早包材"],["鐵炮竹竹籤9cm(250支/80包)","包",58,"義早包材"],["黑色西餐匙(100支/40包/箱)","包",46,"義早包材"],["黑色西餐叉(100支/30包/2箱)","包",45,"義早包材"],["單支膠裝斜口6*18透明吸管(200支/20包/箱)","包",26,"義早包材"],["單支膠裝斜口12*21透明吸管(50支/40包/箱)","包",14,"義早包材"],["單支紙包斜口6*21透明吸管(100支/40包/箱)","包",40,"義早包材"],["單支紙包斜口6*21透明吸管(100支/50包/箱)","包",46,"義早包材"],["單支紙包斜口12*21透明吸管(50支/40包/箱)","包",47,"義早包材"],["免洗筷(80雙/30包/袋)","包",21,"義早包材"],["環保餐巾紙23cm單層(100張/60包/箱)","包",22,"義早包材"],["平邊牛皮色-四折扇形紙(100張/100包/箱)","包",16,"義早包材"],["空白封口膜(350m/6捲/箱)","捲",352,"義早包材"],["感熱紙80*80mm(60捲/箱)","捲",22,"義早包材"],["標籤貼紙40*30mm(5捲/20包/箱)","包",139,"義早包材"],["保鮮膜30公分 X 500公尺","盒",399,"義早包材"],["透明1號提袋(1kg/包)","包",120,"義早包材"],["透明2號提袋(1kg/包)","包",120,"義早包材"],["透明3號提袋(1kg/包)","包",120,"義早包材"],["透明1號提袋(2kg/包)","包",240,"義早包材"],["透明2號提袋(2kg/包)","包",240,"義早包材"],["透明3號提袋(2kg/包)","包",240,"義早包材"],["PS黑色雙杯座(100個/20包/箱)","包",56,"義早包材"],["PS黑色四杯座(50個/20包/箱)","包",49,"義早包材"],["煎板清潔劑","瓶",303,"義早包材"],["塑膠垃圾袋66*80(10包/箱)","包",97,"義早包材"],["義早logo圓貼(5000張)(約1~4天)","包",1380,"義早包材"],["收入傳票","本",25,"義早包材"],["支出傳票","本",25,"義早包材"],["二聯收據(50組/本)","本",35,"義早包材"],["透明膠帶18mm(8入/捆)","捆",95,"義早包材"],["BUNN12.75*5.25濾紙(500pcs/箱)","箱",1102.5,"義早包材"],["NBR無粉手套紫S號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫M號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫L號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫XL號(100入/盒)","盒",185,"義早包材"],["立領長袖反摺-淺灰襯衫(M) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(L) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(XL) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(2L) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(3L) 義早","件",700,"義早包材"],["雙肩銅鈎耐磨咖啡色背心圍裙","件",600,"義早包材"],["深麻灰打鳥帽 義早","件",200,"義早包材"],["蒜香雞肉(1kg/包)","包",210,"咕咕食材"],["綜合鮮菇(1kg/包)","包",180,"咕咕食材"],["炭香燒肉(1kg/包)","包",260,"咕咕食材"],["鮪魚醬(1kg/包)","包",290,"咕咕食材"],["肉醬(1kg/包)","包",180,"咕咕食材"],["泰式打拋豬(1kg/包)","包",195,"咕咕食材"],["辣椒醬(500g/包)","包",140,"咕咕食材"],["醬油膏(1kg/包)","包",95,"咕咕食材"],["酸菜(1kg/包)","包",110,"咕咕食材"],["菜脯(1kg/包)","包",90,"咕咕食材"],["焢肉(1kg/包)","包",185,"咕咕食材"],["料理調味粉(1kg/包)","包",130,"咕咕食材"],["小熱狗(50支/20包/箱)","包",120,"咕咕食材"],["起司片(90片/12包)","包",265,"咕咕食材"],["乳酪絲(1kg/10包/箱)","包",245,"咕咕食材"],["薯餅(20片/12包/箱)","包",150,"咕咕食材"],["脆皮薯條(2kg/6包/箱)","包",210,"咕咕食材"],["鮮奶油23.3%(12罐/箱)","罐",105,"咕咕食材"],["美乃滋(600g/包)","包",76,"咕咕食材"],["老麵饅頭(6入/包)","包",78,"咕咕食材"],["黑糖饅頭(6入/包)","包",92,"咕咕食材"],["蔥捲(6入/包)","包",135,"咕咕食材"],["芋頭捲(6入/包)","包",143,"咕咕食材"],["雜糧堅果饅頭(6入/包)","包",168,"咕咕食材"],["鮮蔥黑豚包(6入/包)","包",152,"咕咕食材"],["金沙包(6入/包)","包",152,"咕咕食材"],["芝麻包(6入/包)","包",143,"咕咕食材"],["刈包(20入/8包/箱)","包",150,"咕咕食材"],["蛋餅皮(30片/12包/箱)","包",65,"咕咕食材"],["厚切蔥抓餅(10片/10包/箱)","包",90,"咕咕食材"],["河粉皮(10片/10包/箱)","包",50,"咕咕食材"],["乳酪燒餅(10片/3盒/箱)","箱",320,"咕咕食材"],["蘿蔔糕(10片/10包/箱)","包",60,"咕咕食材"],["鍋貼(50入/12包/箱)","包",100,"咕咕食材"],["生煎包(50入/12包/箱)","包",100,"咕咕食材"],["肉粽(10入/12包/箱)","包",250,"咕咕食材"],["老油條(300入/3kg/箱)","箱",650,"咕咕食材"],["肉鬆(3kg/桶)","包",400,"咕咕食材"],["優質雞塊(1kg/12包/箱)","包",142,"咕咕食材"],["黃金脆皮雞排(30片/箱)(5片/包)","包",105,"咕咕食材"],["玉米粒易開罐(285g/24罐/箱)","罐",22,"咕咕食材"],["滷蛋(30粒/8包/箱)","包",240,"咕咕食材"],["豆皮菜鬆(600g/包)","包",110,"咕咕食材"],["豆棗(3kg/包)","包",320,"咕咕食材"],["牛蒡絲(3kg/包)","包",425,"咕咕食材"],["飯糰米(5kg/1包)","包",260,"咕咕食材"],["紅藜麥(1kg/1包)","包",165,"咕咕食材"],["花生粉(600g/包)","包",100,"咕咕食材"],["低筋麵粉(3kg/包)","包",110,"咕咕食材"],["鹽(1kg/1包)","包",20,"咕咕食材"],["二砂(1kg/1包)","包",40,"咕咕食材"],["胡椒鹽(600g/包)","包",120,"咕咕食材"],["番茄醬(3.15kg/桶)","桶",200,"咕咕食材"],["醬油膏(6kg/桶)","桶",235,"咕咕食材"],["沙拉油(18L/桶)","桶",865,"咕咕食材"],["耐炸油(18L/桶)","桶",875,"咕咕食材"],["泰式紅茶葉(600g*/30包/箱)","包",157,"咕咕食材"],["蔗糖液(3kg/8包/箱)","包",125,"咕咕食材"],["專用奶精粉(1kg/20包/箱)","包",173,"咕咕食材"],["400空白紙杯(50個/20包/箱)","包",53,"咕咕包材"],["凸杯蓋 90mm(50個/20包/箱)","包",49,"咕咕包材"],["90熱杯套(25個/40包/箱)","串",20,"咕咕包材"],["1.5OZ PET塑膠杯蓋(100個/25包/箱)","包",92,"咕咕包材"],["850空白紙湯碗(50個/12包/箱)","包",60,"咕咕包材"],["850平蓋(50個/12包/箱)","包",29,"咕咕包材"],["260空白紙湯碗(50個/40包/箱)","包",30,"咕咕包材"],["空白一體小(60個/10包/箱)","包",83,"咕咕包材"],["空白點心盒(100個/10包/箱)","包",95,"咕咕包材"],["20*20CM防油牛皮L袋(100張/40包/箱)","包",88,"咕咕包材"],["20*20CM防油牛皮L袋(200張/25包/箱)","包",172,"咕咕包材"],["30*30CM空白淋膜紙(1000張/4包/箱)","包",900,"咕咕包材"],["4兩防油紙袋(100入/束)","束",40,"咕咕包材"],["薯條袋","束",35,"咕咕包材"],["橡皮筋小","包",50,"咕咕包材"],["0號夾鏈袋","包",15,"咕咕包材"],["擦手紙(120抽/20包/箱)","箱",410,"咕咕包材"],["黑色西餐匙(100支/40包/箱)","包",46,"咕咕包材"],["黑色西餐叉(100支/30包/2箱)","包",45,"咕咕包材"],["單支膠裝斜口6*18透明吸管(200支/20包/箱)","包",26,"咕咕包材"],["單支紙包斜口6*21透明吸管(100支/50包/箱)","包",46,"咕咕包材"],["免洗筷(80雙/30包/袋)","包",21,"咕咕包材"],["環保餐巾紙23cm單層(100張/60包/箱)","包",22,"咕咕包材"],["空白封口膜(350m/6捲/箱)","捲",352,"咕咕包材"],["感熱紙80*80mm(60捲/箱)","捲",22,"咕咕包材"],["標籤貼紙40*30mm(5捲/20包/箱)","包",139,"咕咕包材"],["保鮮膜30公分 X 500公尺","盒",399,"咕咕包材"],["4兩耐熱袋","包",40,"咕咕包材"],["6兩耐熱袋","包",40,"咕咕包材"],["6兩耐熱袋(捲)","捲",180,"咕咕包材"],["1斤耐熱袋","捲",180,"咕咕包材"],["3斤耐熱袋","捲",180,"咕咕包材"],["10斤耐熱袋","捲",180,"咕咕包材"],["煎板清潔劑","瓶",303,"咕咕包材"],["水槽濾網(50入/包)","包",35,"咕咕包材"],["沙拉脫","桶",50,"咕咕包材"],["漂白水","桶",50,"咕咕包材"],["除油劑","桶",210,"咕咕包材"],["酒精","桶",505,"咕咕包材"],["3M菜瓜布(2入/包)","包",45,"咕咕包材"],["3M綠菜瓜布(2入/包)","包",45,"咕咕包材"],["好神拖布盤","個",230,"咕咕包材"],["塑膠垃圾袋66*80(10包/箱)","包",97,"咕咕包材"],["咕咕logo圓貼(5000張)(約1~4天)","包",1380,"咕咕包材"],["收入傳票","本",25,"咕咕包材"],["支出傳票","本",25,"咕咕包材"],["二聯收據(50組/本)","本",35,"咕咕包材"],["透明膠帶18mm(8入/捆)","捆",95,"咕咕包材"],["NBR無粉手套紫S號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫M號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫L號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫XL號(100入/盒)","盒",185,"咕咕包材"]];
 
 window.importSheetProducts=function(){
@@ -720,13 +744,14 @@ window.importSheetProducts=function(){
 
 window.openResalePoolView=function(){
   var pool=getResalePool();var tiers=getTiers();
-  var thead='<tr><th>商品</th><th>來源</th><th style="text-align:right">成本</th><th style="text-align:right">基準售價</th>'+tiers.map(function(t){return '<th style="font-size:0.74rem;text-align:right">'+esc(t.name)+'</th>'}).join('')+'</tr>';
+  pool.sort(function(a,b){var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
+  var thead='<tr><th style="width:46px">序</th><th>商品</th><th>來源</th><th style="text-align:right">成本</th><th style="text-align:right">基準售價</th>'+tiers.map(function(t){return '<th style="font-size:0.74rem;text-align:right">'+esc(t.name)+'</th>'}).join('')+'</tr>';
   var rows=pool.length?pool.map(function(p){
     var srcBadge=p.source==='internal'?'<span class="badge badge-blue">轉售品項</span>':'<span class="badge badge-warn">自製品</span>';
     var tcells=tiers.map(function(t){var ov=p.tierOverrides&&p.tierOverrides[t.name]!=null&&p.tierOverrides[t.name]!=='';var price=window.getTierPrice(p,t.name);return '<td style="text-align:right'+(ov?';color:#B82525;font-weight:700':'')+'">'+CUR()+fmt(price,1)+(ov?' *':'')+'</td>'}).join('');
-    return '<tr><td style="font-weight:600">'+esc(p.name)+'</td><td>'+srcBadge+'</td><td style="text-align:right;color:#706E68">'+CUR()+fmt(p.cost,1)+'</td><td style="text-align:right;font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td>'+tcells+'</tr>';
-  }).join(''):'<tr><td colspan="'+(4+tiers.length)+'" style="text-align:center;color:#999;padding:20px">尚無可轉售商品 — 轉售品項自動納入;配方需勾「納入轉售商品池」</td></tr>';
-  var html='<div style="font-size:1.1rem;font-weight:700;margin-bottom:6px">🛒 可轉售商品池 ('+pool.length+' 項)</div><div style="font-size:0.8rem;color:#706E68;margin-bottom:10px">轉售品項全數納入;配方需在編輯時勾選「納入轉售商品池」。紅字 * = 該層級為個別覆寫價。Phase 2 門市叫貨 / Phase 3 客戶下單會讀此池。</div><div style="overflow-x:auto"><table class="tbl" style="font-size:0.84rem"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div><div class="save-btns" style="margin-top:14px"><button class="btn btn-primary" onclick="closeModal()">關閉</button></div>';
+    return '<tr><td><input type="number" value="'+(+p.sort||'')+'" onchange="_setPoolSort(\''+p.source+'\',\''+esc(p.id)+'\',this.value)" title="輸入序號(小→大),客戶下單頁會依此排" style="width:42px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px;font-size:0.8rem"></td><td style="font-weight:600">'+esc(p.name)+'</td><td>'+srcBadge+'</td><td style="text-align:right;color:#706E68">'+CUR()+fmt(p.cost,1)+'</td><td style="text-align:right;font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td>'+tcells+'</tr>';
+  }).join(''):'<tr><td colspan="'+(5+tiers.length)+'" style="text-align:center;color:#999;padding:20px">尚無可轉售商品 — 轉售品項自動納入;配方需勾「納入轉售商品池」</td></tr>';
+  var html='<div style="font-size:1.1rem;font-weight:700;margin-bottom:6px">🛒 可轉售商品池 ('+pool.length+' 項)</div><div style="font-size:0.8rem;color:#706E68;margin-bottom:10px">轉售品項全數納入;配方需在編輯時勾選「納入轉售商品池」。🔢 最左「序」欄可直接輸入序號(小→大)排列<b>轉售品項＋自製品</b>,客戶下單頁順序會依此連動(全客戶共用)。紅字 * = 該層級為個別覆寫價。</div><div style="overflow-x:auto"><table class="tbl" style="font-size:0.84rem"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div><div class="save-btns" style="margin-top:14px"><button class="btn btn-outline" onclick="openResalePoolView()">🔄 重新整理排序</button><button class="btn btn-primary" onclick="closeModal()">關閉</button></div>';
   modal(html,true);
 };
 const opts=(arr,sel)=>arr.map(v=>`<option value="${esc(v)}"${v===sel?' selected':''}>${esc(v)}</option>`).join('');
@@ -10380,7 +10405,7 @@ window._renderIPListBody=function(prods,kw){
     var catBadge=cat==='包材'?'<span class="badge badge-warn">包材</span>':'<span class="badge badge-green">食材</span>';
     var typeBadge='<span class="badge '+(p.type==='加工品'?'badge-warn':p.type==='分裝品'?'badge-blue':'badge-gray')+'">'+esc(p.type||'')+'</span>';
     var statusBadge=done?'<span style="color:#0A5A46;font-weight:700;font-size:0.8rem">✅ 完成</span>':'<span style="color:#B82525;font-weight:700;font-size:0.8rem">⏳ 待補</span>';
-    html+=groupRow+'<tr id="ip-row-'+esc(p.id)+'"><td style="text-align:center;color:#999;font-size:0.8rem">'+(+p.sort||'')+'</td><td>'+catBadge+'</td><td style="font-weight:700">'+esc(p.name)+'</td><td>'+typeBadge+'</td><td style="font-size:0.82rem">'+esc(supName)+'</td><td style="font-size:0.84rem">'+esc(p.spec||'—')+'</td><td>'+CUR()+fmt(p.cost,1)+'</td><td style="font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td><td style="color:#0A5A46;font-weight:700">+'+markup+'%</td><td>'+statusBadge+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openInternalProductModal(\''+p.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delInternalProduct(\''+p.id+'\')">刪除</button></div></td></tr>';
+    html+=groupRow+'<tr id="ip-row-'+esc(p.id)+'"><td style="text-align:center"><input type="number" value="'+(+p.sort||'')+'" onchange="_setIPSort(\''+esc(p.id)+'\',this.value)" title="輸入序號(小→大);客戶下單頁也會跟著這個順序排" style="width:46px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px;font-size:0.8rem"></td><td>'+catBadge+'</td><td style="font-weight:700">'+esc(p.name)+'</td><td>'+typeBadge+'</td><td style="font-size:0.82rem">'+esc(supName)+'</td><td style="font-size:0.84rem">'+esc(p.spec||'—')+'</td><td>'+CUR()+fmt(p.cost,1)+'</td><td style="font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td><td style="color:#0A5A46;font-weight:700">+'+markup+'%</td><td>'+statusBadge+'</td><td><div style="display:flex;gap:4px"><button class="btn btn-sm btn-outline" onclick="openInternalProductModal(\''+p.id+'\')">編輯</button><button class="btn btn-sm btn-danger" onclick="delInternalProduct(\''+p.id+'\')">刪除</button></div></td></tr>';
   });
   html+='</tbody></table></div>';
   html+='<div style="font-size:0.72rem;color:#999;margin-top:6px">共 '+filtered.length+' 項'+(kw?' (已過濾)':'')+' ｜ 排序:'+(customMode?'自訂序號(Excel匯入)':'食材→包材,已完成→未完成,同供應商相鄰')+'</div>';
@@ -12128,14 +12153,19 @@ window.openCustModal=function(id){
   var _ol=window._custOrderableList();
   var _supListHtml='';
   ['自製品','轉售食材','轉售包材'].forEach(function(gn){var arr=_ol[gn]||[];if(!arr.length)return;_supListHtml+='<div style="margin-top:8px"><div style="font-size:0.78rem;font-weight:700;color:#0A5A46;margin-bottom:4px">'+gn+' <span style="font-weight:400;color:#999">('+arr.length+')</span> <button type="button" class="btn btn-sm btn-outline" style="padding:0 8px;font-size:0.7rem" onclick="_supplyGroupToggle(\''+gn+'\',true)">全選</button> <button type="button" class="btn btn-sm btn-outline" style="padding:0 8px;font-size:0.7rem" onclick="_supplyGroupToggle(\''+gn+'\',false)">清空</button></div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1px 10px">';arr.forEach(function(it){_supListHtml+='<label data-grp="'+gn+'" style="display:flex;align-items:center;gap:5px;font-size:0.82rem;cursor:pointer;padding:1px 0"><input type="checkbox" class="cu-supply-ck" value="'+esc(it.id)+'"'+(_supSet[it.id]?' checked':'')+'>'+esc(it.name)+'</label>'});_supListHtml+='</div></div>'});
+  var _supCopyOpts=(state.customers||[]).filter(function(x){return x.id!==id}).map(function(x){return '<option value="'+x.id+'">'+esc(x.code||'')+' '+esc(x.name)+(x.supplyMode==='list'?' (限'+((x.supplyItems||[]).length)+'項)':' (全部)')+'</option>'}).join('');
+  var _supBulkOpts=(state.customers||[]).filter(function(x){return x.id!==id}).map(function(x){return '<label style="display:inline-flex;align-items:center;gap:4px;margin:2px 10px 2px 0;font-size:0.82rem;cursor:pointer"><input type="checkbox" class="cu-bulk-ck" value="'+x.id+'">'+esc(x.code||'')+' '+esc(x.name)+'</label>'}).join('');
   var _supSectionHtml='<div style="background:#FFF1F0;padding:12px;border-radius:6px;margin-bottom:12px">'+
     '<div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">🛒 可訂購品項（控制這個客戶下單頁看得到哪些）</div>'+
+    (_supCopyOpts?'<div style="margin-bottom:10px;padding:8px;background:#fff;border:1px dashed #bbb;border-radius:6px;font-size:0.82rem">📋 快速套用：<select id="cu-supply-copy" style="padding:4px 6px;border:1px solid #ccc;border-radius:5px;font-family:inherit;max-width:240px"><option value="">— 選一個客戶複製其清單 —</option>'+_supCopyOpts+'</select> <button type="button" class="btn btn-sm btn-outline" onclick="_supplyCopyFrom()">複製進來</button></div>':'')+
     '<label style="display:inline-flex;align-items:center;gap:5px;margin-right:18px;cursor:pointer;font-size:0.86rem"><input type="radio" name="cu-supply" value="all"'+(_supMode==='all'?' checked':'')+' onchange="_supplyModeToggle()"> 全部品項（預設）</label>'+
     '<label style="display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-size:0.86rem"><input type="radio" name="cu-supply" value="list"'+(_supMode==='list'?' checked':'')+' onchange="_supplyModeToggle()"> 只開放指定品項</label>'+
     '<div id="cu-supply-box" style="margin-top:10px;'+(_supMode==='list'?'':'display:none')+'">'+
     '<div style="font-size:0.74rem;color:#B82525;margin-bottom:6px">勾選此客戶可訂購的品項；沒勾的不會出現在他的下單頁</div>'+
     _supListHtml+
-    '</div></div>';
+    '</div>'+
+    (_supBulkOpts?'<div style="margin-top:10px"><button type="button" class="btn btn-sm btn-outline" onclick="_supplyBulkPanel()">📋 把目前的清單套用到其他客戶…</button><div id="cu-supply-bulk" style="display:none;margin-top:8px;padding:10px;background:#fff;border:1px solid #ccc;border-radius:6px"><div style="font-size:0.78rem;color:#666;margin-bottom:6px">勾選要套用的客戶，會把<b>目前畫面上的設定</b>覆寫過去（適合一次設定多家門市/加盟店）：</div><div style="max-height:160px;overflow:auto;margin-bottom:8px">'+_supBulkOpts+'</div><button type="button" class="btn btn-sm btn-primary" onclick="_supplyBulkApply(\''+id+'\')">✅ 套用到勾選的客戶</button></div></div>':'')+
+    '</div>';
   modal(mH(id?'編輯客戶':'新增客戶')+
     '<div style="background:#F3F1EB;padding:12px;border-radius:6px;margin-bottom:12px">'+
     '<div style="font-size:0.85rem;font-weight:600;margin-bottom:8px">📋 基本資料</div>'+
@@ -13982,7 +14012,7 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.14.0';
+      window.SYSTEM_VERSION = '2.16.0';
       window.BUILD_NUMBER = '20260523-erp';
     } catch(e){}
 
@@ -14057,7 +14087,7 @@ pushUndo(); // 初始快照
           '👥 客戶資料新增「🗑 刪除」:刪除後其餘代碼自動往前重排(001/002/003…無空號);有訂單記錄的客戶禁止刪除(請改停用),保護帳務'
         ]
       });
-      // v2.14.0 (本次更新 — 最新)
+      // v2.14.0
       VERSION_HISTORY.unshift({
         ver: '2.14.0',
         build: '20260607-erp',
@@ -14068,19 +14098,41 @@ pushUndo(); // 初始快照
           '💡 設定即時生效:客戶下次重新整理下單頁即套用(同售價更新邏輯)'
         ]
       });
+      // v2.15.0
+      VERSION_HISTORY.unshift({
+        ver: '2.15.0',
+        build: '20260607-erp',
+        date: '2026-06-07',
+        changes: [
+          '📋 可訂購品項「複製自其他客戶」:在客戶編輯畫面一鍵帶入另一客戶的清單,免重設',
+          '📋 可訂購品項「批次套用」:設好一份清單→勾選一票客戶(門市/加盟店)→一次覆寫套用,解決上百客戶逐一設定的問題',
+          '↕️ 轉售品項列表「序號」改成可直接輸入(免Excel):打數字即時排序,小→大',
+          '🔗 客戶下單頁品項順序「連動序號」:依轉售品項序號排列,全客戶共用同一份排序'
+        ]
+      });
+      // v2.16.0 (本次更新 — 最新)
+      VERSION_HISTORY.unshift({
+        ver: '2.16.0',
+        build: '20260607-erp',
+        date: '2026-06-07',
+        changes: [
+          '🔢 自製品也可排序:「🛒 可轉售商品池」新增「序」欄,轉售品項＋自製品全列在一起,直接輸入序號(小→大)即排;客戶下單頁順序連動(全客戶共用)',
+          '🔄 可轉售商品池加「重新整理排序」鈕,輸入序號後即時預覽排列結果'
+        ]
+      });
     }
 
     // 更新 topbar logo 版本顯示
     const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
     if(verSpan && /v2\.[0-9]/.test(verSpan.textContent)){
-      verSpan.textContent = 'v2.14.0';
+      verSpan.textContent = 'v2.16.0';
       verSpan.style.color = 'rgba(212,149,15,.85)';
       verSpan.style.fontWeight = '600';
     }
     // 更新瀏覽器標題
-    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.14.0'}catch(e){}
+    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.16.0'}catch(e){}
 
-    console.log('  ✅ 版本升級至 v2.14.0 (Build 20260607-erp)');
+    console.log('  ✅ 版本升級至 v2.16.0 (Build 20260607-erp)');
 
     // ═══════════════════════════════════════════════════════════
     // 完成
