@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.16.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.17.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -240,7 +240,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.16.0</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.17.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -745,14 +745,58 @@ window.importSheetProducts=function(){
 window.openResalePoolView=function(){
   var pool=getResalePool();var tiers=getTiers();
   pool.sort(function(a,b){var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
+  var nameCount={};pool.forEach(function(p){var k=(p.name||'').trim();nameCount[k]=(nameCount[k]||0)+1});
+  var dupNames=Object.keys(nameCount).filter(function(k){return k&&nameCount[k]>1});
+  var dupSet={};dupNames.forEach(function(k){dupSet[k]=1});
+  var dupBanner=dupNames.length?'<div style="background:#FFF3CD;border:1px solid #E0A800;color:#7A5600;padding:8px 12px;border-radius:6px;margin-bottom:10px;font-size:0.84rem">⚠️ 發現 '+dupNames.length+' 組重複品名（同名出現多次）：'+dupNames.map(function(n){return esc(n)+'×'+nameCount[n]}).join('、')+'<br><span style="font-size:0.76rem">下方紅色⚠️標記的列即重複,建議檢查是否要保留或刪除(例如義早與咕咕的同名品)。</span></div>':'';
   var thead='<tr><th style="width:46px">序</th><th>商品</th><th>來源</th><th style="text-align:right">成本</th><th style="text-align:right">基準售價</th>'+tiers.map(function(t){return '<th style="font-size:0.74rem;text-align:right">'+esc(t.name)+'</th>'}).join('')+'</tr>';
   var rows=pool.length?pool.map(function(p){
     var srcBadge=p.source==='internal'?'<span class="badge badge-blue">轉售品項</span>':'<span class="badge badge-warn">自製品</span>';
     var tcells=tiers.map(function(t){var ov=p.tierOverrides&&p.tierOverrides[t.name]!=null&&p.tierOverrides[t.name]!=='';var price=window.getTierPrice(p,t.name);return '<td style="text-align:right'+(ov?';color:#B82525;font-weight:700':'')+'">'+CUR()+fmt(price,1)+(ov?' *':'')+'</td>'}).join('');
-    return '<tr><td><input type="number" value="'+(+p.sort||'')+'" onchange="_setPoolSort(\''+p.source+'\',\''+esc(p.id)+'\',this.value)" title="輸入序號(小→大),客戶下單頁會依此排" style="width:42px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px;font-size:0.8rem"></td><td style="font-weight:600">'+esc(p.name)+'</td><td>'+srcBadge+'</td><td style="text-align:right;color:#706E68">'+CUR()+fmt(p.cost,1)+'</td><td style="text-align:right;font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td>'+tcells+'</tr>';
+    return '<tr'+(dupSet[(p.name||'').trim()]?' style="background:#FFF8F0"':'')+'><td><input type="number" value="'+(+p.sort||'')+'" onchange="_setPoolSort(\''+p.source+'\',\''+esc(p.id)+'\',this.value)" title="輸入序號(小→大),客戶下單頁會依此排" style="width:42px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px;font-size:0.8rem"></td><td style="font-weight:600'+(dupSet[(p.name||'').trim()]?';color:#B82525':'')+'">'+(dupSet[(p.name||'').trim()]?'⚠️ ':'')+esc(p.name)+'</td><td>'+srcBadge+'</td><td style="text-align:right;color:#706E68">'+CUR()+fmt(p.cost,1)+'</td><td style="text-align:right;font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td>'+tcells+'</tr>';
   }).join(''):'<tr><td colspan="'+(5+tiers.length)+'" style="text-align:center;color:#999;padding:20px">尚無可轉售商品 — 轉售品項自動納入;配方需勾「納入轉售商品池」</td></tr>';
-  var html='<div style="font-size:1.1rem;font-weight:700;margin-bottom:6px">🛒 可轉售商品池 ('+pool.length+' 項)</div><div style="font-size:0.8rem;color:#706E68;margin-bottom:10px">轉售品項全數納入;配方需在編輯時勾選「納入轉售商品池」。🔢 最左「序」欄可直接輸入序號(小→大)排列<b>轉售品項＋自製品</b>,客戶下單頁順序會依此連動(全客戶共用)。紅字 * = 該層級為個別覆寫價。</div><div style="overflow-x:auto"><table class="tbl" style="font-size:0.84rem"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div><div class="save-btns" style="margin-top:14px"><button class="btn btn-outline" onclick="openResalePoolView()">🔄 重新整理排序</button><button class="btn btn-primary" onclick="closeModal()">關閉</button></div>';
+  var html='<div style="font-size:1.1rem;font-weight:700;margin-bottom:6px">🛒 可轉售商品池 ('+pool.length+' 項)</div><div style="font-size:0.8rem;color:#706E68;margin-bottom:10px">轉售品項全數納入;配方需在編輯時勾選「納入轉售商品池」。🔢 最左「序」欄可直接輸入序號(小→大)排列<b>轉售品項＋自製品</b>,客戶下單頁順序會依此連動(全客戶共用)。品項多時可用下方「📊 匯出排序Excel」在 Excel 排好再匯入。紅字 * = 該層級為個別覆寫價。</div>'+dupBanner+'<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="exportPoolSortExcel()">📊 匯出排序Excel</button><label class="btn btn-sm btn-outline" style="cursor:pointer;display:inline-flex;align-items:center">📥 匯入排序Excel<input type="file" accept=".xlsx,.xls" style="display:none" onchange="importPoolSortExcel(this)"></label></div><div style="overflow-x:auto"><table class="tbl" style="font-size:0.84rem"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div><div class="save-btns" style="margin-top:14px"><button class="btn btn-outline" onclick="openResalePoolView()">🔄 重新整理排序</button><button class="btn btn-primary" onclick="closeModal()">關閉</button></div>';
   modal(html,true);
+};
+window.exportPoolSortExcel=function(){
+  if(typeof XLSX==='undefined'){toast('Excel 引擎尚未載入','err');return}
+  var pool=getResalePool();
+  pool.sort(function(a,b){var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
+  if(!pool.length){toast('尚無可轉售商品','err');return}
+  var nameCount={};pool.forEach(function(p){var k=(p.name||'').trim();nameCount[k]=(nameCount[k]||0)+1});
+  var rows=pool.map(function(p,i){return {'序號':(+p.sort||0)||(i+1),'來源':p.source==='recipe'?'自製品':'轉售品項','編號':p.id,'品名':p.name||'','單位':p.unit||'','成本':+p.cost||0,'基準售價':+p.sellPrice||0,'重複':nameCount[(p.name||'').trim()]>1?'⚠️重複':''}});
+  var ws=XLSX.utils.json_to_sheet(rows);var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'可轉售商品排序');
+  XLSX.writeFile(wb,'可轉售商品排序_'+toDay()+'.xlsx');
+  toast('✅ 已匯出 '+rows.length+' 項\n在 Excel 改「序號」欄(小→大)後再匯入,順序連動客戶頁');
+};
+window.importPoolSortExcel=function(input){
+  if(!input.files.length)return;
+  if(typeof XLSX==='undefined'){toast('Excel 引擎尚未載入','err');return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array'});var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      var ipById={},recById={},ipByName={},recByName={};
+      (state.internalProducts||[]).forEach(function(p){ipById[p.id]=p;ipByName[(p.name||'').trim()]=p});
+      (state.recipes||[]).forEach(function(r){if(r.resale){recById[r.id]=r;recByName[(r.name||'').trim()]=r}});
+      var updated=0,notFound=[];
+      rows.forEach(function(r){
+        var id=String(r['編號']||'').trim();var nm=String(r['品名']||'').trim();
+        var o=ipById[id]||recById[id]||ipByName[nm]||recByName[nm];
+        if(!o){if(nm)notFound.push(nm);return}
+        if(String(r['序號'])!=='')o.sort=+r['序號']||0;
+        updated++;
+      });
+      saveState();
+      var msg='✅ 已更新 '+updated+' 項排序';
+      if(notFound.length)msg+='\n⚠️ '+notFound.length+' 項找不到對應品項:'+notFound.slice(0,5).join('、')+(notFound.length>5?'…':'');
+      alert(msg);
+      if(typeof openResalePoolView==='function')openResalePoolView();
+    }catch(err){alert('匯入失敗:'+err.message)}
+  };
+  reader.readAsArrayBuffer(input.files[0]);input.value='';
 };
 const opts=(arr,sel)=>arr.map(v=>`<option value="${esc(v)}"${v===sel?' selected':''}>${esc(v)}</option>`).join('');
 
@@ -14012,7 +14056,7 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.16.0';
+      window.SYSTEM_VERSION = '2.17.0';
       window.BUILD_NUMBER = '20260523-erp';
     } catch(e){}
 
@@ -14110,7 +14154,7 @@ pushUndo(); // 初始快照
           '🔗 客戶下單頁品項順序「連動序號」:依轉售品項序號排列,全客戶共用同一份排序'
         ]
       });
-      // v2.16.0 (本次更新 — 最新)
+      // v2.16.0
       VERSION_HISTORY.unshift({
         ver: '2.16.0',
         build: '20260607-erp',
@@ -14120,19 +14164,29 @@ pushUndo(); // 初始快照
           '🔄 可轉售商品池加「重新整理排序」鈕,輸入序號後即時預覽排列結果'
         ]
       });
+      // v2.17.0 (本次更新 — 最新)
+      VERSION_HISTORY.unshift({
+        ver: '2.17.0',
+        build: '20260610-erp',
+        date: '2026-06-10',
+        changes: [
+          '📊 可轉售商品池「Excel 匯出/匯入排序」:轉售品項＋自製品一起匯出,在 Excel 改「序號」欄(小→大)再匯入,免逐格輸入;依編號比對,客戶下單頁順序連動',
+          '⚠️ 重複品名偵測:可轉售商品池自動標出同名重複品項(橘色警示列出+紅色⚠️標記該列),Excel 也帶「重複」欄,方便清理義早/咕咕等同名品'
+        ]
+      });
     }
 
     // 更新 topbar logo 版本顯示
     const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
     if(verSpan && /v2\.[0-9]/.test(verSpan.textContent)){
-      verSpan.textContent = 'v2.16.0';
+      verSpan.textContent = 'v2.17.0';
       verSpan.style.color = 'rgba(212,149,15,.85)';
       verSpan.style.fontWeight = '600';
     }
     // 更新瀏覽器標題
-    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.16.0'}catch(e){}
+    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.17.0'}catch(e){}
 
-    console.log('  ✅ 版本升級至 v2.16.0 (Build 20260607-erp)');
+    console.log('  ✅ 版本升級至 v2.17.0 (Build 20260610-erp)');
 
     // ═══════════════════════════════════════════════════════════
     // 完成
