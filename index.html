@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.17.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.21.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -240,7 +240,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.17.0</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.21.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -525,8 +525,23 @@ window.runMigrations=function(){
 
 
 
+// ═══ 🩺 全域除錯機制:前端錯誤自動上報 Firestore erp_errors(每session最多10筆/同訊息去重/防迴圈) ═══
+window._errLogCount=0;window._errLogSeen={};window._errQueue=[];
+window._logErrorToCloud=function(type,msg,src,line){
+  try{
+    if(window._errLogCount>=10)return;
+    var key=String(msg||'').slice(0,80);if(window._errLogSeen[key])return;
+    if(typeof _fbDb==='undefined'||!_fbDb){window._errQueue.push([type,msg,src,line]);return}
+    window._errLogSeen[key]=1;window._errLogCount++;
+    _fbDb.collection('erp_errors').add({ts:new Date().toISOString(),ver:window.SYSTEM_VERSION||'',device:(typeof state!=='undefined'&&state.cloudConfig&&state.cloudConfig.deviceName)||'',ua:navigator.userAgent.slice(0,120),type:type,msg:String(msg).slice(0,300),src:String(src||'').slice(0,120),line:+line||0}).catch(function(){})
+  }catch(e){}
+};
+function _logErrorToCloud(t,m,s2,l){window._logErrorToCloud(t,m,s2,l)}
+window.onerror=function(msg,src,line,col,err){window._logErrorToCloud('onerror',msg,src,line);return false};
+window.addEventListener('unhandledrejection',function(ev){window._logErrorToCloud('promise',(ev.reason&&(ev.reason.message||ev.reason))||'unknown','',0)});
 let _saveTimer=null;
 var _fbSaveTimer=null;
+window._cloudLoaded=false;  // 🛡️ 雲端是否已完成首次載入(防止新裝置空白覆蓋雲端)
 function saveState(){
   // 儲存當下視為已存,清空 modal snapshot 避免 closeModal 誤判 dirty
   window._modalSnapshot=null;
@@ -552,10 +567,15 @@ function saveState(){
 }
 function _saveToFirebase(){
   if(!initFirebaseSDK())return;
+  // 🛡️ 防護①:雲端尚未完成首次載入前,絕不推送(擋掉新裝置/手機登入時的初始競爭)
+  if(!window._cloudLoaded){console.warn('[防護] 雲端尚未載入完成,暫緩推送以免覆蓋');return;}
   if(_cloudSyncing)return;
-  _cloudSyncing=true;
   var stateClone=JSON.parse(JSON.stringify(state));
   delete stateClone.cloudConfig;
+  // 🛡️ 防護②(最關鍵):目前無核心資料時絕不推送 — 空白狀態永遠不可能覆蓋雲端
+  var _hasData=(stateClone.ings&&stateClone.ings.length)||(stateClone.recipes&&stateClone.recipes.length)||(stateClone.customers&&stateClone.customers.length)||(stateClone.internalProducts&&stateClone.internalProducts.length);
+  if(!_hasData){console.warn('[防護] 目前無核心資料,暫緩推送以免覆蓋雲端資料');return;}
+  _cloudSyncing=true;
   
   // 主資料存到 erp/state/main
   _fbDb.collection('erp').doc('state').set({
@@ -693,8 +713,8 @@ window.getResalePool=function(){
 window._custOrderableList=function(){
   var g={'自製品':[],'轉售食材':[],'轉售包材':[]};
   (state.recipes||[]).forEach(function(r){if(r.resale){g['自製品'].push({id:r.id,name:r.name})}});
-  (state.internalProducts||[]).forEach(function(p){var pk=(p.category==='包材'||p.type==='包材');(pk?g['轉售包材']:g['轉售食材']).push({id:p.id,name:p.name})});
-  (state.ings||[]).forEach(function(i){if(i.customerSell===true){(i.cat==='包材'?g['轉售包材']:g['轉售食材']).push({id:i.id,name:i.name})}});
+  (state.internalProducts||[]).forEach(function(p){var pk=(((p.category||'')+(p.type||'')).indexOf('包材')>=0);(pk?g['轉售包材']:g['轉售食材']).push({id:p.id,name:p.name})});
+  (state.ings||[]).forEach(function(i){if(i.customerSell===true){((i.cat||'').indexOf('包材')>=0?g['轉售包材']:g['轉售食材']).push({id:i.id,name:i.name})}});
   return g;
 };
 window._supplyModeToggle=function(){var m=(document.querySelector('input[name="cu-supply"]:checked')||{}).value;var b=document.getElementById('cu-supply-box');if(b)b.style.display=(m==='list')?'':'none'};
@@ -723,6 +743,7 @@ window._supplyBulkApply=function(curId){
 };
 window._setIPSort=function(id,v){var p=(state.internalProducts||[]).find(function(x){return x.id===id});if(!p)return;p.sort=+v||0;saveState();if(typeof filterIPList==='function'){filterIPList()}else if(typeof renderPage==='function'){renderPage()}};
 window._setPoolSort=function(source,id,v){var arr=source==='recipe'?state.recipes:state.internalProducts;var o=(arr||[]).find(function(x){return x.id===id});if(!o)return;o.sort=+v||0;saveState();if(typeof toast==='function')toast('序號已儲存(關閉重開或按🔄可預覽排序)')};
+window._poolGroup=function(p){return p.source==='recipe'?'自製品':((p.cat||'').indexOf('包材')>=0?'包材':'食材')};
 var SHEET_IMPORT_SEED=[["紐澳良雞腿排(4支/包)","包",200,"義早食材"],["蒜香雞肉(1kg/包)","包",210,"義早食材"],["綜合鮮菇(1kg/包)","包",180,"義早食材"],["炭香燒肉(1kg/包)","包",260,"義早食材"],["鮪魚醬(1kg/包)","包",290,"義早食材"],["凱撒醬(1kg/包)","包",275,"義早食材"],["蜂蜜芥末醬(1kg/包)","包",180,"義早食材"],["塔塔醬(1kg/包)","包",180,"義早食材"],["藍莓優格醬(1kg/包)","包",270,"義早食材"],["大蒜醬(500g/盒)","盒",230,"義早食材"],["杏仁奶酥醬(500g/盒)","盒",245,"義早食材"],["紅醬(1kg/包)","包",160,"義早食材"],["白醬(1kg/包)","包",160,"義早食材"],["青醬(1kg/包)","包",210,"義早食材"],["肉醬(1kg/包)","包",180,"義早食材"],["泰式打拋豬(1kg/包)","包",195,"義早食材"],["麻辣醬(1kg/包)","包",270,"義早食材"],["辣椒醬(500g/包)","包",140,"義早食材"],["醬油膏(1kg/包)","包",95,"義早食材"],["料理調味粉(1kg/包)","包",130,"義早食材"],["義大利直麵(熟)(200g/包)","包",10,"義早食材"],["蜜汁鴨胸(500g/23包/箱)","包",315,"義早食材"],["青花菜(1kg/10包/箱)","包",70,"義早食材"],["玉米筍(1kg/10包/箱)","包",126,"義早食材"],["紅蘿蔔片(1kg/10包/箱)","包",58,"義早食材"],["大魚排(60片/箱)(5片為單位)","包",75,"義早食材"],["日式雪花豬排(130g/45片/6kg箱)(5片為單位)","包",175,"義早食材"],["鯰魚排(5片/10包/箱)","包",179,"義早食材"],["鯰魚排(3片/10包/箱)","包",95,"義早食材"],["韓式泡菜(3kg/桶)","包",480,"義早食材"],["優質雞塊(1kg/12包)","包",142,"義早食材"],["紅皮熟栗地瓜(1kg/12包/箱)","包",116,"義早食材"],["玉米粒易開罐(285g/24罐/箱)","罐",22,"義早食材"],["義大利直麵(生)(500g/20包/箱)","包",26,"義早食材"],["鮮奶油23.3%(12罐/箱)","罐",105,"義早食材"],["原味乳酪醬(500g/盒)","盒",194,"義早食材"],["藍莓乳酪醬(500g/盒)","盒",200,"義早食材"],["青蘋果餡(2.7g/6罐/箱)","罐",683,"義早食材"],["美乃滋(600g/包)","包",76,"義早食材"],["美式鬆餅(2片/50包/箱)","包",12,"義早食材"],["乳酪燒餅(10片/3盒/箱)","箱",320,"義早食材"],["光頭堡(30顆/籃)","顆",7,"義早食材"],["帕尼尼(30顆/籃)","顆",13,"義早食材"],["帕瑪森熱狗堡(12入/包)","包",164,"義早食材"],["泰式紅茶葉(600g*/30包/箱)","包",157,"義早食材"],["奶香金萱(600g/30包/箱)","包",224,"義早食材"],["白葡萄風味烏龍茶包(6.5g*50入/20包/箱)","包",242,"義早食材"],["南非國寶茶(7g*50入/20包/箱)","包",453,"義早食材"],["南非綠國寶茶(3.5g*50入/20包/箱)","包",389,"義早食材"],["南非紫蘇綠國寶茶(4.5g*50入/20包/箱)","包",389,"義早食材"],["專用奶精粉(1kg/20包/箱)","包",173,"義早食材"],["什穀芝麻飲粉(500g/40包/箱)","包",168,"義早食材"],["比利時風味巧克力粉(1kg/20包/箱)","包",420,"義早食材"],["PET8OZ透明沙拉碗(25個/20包/箱)","包",44,"義早包材"],["PET8OZ透明沙拉蓋(50個/10包/箱)","包",53,"義早包材"],["PET24OZ花型沙拉碗、蓋(50個/3組/箱)","組",273,"義早包材"],["500空白紙杯(50個/20包/箱)","包",60,"義早包材"],["400空白紙杯(50個/20包/箱)","包",55,"義早包材"],["360空白紙杯(50個/20包/箱)","包",53,"義早包材"],["8OZ空白紙杯(50個/20包/箱)","包",54,"義早包材"],["凸杯蓋 90mm(50個/20包/箱)","包",49,"義早包材"],["凸杯蓋 78mm(50個/20包/箱)","包",57,"義早包材"],["90熱杯套(25個/40包/箱)","串",20,"義早包材"],["1.5OZ PET塑膠杯蓋(100個/25包/箱)","包",92,"義早包材"],["902塑膠內襯(50個/12包/箱)","包",63,"義早包材"],["902空白紙湯碗(50個/12包/箱)","包",81,"義早包材"],["902凸蓋(50個/12包/箱)","包",66,"義早包材"],["850透明塑膠湯碗(50個/12包/箱)","包",103,"義早包材"],["850空白紙湯碗(50個/12包/箱)","包",60,"義早包材"],["850平蓋(50個/12包/箱)","包",29,"義早包材"],["L300(50個/10包/箱)","包",276,"義早包材"],["L500(50個/10包/箱)","包",171,"義早包材"],["9吋披薩盒(50個/箱)","箱",630,"義早包材"],["3號內折牛皮方形餐盒(50個/4包/箱)","包",315,"義早包材"],["空白一體小(60個/10包/箱)","包",83,"義早包材"],["空白點心盒(100個/10包/箱)","包",95,"義早包材"],["20*20CM防油牛皮L袋(100個/40包/箱)","包",88,"義早包材"],["#70平口金色三角袋(100只/包)","包",91,"義早包材"],["鐵炮竹竹籤9cm(250支/80包)","包",58,"義早包材"],["黑色西餐匙(100支/40包/箱)","包",46,"義早包材"],["黑色西餐叉(100支/30包/2箱)","包",45,"義早包材"],["單支膠裝斜口6*18透明吸管(200支/20包/箱)","包",26,"義早包材"],["單支膠裝斜口12*21透明吸管(50支/40包/箱)","包",14,"義早包材"],["單支紙包斜口6*21透明吸管(100支/40包/箱)","包",40,"義早包材"],["單支紙包斜口6*21透明吸管(100支/50包/箱)","包",46,"義早包材"],["單支紙包斜口12*21透明吸管(50支/40包/箱)","包",47,"義早包材"],["免洗筷(80雙/30包/袋)","包",21,"義早包材"],["環保餐巾紙23cm單層(100張/60包/箱)","包",22,"義早包材"],["平邊牛皮色-四折扇形紙(100張/100包/箱)","包",16,"義早包材"],["空白封口膜(350m/6捲/箱)","捲",352,"義早包材"],["感熱紙80*80mm(60捲/箱)","捲",22,"義早包材"],["標籤貼紙40*30mm(5捲/20包/箱)","包",139,"義早包材"],["保鮮膜30公分 X 500公尺","盒",399,"義早包材"],["透明1號提袋(1kg/包)","包",120,"義早包材"],["透明2號提袋(1kg/包)","包",120,"義早包材"],["透明3號提袋(1kg/包)","包",120,"義早包材"],["透明1號提袋(2kg/包)","包",240,"義早包材"],["透明2號提袋(2kg/包)","包",240,"義早包材"],["透明3號提袋(2kg/包)","包",240,"義早包材"],["PS黑色雙杯座(100個/20包/箱)","包",56,"義早包材"],["PS黑色四杯座(50個/20包/箱)","包",49,"義早包材"],["煎板清潔劑","瓶",303,"義早包材"],["塑膠垃圾袋66*80(10包/箱)","包",97,"義早包材"],["義早logo圓貼(5000張)(約1~4天)","包",1380,"義早包材"],["收入傳票","本",25,"義早包材"],["支出傳票","本",25,"義早包材"],["二聯收據(50組/本)","本",35,"義早包材"],["透明膠帶18mm(8入/捆)","捆",95,"義早包材"],["BUNN12.75*5.25濾紙(500pcs/箱)","箱",1102.5,"義早包材"],["NBR無粉手套紫S號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫M號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫L號(100入/盒)","盒",185,"義早包材"],["NBR無粉手套紫XL號(100入/盒)","盒",185,"義早包材"],["立領長袖反摺-淺灰襯衫(M) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(L) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(XL) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(2L) 義早","件",700,"義早包材"],["立領長袖反摺-淺灰襯衫(3L) 義早","件",700,"義早包材"],["雙肩銅鈎耐磨咖啡色背心圍裙","件",600,"義早包材"],["深麻灰打鳥帽 義早","件",200,"義早包材"],["蒜香雞肉(1kg/包)","包",210,"咕咕食材"],["綜合鮮菇(1kg/包)","包",180,"咕咕食材"],["炭香燒肉(1kg/包)","包",260,"咕咕食材"],["鮪魚醬(1kg/包)","包",290,"咕咕食材"],["肉醬(1kg/包)","包",180,"咕咕食材"],["泰式打拋豬(1kg/包)","包",195,"咕咕食材"],["辣椒醬(500g/包)","包",140,"咕咕食材"],["醬油膏(1kg/包)","包",95,"咕咕食材"],["酸菜(1kg/包)","包",110,"咕咕食材"],["菜脯(1kg/包)","包",90,"咕咕食材"],["焢肉(1kg/包)","包",185,"咕咕食材"],["料理調味粉(1kg/包)","包",130,"咕咕食材"],["小熱狗(50支/20包/箱)","包",120,"咕咕食材"],["起司片(90片/12包)","包",265,"咕咕食材"],["乳酪絲(1kg/10包/箱)","包",245,"咕咕食材"],["薯餅(20片/12包/箱)","包",150,"咕咕食材"],["脆皮薯條(2kg/6包/箱)","包",210,"咕咕食材"],["鮮奶油23.3%(12罐/箱)","罐",105,"咕咕食材"],["美乃滋(600g/包)","包",76,"咕咕食材"],["老麵饅頭(6入/包)","包",78,"咕咕食材"],["黑糖饅頭(6入/包)","包",92,"咕咕食材"],["蔥捲(6入/包)","包",135,"咕咕食材"],["芋頭捲(6入/包)","包",143,"咕咕食材"],["雜糧堅果饅頭(6入/包)","包",168,"咕咕食材"],["鮮蔥黑豚包(6入/包)","包",152,"咕咕食材"],["金沙包(6入/包)","包",152,"咕咕食材"],["芝麻包(6入/包)","包",143,"咕咕食材"],["刈包(20入/8包/箱)","包",150,"咕咕食材"],["蛋餅皮(30片/12包/箱)","包",65,"咕咕食材"],["厚切蔥抓餅(10片/10包/箱)","包",90,"咕咕食材"],["河粉皮(10片/10包/箱)","包",50,"咕咕食材"],["乳酪燒餅(10片/3盒/箱)","箱",320,"咕咕食材"],["蘿蔔糕(10片/10包/箱)","包",60,"咕咕食材"],["鍋貼(50入/12包/箱)","包",100,"咕咕食材"],["生煎包(50入/12包/箱)","包",100,"咕咕食材"],["肉粽(10入/12包/箱)","包",250,"咕咕食材"],["老油條(300入/3kg/箱)","箱",650,"咕咕食材"],["肉鬆(3kg/桶)","包",400,"咕咕食材"],["優質雞塊(1kg/12包/箱)","包",142,"咕咕食材"],["黃金脆皮雞排(30片/箱)(5片/包)","包",105,"咕咕食材"],["玉米粒易開罐(285g/24罐/箱)","罐",22,"咕咕食材"],["滷蛋(30粒/8包/箱)","包",240,"咕咕食材"],["豆皮菜鬆(600g/包)","包",110,"咕咕食材"],["豆棗(3kg/包)","包",320,"咕咕食材"],["牛蒡絲(3kg/包)","包",425,"咕咕食材"],["飯糰米(5kg/1包)","包",260,"咕咕食材"],["紅藜麥(1kg/1包)","包",165,"咕咕食材"],["花生粉(600g/包)","包",100,"咕咕食材"],["低筋麵粉(3kg/包)","包",110,"咕咕食材"],["鹽(1kg/1包)","包",20,"咕咕食材"],["二砂(1kg/1包)","包",40,"咕咕食材"],["胡椒鹽(600g/包)","包",120,"咕咕食材"],["番茄醬(3.15kg/桶)","桶",200,"咕咕食材"],["醬油膏(6kg/桶)","桶",235,"咕咕食材"],["沙拉油(18L/桶)","桶",865,"咕咕食材"],["耐炸油(18L/桶)","桶",875,"咕咕食材"],["泰式紅茶葉(600g*/30包/箱)","包",157,"咕咕食材"],["蔗糖液(3kg/8包/箱)","包",125,"咕咕食材"],["專用奶精粉(1kg/20包/箱)","包",173,"咕咕食材"],["400空白紙杯(50個/20包/箱)","包",53,"咕咕包材"],["凸杯蓋 90mm(50個/20包/箱)","包",49,"咕咕包材"],["90熱杯套(25個/40包/箱)","串",20,"咕咕包材"],["1.5OZ PET塑膠杯蓋(100個/25包/箱)","包",92,"咕咕包材"],["850空白紙湯碗(50個/12包/箱)","包",60,"咕咕包材"],["850平蓋(50個/12包/箱)","包",29,"咕咕包材"],["260空白紙湯碗(50個/40包/箱)","包",30,"咕咕包材"],["空白一體小(60個/10包/箱)","包",83,"咕咕包材"],["空白點心盒(100個/10包/箱)","包",95,"咕咕包材"],["20*20CM防油牛皮L袋(100張/40包/箱)","包",88,"咕咕包材"],["20*20CM防油牛皮L袋(200張/25包/箱)","包",172,"咕咕包材"],["30*30CM空白淋膜紙(1000張/4包/箱)","包",900,"咕咕包材"],["4兩防油紙袋(100入/束)","束",40,"咕咕包材"],["薯條袋","束",35,"咕咕包材"],["橡皮筋小","包",50,"咕咕包材"],["0號夾鏈袋","包",15,"咕咕包材"],["擦手紙(120抽/20包/箱)","箱",410,"咕咕包材"],["黑色西餐匙(100支/40包/箱)","包",46,"咕咕包材"],["黑色西餐叉(100支/30包/2箱)","包",45,"咕咕包材"],["單支膠裝斜口6*18透明吸管(200支/20包/箱)","包",26,"咕咕包材"],["單支紙包斜口6*21透明吸管(100支/50包/箱)","包",46,"咕咕包材"],["免洗筷(80雙/30包/袋)","包",21,"咕咕包材"],["環保餐巾紙23cm單層(100張/60包/箱)","包",22,"咕咕包材"],["空白封口膜(350m/6捲/箱)","捲",352,"咕咕包材"],["感熱紙80*80mm(60捲/箱)","捲",22,"咕咕包材"],["標籤貼紙40*30mm(5捲/20包/箱)","包",139,"咕咕包材"],["保鮮膜30公分 X 500公尺","盒",399,"咕咕包材"],["4兩耐熱袋","包",40,"咕咕包材"],["6兩耐熱袋","包",40,"咕咕包材"],["6兩耐熱袋(捲)","捲",180,"咕咕包材"],["1斤耐熱袋","捲",180,"咕咕包材"],["3斤耐熱袋","捲",180,"咕咕包材"],["10斤耐熱袋","捲",180,"咕咕包材"],["煎板清潔劑","瓶",303,"咕咕包材"],["水槽濾網(50入/包)","包",35,"咕咕包材"],["沙拉脫","桶",50,"咕咕包材"],["漂白水","桶",50,"咕咕包材"],["除油劑","桶",210,"咕咕包材"],["酒精","桶",505,"咕咕包材"],["3M菜瓜布(2入/包)","包",45,"咕咕包材"],["3M綠菜瓜布(2入/包)","包",45,"咕咕包材"],["好神拖布盤","個",230,"咕咕包材"],["塑膠垃圾袋66*80(10包/箱)","包",97,"咕咕包材"],["咕咕logo圓貼(5000張)(約1~4天)","包",1380,"咕咕包材"],["收入傳票","本",25,"咕咕包材"],["支出傳票","本",25,"咕咕包材"],["二聯收據(50組/本)","本",35,"咕咕包材"],["透明膠帶18mm(8入/捆)","捆",95,"咕咕包材"],["NBR無粉手套紫S號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫M號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫L號(100入/盒)","盒",185,"咕咕包材"],["NBR無粉手套紫XL號(100入/盒)","盒",185,"咕咕包材"]];
 
 window.importSheetProducts=function(){
@@ -744,27 +765,34 @@ window.importSheetProducts=function(){
 
 window.openResalePoolView=function(){
   var pool=getResalePool();var tiers=getTiers();
-  pool.sort(function(a,b){var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
+  var _GO={'自製品':0,'食材':1,'包材':2};
+  pool.sort(function(a,b){var ga=_GO[window._poolGroup(a)],gb=_GO[window._poolGroup(b)];if(ga!==gb)return ga-gb;var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
   var nameCount={};pool.forEach(function(p){var k=(p.name||'').trim();nameCount[k]=(nameCount[k]||0)+1});
   var dupNames=Object.keys(nameCount).filter(function(k){return k&&nameCount[k]>1});
   var dupSet={};dupNames.forEach(function(k){dupSet[k]=1});
   var dupBanner=dupNames.length?'<div style="background:#FFF3CD;border:1px solid #E0A800;color:#7A5600;padding:8px 12px;border-radius:6px;margin-bottom:10px;font-size:0.84rem">⚠️ 發現 '+dupNames.length+' 組重複品名（同名出現多次）：'+dupNames.map(function(n){return esc(n)+'×'+nameCount[n]}).join('、')+'<br><span style="font-size:0.76rem">下方紅色⚠️標記的列即重複,建議檢查是否要保留或刪除(例如義早與咕咕的同名品)。</span></div>':'';
   var thead='<tr><th style="width:46px">序</th><th>商品</th><th>來源</th><th style="text-align:right">成本</th><th style="text-align:right">基準售價</th>'+tiers.map(function(t){return '<th style="font-size:0.74rem;text-align:right">'+esc(t.name)+'</th>'}).join('')+'</tr>';
-  var rows=pool.length?pool.map(function(p){
-    var srcBadge=p.source==='internal'?'<span class="badge badge-blue">轉售品項</span>':'<span class="badge badge-warn">自製品</span>';
+  var _lastG=null;var _rowsArr=[];var _gLabel={'自製品':'🍽️ 自製品','食材':'🥬 轉售食材','包材':'📦 轉售包材'};
+  pool.forEach(function(p){
+    var _g=window._poolGroup(p);
+    if(_g!==_lastG){_rowsArr.push('<tr><td colspan="'+(5+tiers.length)+'" style="background:#EDEAE3;font-weight:700;padding:6px 10px;font-size:0.86rem">'+_gLabel[_g]+'</td></tr>');_lastG=_g}
+    var srcBadge=p.source==='recipe'?'<span class="badge badge-warn">自製品</span>':(_g==='包材'?'<span class="badge badge-blue">轉售包材</span>':'<span class="badge badge-green">轉售食材</span>');
     var tcells=tiers.map(function(t){var ov=p.tierOverrides&&p.tierOverrides[t.name]!=null&&p.tierOverrides[t.name]!=='';var price=window.getTierPrice(p,t.name);return '<td style="text-align:right'+(ov?';color:#B82525;font-weight:700':'')+'">'+CUR()+fmt(price,1)+(ov?' *':'')+'</td>'}).join('');
-    return '<tr'+(dupSet[(p.name||'').trim()]?' style="background:#FFF8F0"':'')+'><td><input type="number" value="'+(+p.sort||'')+'" onchange="_setPoolSort(\''+p.source+'\',\''+esc(p.id)+'\',this.value)" title="輸入序號(小→大),客戶下單頁會依此排" style="width:42px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px;font-size:0.8rem"></td><td style="font-weight:600'+(dupSet[(p.name||'').trim()]?';color:#B82525':'')+'">'+(dupSet[(p.name||'').trim()]?'⚠️ ':'')+esc(p.name)+'</td><td>'+srcBadge+'</td><td style="text-align:right;color:#706E68">'+CUR()+fmt(p.cost,1)+'</td><td style="text-align:right;font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td>'+tcells+'</tr>';
-  }).join(''):'<tr><td colspan="'+(5+tiers.length)+'" style="text-align:center;color:#999;padding:20px">尚無可轉售商品 — 轉售品項自動納入;配方需勾「納入轉售商品池」</td></tr>';
+    _rowsArr.push('<tr'+(dupSet[(p.name||'').trim()]?' style="background:#FFF8F0"':'')+'><td><input type="number" value="'+(+p.sort||'')+'" onchange="_setPoolSort(\''+p.source+'\',\''+esc(p.id)+'\',this.value)" title="輸入序號(小→大),客戶下單頁會依此排" style="width:42px;text-align:center;border:1px solid #ddd;border-radius:4px;padding:2px;font-size:0.8rem"></td><td style="font-weight:600'+(dupSet[(p.name||'').trim()]?';color:#B82525':'')+'">'+(dupSet[(p.name||'').trim()]?'⚠️ ':'')+esc(p.name)+'</td><td>'+srcBadge+'</td><td style="text-align:right;color:#706E68">'+CUR()+fmt(p.cost,1)+'</td><td style="text-align:right;font-weight:700;color:#7A4D0B">'+CUR()+fmt(p.sellPrice,1)+'</td>'+tcells+'</tr>')
+  });
+  var rows=pool.length?_rowsArr.join(''):'<tr><td colspan="'+(5+tiers.length)+'" style="text-align:center;color:#999;padding:20px">尚無可轉售商品 — 轉售品項自動納入;配方需勾「納入轉售商品池」</td></tr>';
   var html='<div style="font-size:1.1rem;font-weight:700;margin-bottom:6px">🛒 可轉售商品池 ('+pool.length+' 項)</div><div style="font-size:0.8rem;color:#706E68;margin-bottom:10px">轉售品項全數納入;配方需在編輯時勾選「納入轉售商品池」。🔢 最左「序」欄可直接輸入序號(小→大)排列<b>轉售品項＋自製品</b>,客戶下單頁順序會依此連動(全客戶共用)。品項多時可用下方「📊 匯出排序Excel」在 Excel 排好再匯入。紅字 * = 該層級為個別覆寫價。</div>'+dupBanner+'<div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-sm btn-outline" onclick="exportPoolSortExcel()">📊 匯出排序Excel</button><label class="btn btn-sm btn-outline" style="cursor:pointer;display:inline-flex;align-items:center">📥 匯入排序Excel<input type="file" accept=".xlsx,.xls" style="display:none" onchange="importPoolSortExcel(this)"></label></div><div style="overflow-x:auto"><table class="tbl" style="font-size:0.84rem"><thead>'+thead+'</thead><tbody>'+rows+'</tbody></table></div><div class="save-btns" style="margin-top:14px"><button class="btn btn-outline" onclick="openResalePoolView()">🔄 重新整理排序</button><button class="btn btn-primary" onclick="closeModal()">關閉</button></div>';
   modal(html,true);
 };
 window.exportPoolSortExcel=function(){
   if(typeof XLSX==='undefined'){toast('Excel 引擎尚未載入','err');return}
   var pool=getResalePool();
-  pool.sort(function(a,b){var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
+  var _GO={'自製品':0,'食材':1,'包材':2};
+  pool.sort(function(a,b){var ga=_GO[window._poolGroup(a)],gb=_GO[window._poolGroup(b)];if(ga!==gb)return ga-gb;var sa=(+a.sort>0)?+a.sort:99999,sb=(+b.sort>0)?+b.sort:99999;if(sa!==sb)return sa-sb;return (a.name||'').localeCompare(b.name||'')});
   if(!pool.length){toast('尚無可轉售商品','err');return}
   var nameCount={};pool.forEach(function(p){var k=(p.name||'').trim();nameCount[k]=(nameCount[k]||0)+1});
-  var rows=pool.map(function(p,i){return {'序號':(+p.sort||0)||(i+1),'來源':p.source==='recipe'?'自製品':'轉售品項','編號':p.id,'品名':p.name||'','單位':p.unit||'','成本':+p.cost||0,'基準售價':+p.sellPrice||0,'重複':nameCount[(p.name||'').trim()]>1?'⚠️重複':''}});
+  var _gName={'自製品':'自製品','食材':'轉售食材','包材':'轉售包材'};
+  var rows=pool.map(function(p,i){return {'分類':_gName[window._poolGroup(p)],'序號':(+p.sort||0)||(i+1),'編號':p.id,'品名':p.name||'','單位':p.unit||'','成本':+p.cost||0,'基準售價':+p.sellPrice||0,'重複':nameCount[(p.name||'').trim()]>1?'⚠️重複':''}});
   var ws=XLSX.utils.json_to_sheet(rows);var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'可轉售商品排序');
   XLSX.writeFile(wb,'可轉售商品排序_'+toDay()+'.xlsx');
@@ -7218,18 +7246,30 @@ var _autoBackupTimer=null;
 function scheduleAutoBackup(){clearInterval(_autoBackupTimer);_autoBackupTimer=setInterval(function(){
 try{
   var now=new Date();var key='hm_autobackup_'+toDay();
-  // 每天第一次自動備份
-  if(!localStorage.getItem(key)){
-    localStorage.setItem(key,JSON.stringify({ts:now.toISOString(),data:state}));
-  }else{
-    // 同一天更新備份
-    localStorage.setItem(key,JSON.stringify({ts:now.toISOString(),data:state}));
-  }
+  // 🛡️ 空白防護:目前無核心資料時不寫備份(不覆蓋今天既有備份,也不產生空白備份)
+  var _bakHasData=(state.ings&&state.ings.length)||(state.recipes&&state.recipes.length)||(state.customers&&state.customers.length)||(state.internalProducts&&state.internalProducts.length);
+  if(_bakHasData){localStorage.setItem(key,JSON.stringify({ts:now.toISOString(),data:state}))}
   // 清理超過 14 天的備份
   var old=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith('hm_autobackup_')&&!k.includes('_T'))old.push(k)}
   old.sort();while(old.length>14){localStorage.removeItem(old.shift())}
 }catch(e){}},180000)}
 scheduleAutoBackup();
+// ═══ 🔄 自動版本檢查:每60分鐘比對線上版,有新版跳橫幅(file://或離線靜默) ═══
+window._checkNewVersion=function(){
+  try{
+    fetch('index.html?_vchk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
+      var m=t.match(/SYSTEM_VERSION\s*=\s*'([\d.]+)'/);
+      if(m&&window.SYSTEM_VERSION&&m[1]!==window.SYSTEM_VERSION&&!document.getElementById('ver-update-bar')){
+        var bar=document.createElement('div');bar.id='ver-update-bar';
+        bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#f6ce37;color:#4c4948;font-weight:700;text-align:center;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer;font-size:0.95rem';
+        bar.innerHTML='🔄 系統有新版本 v'+m[1]+'(目前 v'+window.SYSTEM_VERSION+') — 點此立即更新';
+        bar.onclick=function(){location.reload()};
+        document.body.appendChild(bar)
+      }
+    }).catch(function(){})
+  }catch(e){}
+};
+setTimeout(window._checkNewVersion,30000);setInterval(window._checkNewVersion,3600000);
 
 // ── 10. 雲端同步（剪貼簿方案） ──
 window.cloudExportClipboard=function(){
@@ -9258,6 +9298,10 @@ function initFirebaseSDK(){
     var fbConfig={apiKey:cfg.fbApiKey,authDomain:cfg.fbAuthDomain||'',projectId:cfg.fbProjectId,storageBucket:cfg.fbStorageBucket||'',messagingSenderId:cfg.fbMessagingSenderId||'',appId:cfg.fbAppId||''};
     if(!firebase.apps.length){_fbApp=firebase.initializeApp(fbConfig)}else{_fbApp=firebase.apps[0]}
     _fbDb=firebase.firestore();
+    // 🔐 匿名驗證:為 Firestore 規則收緊做準備(Console 未開啟 Anonymous 前會靜默失敗,不影響現行功能)
+    try{if(typeof firebase.auth==='function'&&!firebase.auth().currentUser){firebase.auth().signInAnonymously().then(function(){console.log('[Auth] ✅ 匿名驗證成功')}).catch(function(e){console.warn('[Auth] 匿名登入未啟用(暫不影響功能):',e.code)})}}catch(e){}
+    // 🩺 flush 早期錯誤佇列
+    try{if(window._errQueue&&window._errQueue.length){window._errQueue.forEach(function(q){_logErrorToCloud(q[0],q[1],q[2],q[3])});window._errQueue=[]}}catch(e){}
     _fbDb.settings&&_fbDb.settings({cacheSizeBytes:firebase.firestore.CACHE_SIZE_UNLIMITED});
     try{_fbDb.enablePersistence({synchronizeTabs:true})}catch(e){}
     // 🆕 即時監聽:客戶新訂單自動進來(只「新增」未見過的單,不覆蓋既有訂單與主資料)
@@ -9267,6 +9311,7 @@ function initFirebaseSDK(){
         _fbDb.collection('erp').doc('state').onSnapshot(function(doc){
           if(!doc.exists)return;
           if(doc.metadata&&doc.metadata.hasPendingWrites)return; // 自己寫的略過
+          if(!(doc.metadata&&doc.metadata.fromCache))window._cloudLoaded=true; // 🛡️ 收到伺服器快照=雲端確實已載入
           var cd=doc.data();if(!cd||!cd.data)return;
           var cloudOrders=cd.data.custOrders||[];
           if(!state.custOrders)state.custOrders=[];
@@ -9290,6 +9335,9 @@ window.firebaseSave=function(silent){
   if(!initFirebaseSDK()){if(!silent)toast('⛔ Firebase 未設定或初始化失敗','err');return}
   var stateClone=JSON.parse(JSON.stringify(state));
   delete stateClone.cloudConfig;
+  // 🛡️ 防護:手動上傳遇空白資料時攔截(避免誤把空白蓋掉雲端)
+  var _hasDataM=(stateClone.ings&&stateClone.ings.length)||(stateClone.recipes&&stateClone.recipes.length)||(stateClone.customers&&stateClone.customers.length)||(stateClone.internalProducts&&stateClone.internalProducts.length);
+  if(!_hasDataM){if(silent)return;if(!confirm('⚠️ 目前系統幾乎沒有資料,確定要上傳並「覆蓋」雲端嗎?\n\n若你正要救回資料,請改用「從雲端載入」或「匯入備份」,千萬不要上傳!'))return;}
   _fbDb.collection('erp').doc('state').set({
     data:stateClone,
     updated_at:firebase.firestore.FieldValue.serverTimestamp(),
@@ -12956,9 +13004,9 @@ document.addEventListener('DOMContentLoaded',()=>{
 (function loadFromFirestore(){
   if(!initFirebaseSDK()){console.log('Firestore not ready, using localStorage');return}
   _fbDb.collection('erp').doc('state').get().then(function(doc){
-    if(!doc.exists||!doc.data()||!doc.data().data){console.log('Firestore empty, using localStorage');return}
+    if(!doc.exists||!doc.data()||!doc.data().data){console.log('Firestore empty, using localStorage');window._cloudLoaded=true;return}
     var cloudData=doc.data().data;
-    if(!cloudData.ings){console.log('Firestore data incomplete, using localStorage');return}
+    if(!cloudData.ings){console.log('Firestore data incomplete, using localStorage');window._cloudLoaded=true;return}
     var savedCloud=JSON.parse(JSON.stringify(state.cloudConfig||{}));
     var savedUsers=state.users?JSON.parse(JSON.stringify(state.users)):null;
     Object.keys(cloudData).forEach(function(k){
@@ -12968,7 +13016,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(savedUsers&&savedUsers.length)state.users=state.users&&state.users.length?state.users:savedUsers;
     state.cloudConfig.lastSync=new Date().toISOString();
     try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){}
-    console.log('✅ Loaded from Firestore');
+    console.log('✅ Loaded from Firestore');window._cloudLoaded=true;
     // 雲端資料載入後重新修正權限和帳號（雲端可能是舊版資料）
     (function(){
       if(!state.permissions)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
@@ -12986,6 +13034,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 })();
 // 🆕 即使 Firestore 沒成功,也試一次 (用 localStorage 模式下,Firebase 仍可能能連)
 setTimeout(function(){if(typeof window.syncHRAccountsCache==='function')window.syncHRAccountsCache()},2000);
+setTimeout(function(){window._cloudLoaded=true},10000); // 🛡️ 保險:10秒後解鎖(空白防護②仍為後盾,避免永久卡住)
 pushUndo(); // 初始快照
   if(state.currentUser){applyPermissions();_origGP('dash')}
   else{showLoginScreen()}
@@ -12995,6 +13044,7 @@ pushUndo(); // 初始快照
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-app-compat.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-firestore-compat.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/10.12.2/firebase-auth-compat.min.js"></script>
 
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -14056,7 +14106,7 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.17.0';
+      window.SYSTEM_VERSION = '2.21.0';
       window.BUILD_NUMBER = '20260523-erp';
     } catch(e){}
 
@@ -14164,7 +14214,7 @@ pushUndo(); // 初始快照
           '🔄 可轉售商品池加「重新整理排序」鈕,輸入序號後即時預覽排列結果'
         ]
       });
-      // v2.17.0 (本次更新 — 最新)
+      // v2.17.0
       VERSION_HISTORY.unshift({
         ver: '2.17.0',
         build: '20260610-erp',
@@ -14174,19 +14224,59 @@ pushUndo(); // 初始快照
           '⚠️ 重複品名偵測:可轉售商品池自動標出同名重複品項(橘色警示列出+紅色⚠️標記該列),Excel 也帶「重複」欄,方便清理義早/咕咕等同名品'
         ]
       });
+      // v2.18.0
+      VERSION_HISTORY.unshift({
+        ver: '2.18.0',
+        build: '20260610-erp',
+        date: '2026-06-10',
+        changes: [
+          '📂 可轉售商品池/Excel 依「自製品→轉售食材→轉售包材」分組排序,各組有標題列,匯出 Excel 多「分類」欄,三類清楚分開方便排序',
+          '🔧 修正包材判斷:改為「包含包材」即可(原本需完全相符),正確抓出義早包材/咕咕包材等;可訂購品項清單分組同步修正'
+        ]
+      });
+      // v2.19.0
+      VERSION_HISTORY.unshift({
+        ver: '2.19.0',
+        build: '20260614-erp',
+        date: '2026-06-14',
+        changes: [
+          '🛡️【重大修正】徹底防止「手機/新裝置登入用空白覆蓋雲端資料」:雲端推送前加雙重防護 — ①雲端首次載入完成前絕不推送(擋初始競爭) ②目前無核心資料(食材/配方/客戶/轉售品全空)時絕不推送,空白狀態永遠不可能覆蓋雲端;手動上傳遇空白也會二次確認攔截'
+        ]
+      });
+      // v2.20.0
+      VERSION_HISTORY.unshift({
+        ver: '2.20.0',
+        build: '20260614-erp',
+        date: '2026-06-14',
+        changes: [
+          '🛡️ 本機自動備份加空白防護:系統無核心資料時不再寫入/覆蓋當日自動備份 — 修正「資料被清空後,3分鐘內空白會蓋掉今天本機備份」的漏洞(這次事故備份不新的原因),並精簡原重複的備份寫入程式',
+          '🔍 全系統7層健檢:CDN無重複、JS語法全過、onclick函式/HTML元素對應完整、Firebase全部寫入路徑防護盤點(ERP→財會為安全的讀合併寫)、ERP↔APP↔財會跨系統路徑一致;12組同名函式確認為刻意的權限/稅務包裝層,非冗餘程式'
+        ]
+      });
+      // v2.21.0 (本次更新 — 最新)
+      VERSION_HISTORY.unshift({
+        ver: '2.21.0',
+        build: '20260614-erp',
+        date: '2026-06-14',
+        changes: [
+          '🔐 Phase1資安第一步:加入 Firebase 匿名驗證(為 Firestore 規則收緊做準備,Console 開啟前靜默不影響功能)',
+          '🩺 全域除錯機制:前端錯誤自動上報雲端 erp_errors(每次最多10筆/去重/防迴圈),事後可直接調閱定位問題',
+          '🔄 自動版本檢查:每60分鐘比對線上版本,發現新版跳出黃色橫幅提示立即更新,解決門市舊分頁用舊版問題'
+        ]
+      });
     }
 
     // 更新 topbar logo 版本顯示
     const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
     if(verSpan && /v2\.[0-9]/.test(verSpan.textContent)){
-      verSpan.textContent = 'v2.17.0';
+      verSpan.textContent = 'v2.21.0';
       verSpan.style.color = 'rgba(212,149,15,.85)';
       verSpan.style.fontWeight = '600';
     }
     // 更新瀏覽器標題
-    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.17.0'}catch(e){}
+    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.21.0'}catch(e){}
 
-    console.log('  ✅ 版本升級至 v2.17.0 (Build 20260610-erp)');
+    console.log('  ✅ 版本升級至 v2.21.0 (Build 20260614-erp)');
 
     // ═══════════════════════════════════════════════════════════
     // 完成
