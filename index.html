@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.23.1</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.24.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -240,7 +240,7 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <body>
 <div id="topbar">
   <div id="topbar-row1">
-    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.23.1</span></div>
+    <div class="logo" style="cursor:pointer" onclick="showVersionInfo()"><span class="logo-dot"></span><span>好洺餐飲事業有限公司 生產管理系統</span><span style="font-size:0.65rem;color:rgba(255,255,255,.4);margin-left:6px;font-weight:400">v2.24.0</span></div>
     <div style="display:flex;align-items:center;gap:6px"><button id="undo-btn" onclick="doUndo()" title="上一步 (Ctrl+Z)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↩️ 上一步</button><button id="redo-btn" onclick="doRedo()" title="下一步 (Ctrl+Y)" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:0.88rem;font-family:inherit;transition:.2s;opacity:.35">↪️ 下一步</button><span id="undo-count" style="font-size:0.72rem;color:rgba(255,255,255,.4);min-width:32px;text-align:center"></span><button id="cloud-backup-btn" onclick="cloudBackup(true)" title="點擊上傳備份到 Google Drive (首次需 Google 登入授權)" style="background:#1455A0;color:#fff;border:none;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:0.86rem;font-weight:700;font-family:inherit;transition:.2s">📥 雲端備份</button><div id="topbar-right"></div></div>
   </div>
   <div id="topbar-row2"><div id="nav-bar"><button data-cp="dash" class="nav-btn active" onclick="goPage('dash')">📊 儀表板</button><button data-cp="po" class="nav-btn" onclick="goPage('po')">📋 採購單</button><button data-cp="buy" class="nav-btn" onclick="goPage('buy')">🛍️ 進貨記錄</button><button data-cp="order" class="nav-btn" onclick="goPage('order')">📋 叫/出貨表</button><button data-cp="batch" class="nav-btn" onclick="goPage('batch')">📅 效期管理</button><span class="nav-divider">│</span><button data-cp="ing" class="nav-btn" onclick="goPage('ing')">🥬 食材庫存</button><button data-cp="recipe" class="nav-btn" onclick="goPage('recipe')">📋 配方卡</button><button data-cp="prod" class="nav-btn" onclick="goPage('prod')">🏭 生產扣料</button><button data-cp="label" class="nav-btn" onclick="goPage('label')">🏷️ 標籤</button><button data-cp="store-inv" class="nav-btn" onclick="goPage('store-inv')">🏬 門市庫存</button><button data-cp="transfer" class="nav-btn" onclick="goPage('transfer')">🔄 調撥</button><button data-cp="count" class="nav-btn" onclick="goPage('count')">📋 盤點</button><span class="nav-divider">│</span><button data-cp="menu" class="nav-btn" onclick="goPage('menu')">🍽️ 菜單成本</button><button data-cp="sales" class="nav-btn" onclick="goPage('sales')">🛒 銷售</button><button data-cp="customer" class="nav-btn" onclick="goPage('customer')">👥 客戶</button><button data-cp="internal" class="nav-btn" onclick="goPage('internal')">🏭→🏪 轉售</button><button data-cp="wo" class="nav-btn" onclick="goPage('wo')">📝 工單</button><span class="nav-divider">│</span><button data-cp="ar" class="nav-btn" onclick="goPage('ar')">💰 應收帳款</button><button data-cp="ap" class="nav-btn" onclick="goPage('ap')">💳 應付帳款</button><button data-cp="tax" class="nav-btn" onclick="goPage('tax')">🧾 稅務</button><button data-cp="rtn" class="nav-btn" onclick="goPage('rtn')">↩️ 退貨</button><button data-cp="cost-analysis" class="nav-btn" onclick="goPage('cost-analysis')">📈 成本分析</button><button data-cp="kitchen-cost" class="nav-btn" onclick="goPage('kitchen-cost')">⚙️ 中央廚房成本</button><button data-cp="profit" class="nav-btn" onclick="goPage('profit')">💰 毛利分析</button><button data-cp="budget" class="nav-btn" onclick="goPage('budget')">💹 預算/KPI</button><span class="nav-divider">│</span><button data-cp="waste" class="nav-btn" onclick="goPage('waste')">♻️ 損耗管理</button><button data-cp="allergen" class="nav-btn" onclick="goPage('allergen')">⚠️ 過敏原</button><button data-cp="qc" class="nav-btn" onclick="goPage('qc')">🔍 品管</button><button data-cp="trace" class="nav-btn" onclick="goPage('trace')">🔄 追溯</button><button data-cp="schedule" class="nav-btn" onclick="goPage('schedule')">📅 排程</button><button data-cp="equip" class="nav-btn" onclick="goPage('equip')">🔧 設備</button><button data-cp="asset" class="nav-btn" onclick="goPage('asset')">🏗️ 資產</button><span class="nav-divider">│</span><button data-cp="sup" class="nav-btn" onclick="goPage('sup')">🏪 供應商</button><button data-cp="contract" class="nav-btn" onclick="goPage('contract')">📄 合約</button><button data-cp="alert-center" class="nav-btn" onclick="goPage('alert-center')">🔔 警示</button><button data-cp="users" class="nav-btn" onclick="goPage('users')">👤 帳號</button><button data-cp="cloud" class="nav-btn" onclick="goPage('cloud')">☁️ 雲端</button><button data-cp="ref" class="nav-btn" onclick="goPage('ref')">⚙️ 設定</button></div></div>
@@ -7254,22 +7254,40 @@ try{
   old.sort();while(old.length>14){localStorage.removeItem(old.shift())}
 }catch(e){}},180000)}
 scheduleAutoBackup();
-// ═══ 🔄 自動版本檢查:每60分鐘比對線上版,有新版跳橫幅(file://或離線靜默) ═══
+// ═══ 🔄 自動版本檢查 v2:每60分鐘比對線上版(file://或離線靜默) ═══
+// 版本比對規則:只有「線上版本 > 目前版本」才提示(語意比對,非字串不等)
+window._verCmp=function(a,b){var x=String(a||'0').split('.'),y=String(b||'0').split('.');var n=Math.max(x.length,y.length);for(var i=0;i<n;i++){var d=(parseInt(x[i],10)||0)-(parseInt(y[i],10)||0);if(d)return d>0?1:-1}return 0};
+// 更新:location.reload() 不保證繞過瀏覽器/CDN 快取(舊版按了常常換不過去)→ 改用一次性參數強制重新抓檔
+window._doVerUpdate=function(v){try{sessionStorage.setItem('hm_erp_verGoto',v||'')}catch(e){}location.replace(location.pathname+'?_v='+Date.now())};
 window._checkNewVersion=function(){
   try{
+    if(location.protocol==='file:')return;
     fetch('index.html?_vchk='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(t){
       var m=t.match(/SYSTEM_VERSION\s*=\s*'([\d.]+)'/);
-      if(m&&window.SYSTEM_VERSION&&m[1]!==window.SYSTEM_VERSION&&!document.getElementById('ver-update-bar')){
-        var bar=document.createElement('div');bar.id='ver-update-bar';
-        bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#f6ce37;color:#4c4948;font-weight:700;text-align:center;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.25);cursor:pointer;font-size:0.95rem';
-        bar.innerHTML='🔄 系統有新版本 v'+m[1]+'(目前 v'+window.SYSTEM_VERSION+') — 點此立即更新';
-        bar.onclick=function(){location.reload()};
-        document.body.appendChild(bar)
-      }
+      if(!m||!window.SYSTEM_VERSION)return;
+      var rv=m[1];
+      if(window._verCmp(rv,window.SYSTEM_VERSION)<=0)return;
+      var skip='';try{skip=sessionStorage.getItem('hm_erp_verSkip')||''}catch(e){}
+      if(skip===rv)return;
+      if(document.getElementById('ver-update-bar'))return;
+      var bar=document.createElement('div');bar.id='ver-update-bar';
+      bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#f6ce37;color:#4c4948;font-weight:700;text-align:center;padding:10px 46px;box-shadow:0 2px 8px rgba(0,0,0,.25);font-size:0.95rem';
+      bar.innerHTML='🔄 系統有新版本 v'+rv+'(目前 v'+window.SYSTEM_VERSION+') — <span id="ver-upd-go" style="text-decoration:underline;cursor:pointer">點此立即更新</span><span id="ver-upd-x" title="稍後再說" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:1.1rem;padding:0 6px">✕</span>';
+      document.body.appendChild(bar);
+      var g=document.getElementById('ver-upd-go');if(g)g.onclick=function(){window._doVerUpdate(rv)};
+      var x=document.getElementById('ver-upd-x');if(x)x.onclick=function(){try{sessionStorage.setItem('hm_erp_verSkip',rv)}catch(e){}bar.parentNode&&bar.parentNode.removeChild(bar)};
     }).catch(function(){})
   }catch(e){}
 };
 setTimeout(window._checkNewVersion,30000);setInterval(window._checkNewVersion,3600000);
+// 更新後驗證:按過更新卻仍是舊版=快取頑固,明確指示強制重新整理;並清掉網址上的一次性參數
+setTimeout(function(){try{
+  var g=sessionStorage.getItem('hm_erp_verGoto');
+  if(g){sessionStorage.removeItem('hm_erp_verGoto');
+    if(window.SYSTEM_VERSION&&window._verCmp(g,window.SYSTEM_VERSION)>0){alert('⚠️ 更新未生效,瀏覽器仍載入舊版 v'+window.SYSTEM_VERSION+'\n\n請按 Ctrl+Shift+R(Mac:Cmd+Shift+R)強制重新整理')}
+  }
+  if(location.search.indexOf('_v=')>=0&&history.replaceState){history.replaceState(null,'',location.pathname)}
+}catch(e){}},1500);
 
 // ── 10. 雲端同步（剪貼簿方案） ──
 window.cloudExportClipboard=function(){
@@ -9687,8 +9705,8 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.23.1';
-var BUILD_NUMBER='20260423-002';
+var SYSTEM_VERSION='2.24.0';
+var BUILD_NUMBER='20260717-erp';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
     '💰 新增應收帳款模組（收款/部分收款/沖帳）',
@@ -14113,8 +14131,11 @@ pushUndo(); // 初始快照
     // STEP 16: 升級版本號 + 加入 changelog
     // ═══════════════════════════════════════════════════════════
     try {
-      window.SYSTEM_VERSION = '2.22.0';
-      window.BUILD_NUMBER = '20260523-erp';
+      // ⚠️【版本單一真相來源】= 檔案上方的 var SYSTEM_VERSION / var BUILD_NUMBER
+      // 此處嚴禁再寫死版本號:舊版寫死會「覆蓋」真相來源,造成「執行版本」與「檔案版本」不一致,
+      // 導致自動版本檢查永遠誤判有新版(無限跳更新橫幅)。改版只需改上方那一行。
+      window.SYSTEM_VERSION = SYSTEM_VERSION;
+      window.BUILD_NUMBER = BUILD_NUMBER;
     } catch(e){}
 
     if(typeof VERSION_HISTORY !== 'undefined' && Array.isArray(VERSION_HISTORY)){
@@ -14271,7 +14292,7 @@ pushUndo(); // 初始快照
           '🔄 自動版本檢查:每60分鐘比對線上版本,發現新版跳出黃色橫幅提示立即更新,解決門市舊分頁用舊版問題'
         ]
       });
-      // v2.23.1 (本次更新 — 最新)
+      // v2.23.1
       VERSION_HISTORY.unshift({
         ver: '2.23.1',
         build: '20260707-erp1',
@@ -14300,19 +14321,37 @@ pushUndo(); // 初始快照
           '🛡️【資安修補】離職員工帳號無法再登入 ERP:HR 帳號標記「已停用」後,ERP 登入即拒絕(原本只比對帳密,漏看停用狀態);並於登入後線上即時複驗,本機快取過舊的裝置也會被立即登出 — 實現「HR 離職斷權→全系統即斷」'
         ]
       });
+      // v2.24.0 (本次更新 — 最新)
+      VERSION_HISTORY.unshift({
+        ver: '2.24.0',
+        build: '20260717-erp',
+        date: '2026-07-17',
+        changes: [
+          '🔧【修正】更新橫幅「一直跳新版、點了也沒用」:根因是版本號在檔案中被寫死兩處且不一致(上方常數 2.23.1、檔尾升級層卻覆蓋回 2.22.0),導致「執行版本」與「檔案版本」永遠不相等而無限誤報 — 實際上已是最新版。現改為【版本單一真相來源】,檔尾一律衍生不再寫死,同類問題根除',
+          '🔄 版本檢查改為語意比對:只有「線上版本確實較新」才提示(原為字串不相等就跳);更新改用強制繞過快取(location.reload 不保證換得過去),並新增「✕ 稍後再說」可關閉;若更新後仍是舊版會明確提示按 Ctrl+Shift+R',
+          '📜【修正】版本紀錄排序錯亂:2.23.0/2.23.1 曾被插在 2.22.0 之前,導致畫面把 2.22.0 顯示成最新版;現加入排序守門,不論插入位置一律依版本號由新到舊重排',
+          '🔧 版本顯示相容大版號:原判斷寫死 v2 開頭,升到 v3 後標題版本將無法更新,已改為通用判斷'
+        ]
+      });
     }
+
+    // 🔧 版本紀錄排序守門:不論各版在哪個位置 unshift,一律依版本號由新到舊重排
+    // (曾發生 2.23.1/2.23.0 插在 2.22.0 之前,導致「版本紀錄」把 2.22.0 顯示成最新)
+    try{ if(typeof VERSION_HISTORY!=='undefined' && Array.isArray(VERSION_HISTORY)){
+      VERSION_HISTORY.sort(function(a,b){return window._verCmp(String(b.ver||'0'),String(a.ver||'0'))});
+    } }catch(e){}
 
     // 更新 topbar logo 版本顯示
     const verSpan = document.querySelector('.logo span:nth-of-type(3)') || document.querySelector('.logo span:last-child');
-    if(verSpan && /v2\.[0-9]/.test(verSpan.textContent)){
-      verSpan.textContent = 'v2.23.1';
+    if(verSpan && /v\d+\./.test(verSpan.textContent)){
+      verSpan.textContent = 'v'+SYSTEM_VERSION;
       verSpan.style.color = 'rgba(212,149,15,.85)';
       verSpan.style.fontWeight = '600';
     }
     // 更新瀏覽器標題
-    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v2.23.1'}catch(e){}
+    try{document.title = '好洺餐飲事業有限公司 — 生產管理系統 v'+SYSTEM_VERSION}catch(e){}
 
-    console.log('  ✅ 版本升級至 v2.23.1 (Build 20260706-erp)');
+    console.log('  ✅ 版本升級至 v'+SYSTEM_VERSION+' (Build '+BUILD_NUMBER+')');
 
     // ═══════════════════════════════════════════════════════════
     // 完成
