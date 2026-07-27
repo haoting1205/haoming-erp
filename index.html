@@ -295,9 +295,43 @@ const TW_BANKS=[
 // ════════════════════════════════════════════════════════════════
 // ERP Core Module — Complete with all CRUD, SOP, Modals
 // ════════════════════════════════════════════════════════════════
+/* ═══════════ 帳號安全（v2.2.0）═══════════
+ * 為何要放在這裡：window.hashPass 定義在後段（約 8781 行），
+ * 但帳號種子在 state 初始化（本行之後）就會執行 —— 載入順序不允許依賴它。
+ * 故此處自帶同演算法的雜湊，兩者結果一致、可互相驗證。
+ * 相容性：_erpVerify 對「無 hm$ 前綴」的舊明文密碼仍可通過，
+ *        既有使用者不會被鎖在系統外，登入後可自然升級為雜湊。 */
+function _erpHash(p){
+  if(!p)return'';
+  var x=0;
+  for(var i=0;i<p.length;i++){x=((x<<5)-x)+p.charCodeAt(i);x=x&x}
+  return'hm$'+Math.abs(x).toString(36)+'$'+p.length;
+}
+function _erpVerify(plain,stored){
+  if(!stored)return false;
+  if(String(stored).indexOf('hm$')!==0)return plain===stored;   // 舊明文相容
+  return _erpHash(plain)===stored;
+}
+function _erpRandPw(){
+  var C='ABCDEFGHJKLMNPQRSTUVWXYZ23456789abcdefghijkmnpqrstuvwxyz',s='';
+  for(var i=0;i<10;i++)s+=C.charAt(Math.floor(Math.random()*C.length));
+  return s+'1a';   // 確保含英數
+}
+/* ★ 管理員種子：單一真實來源。原本 7 處各自寫死 admin123，
+ *   改一處不會全改（v3.38 死碼清理曾踩過同類問題）。 */
+var ERP_DEFAULT_PW='admin123';
+function _erpAdminSeed(){
+  return {id:'U001',username:'admin',password:_erpHash(ERP_DEFAULT_PW),
+          role:'老闆',name:'管理員',active:true,mustChange:true};
+}
+function _erpDemoSeed(){
+  return {id:'UDEMO',username:'demo',password:_erpHash('demo1234'),
+          role:'示範訪客',name:'示範訪客',active:true};
+}
+
 const COST_KEY='hm_cost_v3';
 const DEFAULT_META={company:'好洺餐飲事業有限公司',taxId:'',phone:'',address:'',stores:['交大店','竹北店','台積電店'],targetMargin:0.65,marginTiers:[55,60,65],currency:'NT$'};
-let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}],currentUser:null,invHistory:[],recipeVersions:{},internalProducts:[],internalOrders:[],tiers:[{id:'TIER1',name:'門市內部',rate:0.7,order:1},{id:'TIER2',name:'加盟店',rate:0.8,order:2},{id:'TIER3',name:'VIP客戶',rate:0.85,order:3},{id:'TIER4',name:'一般客戶',rate:1,order:4},{id:'TIER5',name:'新顧客',rate:1,order:5}],arList:[],countList:[],returnList:[],taxConfig:{rate:0.05},workOrders:[],customers:[],custOrders:[],assets:[],salesData:[],cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haomin-system-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyAk8D1oXTYaq9E1t96bPW-1rMu0EhW1JzQ',fbAuthDomain:'haomin-system.firebaseapp.com',fbProjectId:'haomin-system',fbStorageBucket:'haomin-system.firebasestorage.app',fbMessagingSenderId:'348193196599',fbAppId:'1:348193196599:web:c5aa85961d929e7e39cdb2',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[],kitchenCosts:{}};
+let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',refs:JSON.parse(JSON.stringify(DB_REFS)),ings:JSON.parse(JSON.stringify(DB_INGS)),recipes:JSON.parse(JSON.stringify(DB_RECIPES)),menu:JSON.parse(JSON.stringify(DB_MENU)),waste:[],storeInv:[],transfers:[],poList:[],apList:[],batchList:[],prodLog:[],allergenDB:{},contracts:[],qcRecords:[],haccpLogs:[],prodSchedule:[],equipment:[],budget:{},trainLog:[],users:[_erpAdminSeed()],currentUser:null,invHistory:[],recipeVersions:{},internalProducts:[],internalOrders:[],tiers:[{id:'TIER1',name:'門市內部',rate:0.7,order:1},{id:'TIER2',name:'加盟店',rate:0.8,order:2},{id:'TIER3',name:'VIP客戶',rate:0.85,order:3},{id:'TIER4',name:'一般客戶',rate:1,order:4},{id:'TIER5',name:'新顧客',rate:1,order:5}],arList:[],countList:[],returnList:[],taxConfig:{rate:0.05},workOrders:[],customers:[],custOrders:[],assets:[],salesData:[],cloudConfig:{provider:'firebase',url:'',key:'',enabled:true,lastSync:'',autoSync:false,deviceName:'',fbUrl:'https://haomin-system-default-rtdb.asia-southeast1.firebasedatabase.app',fbApiKey:'AIzaSyAk8D1oXTYaq9E1t96bPW-1rMu0EhW1JzQ',fbAuthDomain:'haomin-system.firebaseapp.com',fbProjectId:'haomin-system',fbStorageBucket:'haomin-system.firebasestorage.app',fbMessagingSenderId:'348193196599',fbAppId:'1:348193196599:web:c5aa85961d929e7e39cdb2',jbKey:'',jbBinId:''},sups:JSON.parse(JSON.stringify(DB_SUPS)),buyLog:[],auditLog:[],kitchenCosts:{}};
 
 (function loadState(){try{
   // 🆕 檢查是否為示範模式 session (上次登入是 demo)
@@ -409,7 +443,7 @@ window.runMigrations=function(){
   if(!state.users)state.users=[];
   var admin=state.users.find(function(u){return u.username==='admin'});
   if(!admin){
-    state.users.push({id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true});
+    state.users.push(_erpAdminSeed());
   } else {
     // 確保帳號啟用
     admin.active=true;
@@ -436,10 +470,10 @@ window.runMigrations=function(){
 // 確保管理員帳號始終存在
 (function ensureAdmin(){
   if(!state.users||!state.users.length){
-    state.users=[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}];
+    state.users=[_erpAdminSeed()];
   }else{
     var hasAdmin=state.users.some(function(u){return u.username==='admin'});
-    if(!hasAdmin){state.users.unshift({id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true})}
+    if(!hasAdmin){state.users.unshift(_erpAdminSeed())}
   }
 })();
 
@@ -448,7 +482,7 @@ window.runMigrations=function(){
   if(!state.users)state.users=[];
   var hasDemo=state.users.some(function(u){return u.username==='demo'});
   if(!hasDemo){
-    state.users.push({id:'UDEMO',username:'demo',password:'demo1234',role:'示範訪客',name:'示範訪客',active:true});
+    state.users.push(_erpDemoSeed());
   }
 })();
 
@@ -7209,7 +7243,7 @@ Object.keys(itemTotals).forEach(function(name){var d=itemTotals[name];var rate=d
 return alerts}
 
 // ── 8. 使用者帳號/權限管理（localStorage 版） ──
-if(!state.users)state.users=[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}];
+if(!state.users)state.users=[_erpAdminSeed()];
 if(!state.currentUser)state.currentUser=null;
 
 function renderUsers(){var pg=dv({});var sw=sopBox('users');if(sw)pg.appendChild(sw);var users=state.users||[];
@@ -7220,7 +7254,7 @@ pg.appendChild(dv({cls:'tip'},'⚠️ 此為本機帳號管理（localStorage）
 window.openUserModal=function(id){var def={id:'U'+Date.now(),username:'',password:'',role:'員工',name:'',active:true};var u=id?(state.users||[]).find(function(x){return x.id===id}):def;if(!u)return;
 modal(mH(id?'編輯帳號':'新增帳號')+'<div class="form-row c2"><div class="fg"><label>帳號 *</label><input id="us-un" value="'+esc(u.username)+'"'+(id?' disabled':'')+' placeholder="登入帳號"></div><div class="fg"><label>密碼'+(id?' （留空不修改）':'  *')+'</label><input id="us-pw" type="password" placeholder="'+(id?'留空不修改':'設定密碼')+'"></div></div><div class="form-row c3"><div class="fg"><label>姓名</label><input id="us-name" value="'+esc(u.name)+'" placeholder="顯示名稱"></div><div class="fg"><label>角色</label><select id="us-role"><option value="老闆"'+(u.role==='老闆'?' selected':'')+'>老闆</option><option value="店長"'+(u.role==='店長'?' selected':'')+'>店長</option><option value="員工"'+(u.role==='員工'?' selected':'')+'>員工</option></select></div><div class="fg"><label>狀態</label><select id="us-active"><option value="1"'+(u.active?' selected':'')+'>啟用</option><option value="0"'+(!u.active?' selected':'')+'>停用</option></select></div></div>'+mF("saveUser('"+id+"')"))};
 
-window.saveUser=function(eid){var un=$('us-un')?$('us-un').value.trim():'';if(!un){alert('請填入帳號');return}var pw=$('us-pw')?$('us-pw').value:'';if(!eid&&!pw){alert('請設定密碼');return}var obj={id:eid||'U'+Date.now(),username:un,password:pw||(eid?((state.users||[]).find(function(x){return x.id===eid})||{}).password||'':''),role:$('us-role')?$('us-role').value:'員工',name:$('us-name')?$('us-name').value:'',active:$('us-active')?$('us-active').value==='1':true};if(!state.users)state.users=[];if(eid){state.users=state.users.map(function(x){return x.id===eid?obj:x})}else{if(state.users.some(function(x){return x.username===un})){alert('帳號已存在');return}state.users.push(obj)}addAudit(eid?'編輯帳號':'新增帳號',un);saveState();closeModal();renderPage();toast('✅ 帳號已儲存')};
+window.saveUser=function(eid){var un=$('us-un')?$('us-un').value.trim():'';if(!un){alert('請填入帳號');return}var pw=$('us-pw')?$('us-pw').value:'';if(!eid&&!pw){alert('請設定密碼');return}var obj={id:eid||'U'+Date.now(),username:un,password:(pw?_erpHash(pw):(eid?((state.users||[]).find(function(x){return x.id===eid})||{}).password||'':'')),mustChange:(pw?false:(eid?((state.users||[]).find(function(x){return x.id===eid})||{}).mustChange:false)),role:$('us-role')?$('us-role').value:'員工',name:$('us-name')?$('us-name').value:'',active:$('us-active')?$('us-active').value==='1':true};if(!state.users)state.users=[];if(eid){state.users=state.users.map(function(x){return x.id===eid?obj:x})}else{if(state.users.some(function(x){return x.username===un})){alert('帳號已存在');return}state.users.push(obj)}addAudit(eid?'編輯帳號':'新增帳號',un);saveState();closeModal();renderPage();toast('✅ 帳號已儲存')};
 window.delUser=function(id){if(!confirm('確定刪除？'))return;state.users=(state.users||[]).filter(function(x){return x.id!==id});saveState();renderPage()};
 
 // ── 9. 資料加密與自動備份 ──
@@ -8684,10 +8718,10 @@ function showLoginScreen(){
     '<div id="login-err" style="color:#B82525;font-size:0.84rem;margin-bottom:12px;display:none"></div>'+
     '<div style="display:flex;gap:16px;margin-bottom:16px">'+
     '<label style="display:flex;align-items:center;gap:6px;font-size:0.84rem;color:#555350;cursor:pointer;user-select:none"><input type="checkbox" id="login-remember-user" style="width:16px;height:16px;cursor:pointer"> 記住帳號</label>'+
-    '<label style="display:flex;align-items:center;gap:6px;font-size:0.84rem;color:#555350;cursor:pointer;user-select:none"><input type="checkbox" id="login-remember-pass" style="width:16px;height:16px;cursor:pointer"> 記住密碼</label>'+
+
     '</div>'+
     '<button onclick="doLogin()" style="width:100%;background:#0A5A46;color:#fff;border:none;border-radius:8px;padding:12px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:.2s">登入系統</button>'+
-    '<div style="text-align:center;margin-top:16px;font-size:0.78rem;color:#B0AEA6">老闆登入: admin / admin123<br>示範訪客: <b style="color:#9A6210">demo / demo1234</b> (虛構資料,試用功能)</div>'+
+    '<div style="text-align:center;margin-top:16px;font-size:0.78rem;color:#B0AEA6">示範訪客: <b style="color:#9A6210">demo / demo1234</b> (虛構資料,試用功能)</div>'+
     '<div style="text-align:center;margin-top:10px"><a href="javascript:void(0)" onclick="showForgotPassword()" style="font-size:0.84rem;color:#1455A0;text-decoration:none">忘記密碼？</a></div>'+
     '</div>';
   document.body.appendChild(overlay);
@@ -8703,7 +8737,8 @@ function showLoginScreen(){
     try{
       var saved=JSON.parse(localStorage.getItem('hm_login_memory')||'{}');
       if(saved.username&&userField){userField.value=saved.username;var remU=document.getElementById('login-remember-user');if(remU)remU.checked=true}
-      if(saved.password&&passField){passField.value=saved.password;var remP=document.getElementById('login-remember-pass');if(remP)remP.checked=true}
+      /* 舊版曾存明文密碼，此處主動清除殘留 */
+      if(saved.password){delete saved.password;try{localStorage.setItem('hm_login_memory',JSON.stringify(saved))}catch(e){}}
       if(saved.username&&!saved.password&&passField)passField.focus();
       if(saved.username&&saved.password&&userField)userField.focus();
     }catch(e){}
@@ -8746,7 +8781,7 @@ window.doLogin=function(){
   }
   
   // 回退:查 ERP 自有 state.users (admin/demo 等內建帳號)
-  var user=(state.users||[]).find(function(u){return u.username===un&&u.password===pw&&u.active});
+  var user=(state.users||[]).find(function(u){return u.username===un&&_erpVerify(pw,u.password)&&u.active});
   if(!user){if(errEl){errEl.textContent='帳號或密碼錯誤，或帳號已停用';errEl.style.display='block'}return}
   state.currentUser={id:user.id,username:user.username,name:user.name,role:user.role};
   if(user.role==='示範訪客')enterDemoMode();
@@ -8757,10 +8792,10 @@ window.doLogin=function(){
 function _doLoginCommonFlow(un,pw,role,name){
   try{
     var remUser=document.getElementById('login-remember-user');
-    var remPass=document.getElementById('login-remember-pass');
     var memory={};
     if(remUser&&remUser.checked)memory.username=un;
-    if(remPass&&remPass.checked)memory.password=pw;
+    /* 資安：不再儲存明文密碼（原本「記住密碼」會把密碼明文寫進 localStorage，
+       裝置遺失或被他人操作即等同帳號洩漏）。僅保留「記住帳號」。 */
     if(memory.username||memory.password){localStorage.setItem('hm_login_memory',JSON.stringify(memory))}
     else{localStorage.removeItem('hm_login_memory')}
   }catch(e){}
@@ -8772,6 +8807,16 @@ function _doLoginCommonFlow(un,pw,role,name){
   saveState();
   if(role==='示範訪客')setTimeout(applyDemoModeBadge,200);
   renderPage();
+  /* 強制變更預設密碼：mustChange 或仍在用出廠預設者，登入後立即提示 */
+  try{
+    var _cu=(state.users||[]).find(function(u){return u.username===un});
+    if(_cu&&role!=='示範訪客'&&(_cu.mustChange||_erpVerify(ERP_DEFAULT_PW,_cu.password))){
+      setTimeout(function(){
+        alert('⚠ 你目前使用系統預設密碼\n\n為保護公司資料，請立即變更密碼。');
+        if(typeof openUserModal==='function'&&_cu.id)openUserModal(_cu.id);
+      },800);
+    }
+  }catch(e){}
   toast(role==='示範訪客'?'📍 已進入示範模式 (虛構資料,可自由試用)':'✅ 歡迎，'+name);
   // 登入後在背景同步 HR accounts cache
   if(role!=='示範訪客')setTimeout(syncHRAccountsCache,1000);
@@ -9067,7 +9112,7 @@ window.doRecoveryReset=function(){
   if(code!==(state.recoveryCode||'haoming2026')){if(errEl){errEl.textContent='❌ 救援碼錯誤';errEl.style.display='block'}return}
   var user=(state.users||[]).find(function(u){return u.username===username});
   if(!user){if(errEl){errEl.textContent='帳號不存在';errEl.style.display='block'}return}
-  user.password=newPw;
+  user.password=_erpHash(newPw);user.mustChange=false;
   addAudit('密碼重設（救援碼）',username);
   saveState();
   alert('✅ 密碼已重設，請使用新密碼登入');
@@ -9096,9 +9141,14 @@ window.doSecurityReset=function(){
   if(metaTax&&taxId!==metaTax){if(errEl){errEl.textContent='❌ 統一編號不正確';errEl.style.display='block'}return}
   if(!metaTax&&compName!==metaComp){if(errEl){errEl.textContent='❌ 公司名稱不正確';errEl.style.display='block'}return}
   if(metaTax&&compName!==metaComp){if(errEl){errEl.textContent='❌ 公司名稱不正確';errEl.style.display='block'}return}
+  /* 資安：原本固定重設為 admin123 —— 任何知道公司名稱的人都能取得已知密碼。
+     改為產生一次性隨機密碼，僅顯示一次，且登入後強制變更。 */
+  var _np=_erpRandPw();
   var admin=(state.users||[]).find(function(u){return u.username==='admin'});
-  if(admin){admin.password='admin123';addAudit('密碼重設（公司驗證）','admin');saveState()}
-  alert('✅ 管理員密碼已重設為：admin123\n請登入後立即修改密碼');
+  if(!admin){admin=_erpAdminSeed();state.users=state.users||[];state.users.push(admin)}
+  admin.password=_erpHash(_np);admin.active=true;admin.mustChange=true;
+  addAudit('密碼重設（公司驗證）','admin');saveState();
+  alert('✅ 管理員密碼已重設\n\n帳號：admin\n新密碼：'+_np+'\n\n⚠ 此密碼僅顯示這一次，請立即抄下\n登入後系統會要求你變更密碼');
   backToLogin();
 };
 
@@ -9117,11 +9167,12 @@ window.doEmergencyReset=function(){
   var confirm=(document.getElementById('em-confirm')||{}).value||'';
   if(confirm!=='確認重設'){alert('請正確輸入「確認重設」');return}
   state.currentUser=null;
+  var _np2=_erpRandPw();
   var admin=(state.users||[]).find(function(u){return u.username==='admin'});
-  if(admin){admin.password='admin123';admin.active=true}
-  else{state.users=[{id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true}]}
+  if(!admin){admin=_erpAdminSeed();state.users=[admin]}
+  admin.password=_erpHash(_np2);admin.active=true;admin.mustChange=true;
   saveState();
-  alert('✅ 已完成緊急重設\n帳號：admin\n密碼：admin123\n\n所有 ERP 資料完整保留');
+  alert('✅ 已完成緊急重設\n\n帳號：admin\n新密碼：'+_np2+'\n\n⚠ 此密碼僅顯示這一次，請立即抄下\n登入後系統會要求你變更密碼\n\n所有 ERP 資料完整保留');
   backToLogin();
 };
 
@@ -13049,7 +13100,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(state.permissions['老闆']){allMods.forEach(function(m){if(state.permissions['老闆'].indexOf(m)<0)state.permissions['老闆'].push(m)})}
       if(!state.users)state.users=[];
       var admin=state.users.find(function(u){return u.username==='admin'});
-      if(!admin){state.users.push({id:'U001',username:'admin',password:'admin123',role:'老闆',name:'管理員',active:true})}
+      if(!admin){state.users.push(_erpAdminSeed())}
       else{admin.active=true;admin.role='老闆'}
     })();
     renderPage();
