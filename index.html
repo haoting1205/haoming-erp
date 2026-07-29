@@ -6324,10 +6324,11 @@ permDesc.textContent='設定各角色（老闆/店長/員工）可存取的功�
 permCard.appendChild(permDesc);
 permCard.appendChild(btn('btn btn-primary','🔐 設定模組權限',openPermissionSettings));
 var rcRow=dv({style:'margin-top:12px;display:flex;gap:8px;align-items:flex-end'});
-var rcFg=dv({cls:'fg',style:'flex:1'});rcFg.innerHTML='<label>系統救援碼（忘記密碼時使用）</label><input id="ref-rc" value="'+esc(state.recoveryCode||'haoming2026')+'" type="text" placeholder="設定救援碼">';
-rcRow.appendChild(rcFg);rcRow.appendChild(btn('btn btn-sm btn-primary','儲存救援碼',function(){state.recoveryCode=$('ref-rc')?$('ref-rc').value:'haoming2026';saveState();toast('✅ 救援碼已更新')}));
+var rcFg=dv({cls:'fg',style:'flex:1'});rcFg.innerHTML='<label>系統救援碼（忘記密碼時使用）</label><input id="ref-rc" value="'+esc(state.recoveryCode||'')+'" type="text" placeholder="設定救援碼">';
+rcRow.appendChild(rcFg);rcRow.appendChild(btn('btn btn-sm btn-primary','儲存救援碼',function(){var _rc=$('ref-rc')?$('ref-rc').value.trim():'';if(_rc.length<8){alert('救援碼至少 8 碼');return}state.recoveryCode=_rc;saveState();addAudit('更新救援碼','');toast('✅ 救援碼已更新')}));
 permCard.appendChild(rcRow);
-permCard.appendChild(dv({style:'font-size:0.82rem;color:#706E68;margin-top:6px'},'💡 救援碼用於忘記密碼時重設帳號，請妥善保管。預設：haoming2026'));
+permCard.appendChild(dv({style:'font-size:0.82rem;color:#706E68;margin-top:6px'},'💡 救援碼用於忘記密碼時重設任何帳號的密碼，等同萬用鑰匙，請當作密碼保管、勿外流。至少 8 碼。'));
+if(window._erpRcIsLegacy&&window._erpRcIsLegacy()){permCard.appendChild(dv({style:'margin-top:8px;padding:10px 12px;background:#FDE8E8;border:1px solid #E5A0A0;border-radius:8px;font-size:0.84rem;color:#8C1A1A;line-height:1.6'},'⚠ 目前仍在使用出廠救援碼，該值曾寫在網頁原始碼中，任何人都可能知道。請立即改為自訂值。'))}
 pg.appendChild(permCard);
 const dm=dv({cls:'card'});dm.appendChild(dv({cls:'card-title'},'💾 資料管理'));dm.appendChild(dv({style:'margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap'},btn('btn btn-primary','📋 備份管理中心',openBackupManager),btn('btn btn-outline','📊 Excel 匯出匯入',openExcelCenter),btn('btn btn-outline','🏷️ 層級管理',openTierManager)));dm.appendChild(dv({style:'font-size:0.82rem;color:#706E68;margin-bottom:12px'},'系統每日自動備份到 localStorage，保留最近 7 天。點擊上方按鈕檢視所有備份並還原'));const dr=dv({style:'display:flex;gap:8px;flex-wrap:wrap'});dr.appendChild(btn('btn btn-outline','📤 匯出備份',exportBackup));dr.appendChild(btn('btn btn-outline','📥 匯入備份',()=>$('backup-input')?.click()));dr.appendChild(btn('btn btn-outline','🔐 加密備份',encryptedExport));dr.appendChild(btn('btn btn-outline','🔐 匯入加密',encryptedImport));dr.appendChild(btn('btn btn-danger','🗑️ 清除所有資料',clearAllData));
 dm.appendChild(dr);dm.appendChild(dv({style:'margin-top:12px'}));
@@ -8693,7 +8694,13 @@ var DEFAULT_PERMS={
     });
   }
 })();
-if(!state.recoveryCode)state.recoveryCode='haoming2026';
+/* 救援碼治理（v2.2.0）：原本首次啟用固定填入 'haoming2026'，該值又直接寫在
+   網頁原始碼與設定頁說明中 —— 任何人檢視原始碼即可取得，並用它重設任何帳號的密碼。
+   改為：首次啟用產生隨機碼；既有仍在使用出廠值者，於老闆登入時自動汰換並提示抄下。
+   救援碼在「設定 → 系統救援碼」欄位隨時可查，登入狀態下不會遺失。 */
+var _ERP_LEGACY_RC='haoming2026';
+if(!state.recoveryCode)state.recoveryCode=_erpRandPw();
+window._erpRcIsLegacy=function(){return state.recoveryCode===_ERP_LEGACY_RC};
 if(!state.permissions||!Object.keys(state.permissions).length)state.permissions=JSON.parse(JSON.stringify(DEFAULT_PERMS));
 
 // 登入狀態檢查
@@ -8815,6 +8822,15 @@ function _doLoginCommonFlow(un,pw,role,name){
         alert('⚠ 你目前使用系統預設密碼\n\n為保護公司資料，請立即變更密碼。');
         if(typeof openUserModal==='function'&&_cu.id)openUserModal(_cu.id);
       },800);
+    }
+    /* 出廠救援碼自動汰換：該值曾寫在網頁原始碼中，等同公開。
+       僅老闆登入時處理，並強制以 alert 告知新碼（設定頁隨時可再查詢與修改）。 */
+    if(role==='老闆'&&window._erpRcIsLegacy&&window._erpRcIsLegacy()){
+      var _nrc=_erpRandPw();
+      state.recoveryCode=_nrc;saveState();addAudit('自動汰換出廠救援碼','');
+      setTimeout(function(){
+        alert('🔐 系統救援碼已自動更新\n\n新救援碼：'+_nrc+'\n\n舊的出廠救援碼曾寫在網頁原始碼中，任何人都可能知道，已自動汰換。\n\n請抄下保管。日後可至「設定 → 系統救援碼」查詢或改為自訂值。');
+      },2000);
     }
   }catch(e){}
   toast(role==='示範訪客'?'📍 已進入示範模式 (虛構資料,可自由試用)':'✅ 歡迎，'+name);
@@ -9109,7 +9125,8 @@ window.doRecoveryReset=function(){
   var newPw=(document.getElementById('rc-newpw')||{}).value||'';
   var errEl=document.getElementById('rc-err');
   if(!code||!newPw){if(errEl){errEl.textContent='請填入救援碼和新密碼';errEl.style.display='block'}return}
-  if(code!==(state.recoveryCode||'haoming2026')){if(errEl){errEl.textContent='❌ 救援碼錯誤';errEl.style.display='block'}return}
+  if(!state.recoveryCode){if(errEl){errEl.textContent='❌ 尚未設定救援碼，請改用其他重設方式';errEl.style.display='block'}return}
+  if(code!==state.recoveryCode){if(errEl){errEl.textContent='❌ 救援碼錯誤';errEl.style.display='block'}return}
   var user=(state.users||[]).find(function(u){return u.username===username});
   if(!user){if(errEl){errEl.textContent='帳號不存在';errEl.style.display='block'}return}
   user.password=_erpHash(newPw);user.mustChange=false;
