@@ -6328,6 +6328,41 @@ var rcFg=dv({cls:'fg',style:'flex:1'});rcFg.innerHTML='<label>系統救援碼（
 rcRow.appendChild(rcFg);rcRow.appendChild(btn('btn btn-sm btn-primary','儲存救援碼',function(){var _rc=$('ref-rc')?$('ref-rc').value.trim():'';if(_rc.length<8){alert('救援碼至少 8 碼');return}state.recoveryCode=_rc;saveState();addAudit('更新救援碼','');toast('✅ 救援碼已更新')}));
 permCard.appendChild(rcRow);
 permCard.appendChild(dv({style:'font-size:0.82rem;color:#706E68;margin-top:6px'},'💡 救援碼用於忘記密碼時重設任何帳號的密碼，等同萬用鑰匙，請當作密碼保管、勿外流。至少 8 碼。'));
+/* ── OneDrive 資料夾備份設定 ── */
+(function(){
+  var obCard=dv({cls:'card'});
+  obCard.appendChild(dv({cls:'card-title'},'☁️ OneDrive 資料夾備份'));
+  var nm=localStorage.getItem('hm_ob_name')||'';
+  var last=localStorage.getItem('hm_ob_last')||'';
+  var used=0; try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);used+=(k.length+(localStorage.getItem(k)||'').length)*2}}catch(e){}
+  var usedMB=(used/1048576).toFixed(1);
+  obCard.appendChild(dv({style:'font-size:0.86rem;color:#555350;line-height:1.8;margin-bottom:10px'},
+    (nm? '目前資料夾：'+esc(nm) : '⚠ 尚未設定備份資料夾')
+    + (last? '　｜　最後備份：'+new Date(last).toLocaleString('zh-TW') : '')
+    ));
+  obCard.appendChild(dv({style:'background:'+(used>8388608?'#FDE8E8':'#F3F4F0')+';border-radius:8px;padding:10px 12px;font-size:0.82rem;color:'+(used>8388608?'#8C1A1A':'#706E68')+';line-height:1.7;margin-bottom:12px'},
+    '本機儲存用量：'+usedMB+' MB / 約 10 MB（本網域五套系統共用）'
+    + (used>8388608? '　⚠ 已接近上限，資料可能寫不進去，請務必設定資料夾備份' : '')
+    + '　｜　本機自動備份僅保留 3 份，主力備份寫入資料夾'));
+  var row=dv({style:'display:flex;gap:8px;flex-wrap:wrap'});
+  row.appendChild(btn('btn btn-primary', nm?'📁 變更備份資料夾':'📁 設定備份資料夾', function(){obPickDir()}));
+  row.appendChild(btn('btn btn-sm', '📸 立即備份到資料夾', function(){obBackupNow()}));
+  row.appendChild(btn('btn btn-sm', '🧹 清理舊的本機備份', function(){
+    var n=_bakPrune(1);
+    var u=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);u+=(k.length+(localStorage.getItem(k)||'').length)*2}
+    alert('✅ 已清除 '+n+' 份舊備份\n\n目前用量：'+(u/1048576).toFixed(1)+' MB');
+    renderPage();
+  }));
+  obCard.appendChild(row);
+  obCard.appendChild(dv({style:'font-size:0.8rem;color:#A8A6A0;margin-top:10px;line-height:1.7'},
+    '① 點「設定備份資料夾」，選擇 OneDrive 底下任一資料夾（建議另建「系統備份」子資料夾）'
+    +'　② 之後每 30 分鐘自動寫入一份，OneDrive 會自動同步上雲'
+    +'　③ 瀏覽器安全機制：每次重開分頁後首次寫入需按一下確認，同一階段內不再詢問'));
+  if(!window.obSupported||!obSupported()){
+    obCard.appendChild(dv({style:'margin-top:8px;padding:9px 11px;background:#FDE8E8;border-radius:8px;font-size:0.82rem;color:#8C1A1A'},'⚠ 此瀏覽器不支援資料夾備份，請改用 Chrome 或 Edge'));
+  }
+  pg.appendChild(obCard);
+})();
 if(window._erpRcIsLegacy&&window._erpRcIsLegacy()){permCard.appendChild(dv({style:'margin-top:8px;padding:10px 12px;background:#FDE8E8;border:1px solid #E5A0A0;border-radius:8px;font-size:0.84rem;color:#8C1A1A;line-height:1.6'},'⚠ 目前仍在使用出廠救援碼，該值曾寫在網頁原始碼中，任何人都可能知道。請立即改為自訂值。'))}
 pg.appendChild(permCard);
 const dm=dv({cls:'card'});dm.appendChild(dv({cls:'card-title'},'💾 資料管理'));dm.appendChild(dv({style:'margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap'},btn('btn btn-primary','📋 備份管理中心',openBackupManager),btn('btn btn-outline','📊 Excel 匯出匯入',openExcelCenter),btn('btn btn-outline','🏷️ 層級管理',openTierManager)));dm.appendChild(dv({style:'font-size:0.82rem;color:#706E68;margin-bottom:12px'},'系統每日自動備份到 localStorage，保留最近 7 天。點擊上方按鈕檢視所有備份並還原'));const dr=dv({style:'display:flex;gap:8px;flex-wrap:wrap'});dr.appendChild(btn('btn btn-outline','📤 匯出備份',exportBackup));dr.appendChild(btn('btn btn-outline','📥 匯入備份',()=>$('backup-input')?.click()));dr.appendChild(btn('btn btn-outline','🔐 加密備份',encryptedExport));dr.appendChild(btn('btn btn-outline','🔐 匯入加密',encryptedImport));dr.appendChild(btn('btn btn-danger','🗑️ 清除所有資料',clearAllData));
@@ -7277,17 +7312,120 @@ var d=JSON.parse(dec.slice(sep+3));if(!d.ings)throw new Error();
 if(!confirm('確定匯入？目前資料將被覆蓋'))return;
 Object.assign(state,d);saveState();renderPage();toast('✅ 加密備份已匯入')}catch(err){alert('❌ 檔案無效或密碼錯誤')}};reader.readAsText(file)};input.click()};
 
+/* ═══════════ OneDrive 資料夾備份（v2.25.0）═══════════
+ * 原理：OneDrive 資料夾就在本機，檔案寫進去即自動同步上雲。
+ *       用 File System Access API 取得資料夾控制權（存於 IndexedDB 可重複使用），
+ *       不需要 Azure 應用註冊、不經過 Google Drive。
+ * 限制：瀏覽器安全機制要求每個工作階段首次寫入需使用者手勢確認一次；
+ *       同一階段內後續自動備份不再詢問。
+ * ─────────────────────────────────────────────── */
+var OB_DB='hm_ob', OB_STORE='h', OB_KEY='dir';
+function _obIdb(){
+  return new Promise(function(res,rej){
+    var r=indexedDB.open(OB_DB,1);
+    r.onupgradeneeded=function(){r.result.createObjectStore(OB_STORE)};
+    r.onsuccess=function(){res(r.result)}; r.onerror=function(){rej(r.error)};
+  });
+}
+function _obPut(v){return _obIdb().then(function(d){return new Promise(function(res,rej){
+  var t=d.transaction(OB_STORE,'readwrite');t.objectStore(OB_STORE).put(v,OB_KEY);
+  t.oncomplete=function(){res(true)};t.onerror=function(){rej(t.error)}})})}
+function _obGet(){return _obIdb().then(function(d){return new Promise(function(res){
+  var t=d.transaction(OB_STORE,'readonly');var q=t.objectStore(OB_STORE).get(OB_KEY);
+  q.onsuccess=function(){res(q.result||null)};q.onerror=function(){res(null)}})}).catch(function(){return null})}
+
+window.obSupported=function(){return typeof window.showDirectoryPicker==='function'};
+
+window.obPickDir=async function(){
+  if(!obSupported()){alert('此瀏覽器不支援資料夾備份\n\n請使用 Chrome 或 Edge');return}
+  try{
+    var dir=await window.showDirectoryPicker({mode:'readwrite'});
+    await _obPut(dir);
+    localStorage.setItem('hm_ob_name',dir.name);
+    addAudit('設定備份資料夾',dir.name);
+    alert('✅ 已設定備份資料夾：'+dir.name+'\n\n之後自動備份會直接寫入此資料夾。\n若這是 OneDrive 底下的資料夾，檔案會自動同步上雲。');
+    if(typeof renderPage==='function')renderPage();
+  }catch(e){ if(e && e.name!=='AbortError') alert('設定失敗：'+e.message); }
+};
+
+window.obWrite=async function(name,text,silent){
+  var dir=await _obGet();
+  if(!dir) return {ok:false,reason:'尚未設定備份資料夾'};
+  try{
+    var p=await dir.queryPermission({mode:'readwrite'});
+    if(p!=='granted'){
+      if(silent) return {ok:false,reason:'需手動確認權限'};
+      p=await dir.requestPermission({mode:'readwrite'});
+      if(p!=='granted') return {ok:false,reason:'使用者未授權'};
+    }
+    var fh=await dir.getFileHandle(name,{create:true});
+    var w=await fh.createWritable();
+    await w.write(text); await w.close();
+    localStorage.setItem('hm_ob_last',new Date().toISOString());
+    return {ok:true,name:name};
+  }catch(e){ return {ok:false,reason:e.name+': '+e.message}; }
+};
+
+window.obBackupNow=async function(){
+  var n=new Date(), p=function(x){return String(x).padStart(2,'0')};
+  var fn='生管ERP_備份_'+n.getFullYear()+p(n.getMonth()+1)+p(n.getDate())+'_'+p(n.getHours())+p(n.getMinutes())+'.json';
+  var r=await obWrite(fn, JSON.stringify({ts:n.toISOString(),sys:'生管ERP',ver:(window.SYSTEM_VERSION||''),data:state}));
+  if(r.ok){addAudit('備份到資料夾',fn);alert('✅ 已備份\n\n檔名：'+fn)}
+  else alert('❌ 備份失敗：'+r.reason);
+  if(typeof renderPage==='function')renderPage();
+};
+
 var _autoBackupTimer=null;
+/* ★ 配額治理（v2.25.0）
+ * 原設定：每 3 分鐘寫一份完整 state（約 800KB），保留 14 天。
+ *   14 × 800KB ≈ 11MB，本身就超過瀏覽器 10MB 上限；而 saveState 的寫入失敗
+ *   被 try/catch 靜默吞掉 —— 結果是 ERP 資料停止儲存卻毫無提示（已實際發生）。
+ * 現改為：間隔 30 分鐘、本機只保留 3 份；寫入遇配額不足時自動清理最舊備份並重試，
+ *   仍失敗才提示使用者。備份主力改為 OneDrive 資料夾（obWrite）。 */
+var OB_KEEP_LOCAL=3;
+function _bakKeys(){
+  var a=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);
+    if(k&&k.indexOf('hm_autobackup_')===0&&k.indexOf('_T')<0)a.push(k)}
+  return a.sort();
+}
+function _bakPrune(keep){
+  var old=_bakKeys();var removed=0;
+  while(old.length>keep){localStorage.removeItem(old.shift());removed++}
+  return removed;
+}
+function _bakSafeSet(key,val){
+  try{ localStorage.setItem(key,val); return true; }
+  catch(e){
+    /* 配額不足：先砍到只留 1 份再重試 */
+    _bakPrune(1);
+    try{ localStorage.setItem(key,val); return true; }
+    catch(e2){
+      if(!window._bakWarned){
+        window._bakWarned=true;
+        try{ toast('⚠ 本機儲存空間不足，自動備份已停止。請設定 OneDrive 備份資料夾','err'); }catch(_){}
+        console.warn('[備份] localStorage 配額不足，本機備份停止：',e2.name);
+      }
+      return false;
+    }
+  }
+}
 function scheduleAutoBackup(){clearInterval(_autoBackupTimer);_autoBackupTimer=setInterval(function(){
 try{
   var now=new Date();var key='hm_autobackup_'+toDay();
-  // 🛡️ 空白防護:目前無核心資料時不寫備份(不覆蓋今天既有備份,也不產生空白備份)
   var _bakHasData=(state.ings&&state.ings.length)||(state.recipes&&state.recipes.length)||(state.customers&&state.customers.length)||(state.internalProducts&&state.internalProducts.length);
-  if(_bakHasData){localStorage.setItem(key,JSON.stringify({ts:now.toISOString(),data:state}))}
-  // 清理超過 14 天的備份
-  var old=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.startsWith('hm_autobackup_')&&!k.includes('_T'))old.push(k)}
-  old.sort();while(old.length>14){localStorage.removeItem(old.shift())}
-}catch(e){}},180000)}
+  if(!_bakHasData)return;
+  var payload=JSON.stringify({ts:now.toISOString(),data:state});
+  _bakPrune(OB_KEEP_LOCAL);            /* 先清再寫，避免寫入時才爆 */
+  _bakSafeSet(key,payload);
+  /* 主力備份：寫入 OneDrive 資料夾（靜默模式，無權限時不打擾使用者） */
+  try{
+    if(window.obWrite){
+      var p=function(x){return String(x).padStart(2,'0')};
+      var fn='生管ERP_備份_'+now.getFullYear()+p(now.getMonth()+1)+p(now.getDate())+'.json';
+      obWrite(fn,payload,true);
+    }
+  }catch(e){}
+}catch(e){}},1800000)}
 scheduleAutoBackup();
 // ═══ 🔄 自動版本檢查 v2:每60分鐘比對線上版(file://或離線靜默) ═══
 // 版本比對規則:只有「線上版本 > 目前版本」才提示(語意比對,非字串不等)
@@ -9773,7 +9911,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.24.0';
+var SYSTEM_VERSION='2.25.0';
 var BUILD_NUMBER='20260717-erp';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
