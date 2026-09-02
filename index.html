@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.31.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.33.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -341,7 +341,9 @@ let state={version:3,meta:JSON.parse(JSON.stringify(DEFAULT_META)),page:'dash',r
   const raw=localStorage.getItem(loadKey);if(!raw)return;const sv=JSON.parse(raw);if(!sv.ings||!sv.ings.length)return;['refs','ings','recipes','menu','waste','storeInv','transfers','poList','apList','batchList','prodLog','allergenDB','contracts','qcRecords','haccpLogs','prodSchedule','equipment','budget','trainLog','users','currentUser','invHistory','recipeVersions','internalProducts','internalOrders','tiers','arList','countList','returnList','taxConfig','workOrders','customers','custOrders','assets','salesData','cloudConfig','recoveryCode','sups','buyLog','auditLog','permissions','kitchenCosts','prodReports','lineWebhook','finishedStock'].forEach(k=>{if(sv[k]!=null)state[k]=sv[k]});
 // 🆕 還原所有以 _ 開頭的暫存狀態 (篩選/分頁/月份/搜尋等),讓使用者重新登入時看到上次的篩選結果
 Object.keys(sv).forEach(k=>{if(k.charAt(0)==='_'&&sv[k]!=null)state[k]=sv[k]});
-state.meta={...DEFAULT_META,...(sv.meta||{})}}catch(e){}})();
+state.meta={...DEFAULT_META,...(sv.meta||{})};
+try{window._lastKnownToken=sv._saveToken||null}catch(e){}
+}catch(e){}})();
 
 // 🔧 migrate: 補舊資料缺少的新欄位 (v2.1.0+)
 // ⚠️ 抽為 window.runMigrations 給 firebaseLoad / jsonbinLoad 重複呼叫
@@ -581,6 +583,40 @@ window.onerror=function(msg,src,line,col,err){window._logErrorToCloud('onerror',
 window.addEventListener('unhandledrejection',function(ev){window._logErrorToCloud('promise',(ev.reason&&(ev.reason.message||ev.reason))||'unknown','',0)});
 let _saveTimer=null;
 var _fbSaveTimer=null;
+/* ═══════════════════════════════════════════════════════
+   🔀 同時操作防護（v2.32.0 新增）
+   🐞 問題：saveState() 把「整個 state」寫進 localStorage / Firestore，
+      沒有任何合併或版本檢查。實測：辦公室電腦與門市各開一個分頁，
+      兩邊各登錄一筆生產 → 只留下一筆、庫存只扣一次，另一個人的工作
+      整批無聲消失。這是多台裝置同時使用時最容易發生也最難察覺的錯誤。
+   做法：每次存檔蓋一個「存檔戳記」。存檔前先看儲存區裡的戳記是不是
+      我這個分頁上次存的 —— 不是就代表別人動過，明白問使用者，
+      而不是默默覆蓋。不自動合併（合併規則因表而異，錯了更難救）。
+   ═══════════════════════════════════════════════════════ */
+window._sessionTag='S'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+/* ⚠️ loadState 在這段之前就執行了，會先把載入時的戳記寫進 window._lastKnownToken。
+   這裡若直接寫 =null 會把它蓋掉，衝突偵測就永遠不會觸發（實測過）。 */
+if(typeof window._lastKnownToken==='undefined')window._lastKnownToken=null;
+window._readStoredToken=function(key){
+  try{var raw=localStorage.getItem(key);if(!raw)return null;return (JSON.parse(raw)||{})._saveToken||null}catch(e){return null}
+};
+window.showStaleBanner=function(who){
+  if(document.getElementById('stale-bar'))return;
+  var bar=document.createElement('div');bar.id='stale-bar';
+  bar.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99997;background:#7A4D0B;color:#fff;padding:10px 16px;font-size:0.86rem;text-align:center;line-height:1.6';
+  bar.innerHTML='⚠️ <b>'+(who||'另一個分頁或裝置')+'剛剛更新了資料</b> —— 你畫面上看到的可能已經是舊的。'+
+    '<button onclick="location.reload()" style="margin-left:12px;background:#fff;color:#7A4D0B;border:none;border-radius:5px;padding:4px 12px;cursor:pointer;font-weight:700">重新載入</button>'+
+    '<button onclick="this.parentNode.remove()" style="margin-left:6px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.5);color:#fff;border-radius:5px;padding:4px 10px;cursor:pointer">先不要</button>';
+  document.body.appendChild(bar);
+};
+/* 同一個瀏覽器的其他分頁存檔時，這個事件會即時觸發 */
+try{window.addEventListener('storage',function(e){
+  if(!e.key||e.key!==COST_KEY)return;
+  var tok=null;try{tok=(JSON.parse(e.newValue||'{}')||{})._saveToken||null}catch(_){}
+  if(tok&&String(tok).indexOf(window._sessionTag)===0)return;   // 自己存的，略過
+  window.showStaleBanner('另一個分頁');
+})}catch(e){}
+
 window._cloudLoaded=false;  // 🛡️ 雲端是否已完成首次載入(防止新裝置空白覆蓋雲端)
 /* 🐞 防護①原本會被「10 秒保險解鎖」繞過：
    某台裝置本機留著舊資料、雲端載入超過 10 秒還沒回來 → 保險把 _cloudLoaded 設成 true
@@ -633,7 +669,24 @@ function saveState(){
   // 1. localStorage 快取（即時）
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(function(){
-    try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){}
+    try{
+      /* 🔀 同時操作防護：儲存區裡的戳記若不是我上次存的，代表別人動過 */
+      var cur=window._readStoredToken(COST_KEY);
+      if(cur&&window._lastKnownToken&&cur!==window._lastKnownToken){
+        if(!window._conflictAsked){
+          window._conflictAsked=true;
+          var ok=confirm('⚠️ 這份資料在別的地方被改過了\n（另一個分頁、另一台裝置，或另一個人）。\n\n'+
+            '你現在存下去，會把對方的變更「整批蓋掉」。\n\n'+
+            '建議按「取消」→ 重新載入頁面拿到最新資料，再重做你剛才的動作。\n\n'+
+            '確定要照樣存（蓋掉對方的變更）嗎？');
+          if(!ok){ window.showStaleBanner('別的裝置或分頁'); window._conflictAsked=false; return; }
+        }
+      }
+      state._saveToken=window._sessionTag+'_'+Date.now();
+      localStorage.setItem(COST_KEY,JSON.stringify(state));
+      window._lastKnownToken=state._saveToken;
+      window._conflictAsked=false;
+    }catch(e){}
   },300);
   // 2. Firebase 主資料庫（2秒防抖，批次寫入）
   clearTimeout(_fbSaveTimer);
@@ -2407,7 +2460,25 @@ window.recipeQtyToStockQty=function(inv,qty,fromUnit){
     var c=window.convertUnit(q,from,to);
     if(c!=null&&isFinite(c))return c;
   }
-  return q;   // 不同類別或計件單位 → 原數量（不再亂除 1000）
+  /* 🐞 跨類別（重量↔容量）：成本計算 calcIngCost 早就會用密度表換算，
+     但這裡沒有 —— 造成「配方寫 g、庫存單位是毫升/公升」的食材（油、米酒、
+     檸檬汁…實際資料有 33 處）成本算得出來、扣料卻換算不過去而完全不扣庫存。
+     改成與成本計算共用同一套密度換算。 */
+  var _uf=(window.UNIT_DB||{})[from], _ut=(window.UNIT_DB||{})[to];
+  if(_uf&&_ut&&((_uf.type==='weight'&&_ut.type==='volume')||(_uf.type==='volume'&&_ut.type==='weight'))){
+    var _den=(window.getDensity?window.getDensity(inv.name):null);
+    if(_den==null||!(_den>0))_den=1.0;   // 查不到密度時以水為準（與成本計算一致）
+    if(_uf.type==='weight'){
+      var _g=window.unitToG(q,from);          // 配方量 → g
+      var _ml=_g/_den;                        // g → ml
+      return _ml/(_ut.toMl||1);               // ml → 庫存單位
+    }else{
+      var _ml2=(window.unitToMl?window.unitToMl(q,from):q*(_uf.toMl||1));
+      var _g2=_ml2*_den;
+      return _g2/(_ut.toG||1);
+    }
+  }
+  return q;   // 真的無法換算（計件不同名等）→ 原數量
 };
 
 /* ★ 單一真實來源：把一筆進貨反映到食材庫存（數量換算 + 單價換算）。
@@ -2645,6 +2716,9 @@ window.qtyConvertible=function(inv,fromUnit){
   var uf=(window.UNIT_DB||{})[from], ut=(window.UNIT_DB||{})[to];
   if(uf&&ut&&uf.type==='count'&&ut.type==='count')return false;
   if(typeof window.convertUnit==='function'&&window.convertUnit(1,from,to)!=null)return true;
+  /* 跨類別（重量↔容量）可用密度換算 —— 與成本計算一致，這裡也要放行，
+     否則油/米酒/檸檬汁這類「配方用 g、庫存用毫升」的食材會完全不扣庫存。 */
+  if(uf&&ut&&((uf.type==='weight'&&ut.type==='volume')||(uf.type==='volume'&&ut.type==='weight')))return true;
   return false;
 };
 
@@ -10100,6 +10174,15 @@ function initFirebaseSDK(){
           if(!doc.exists)return;
           if(doc.metadata&&doc.metadata.hasPendingWrites)return; // 自己寫的略過
           if(!(doc.metadata&&doc.metadata.fromCache)){window._cloudLoaded=true;window._cloudLoadOk=true;} // 🛡️ 收到伺服器快照=雲端確實已載入
+          /* 🔀 別的裝置把資料推上雲端了 → 我畫面上的可能已是舊的 */
+          try{
+            var _cdev=(doc.data()||{}).device||'';
+            var _mine=(state.cloudConfig&&state.cloudConfig.deviceName)||'';
+            if(!(doc.metadata&&doc.metadata.fromCache)&&window._cloudSeenOnce&&_cdev&&_cdev!==_mine){
+              window.showStaleBanner('另一台裝置（'+_cdev+'）');
+            }
+            window._cloudSeenOnce=true;
+          }catch(_){}
           var cd=doc.data();if(!cd||!cd.data)return;
           var cloudOrders=cd.data.custOrders||[];
           if(!state.custOrders)state.custOrders=[];
@@ -10478,8 +10561,8 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.31.0';
-var BUILD_NUMBER='20260902-authfix';
+var SYSTEM_VERSION='2.33.0';
+var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
     '💰 新增應收帳款模組（收款/部分收款/沖帳）',
@@ -12780,6 +12863,7 @@ function _nowStr(){
 window.approveCustOrder=function(orderId){
   var o=(state.custOrders||[]).find(function(x){return x.id===orderId});
   if(!o)return;
+  if(!window.coGuard(o,'核准'))return;
   var cust=(state.customers||[]).find(function(x){return x.id===o.custId});
   
   // 額度檢查
@@ -12877,9 +12961,29 @@ window._doApproveWithEditedPrice=function(orderId){
   saveState();closeModalForce();renderPage();toast('✅ 已核准訂單 (售價已調整)');
 };
 
+/* 🐞 客戶訂單原本沒有任何狀態守門：
+   已完成的訂單可以被改回「已核准」「已出貨」甚至被取消；
+   已取消的訂單還能被出貨、被收款 —— 帳與實際狀況會對不起來。
+   這裡只鎖「終結狀態」（已完成/已取消/已退貨/已退款），
+   其餘流轉維持原本彈性，避免擋到實際作業習慣（例如先收訂金再出貨）。 */
+window.CO_FINAL={completed:'已完成',cancelled:'已取消',returned:'已退貨',refunded:'已退款'};
+window.coGuard=function(o,actLabel){
+  if(!o)return false;
+  var f=window.CO_FINAL[o.status];
+  if(f){
+    alert('這張訂單已經是「'+f+'」，不能再'+actLabel+'。\n\n'+
+          '訂單：'+o.id+'\n'+
+          '如果要修正，請另開一張沖銷/退貨單，不要把已結案的訂單改回去 —— '+
+          '直接改狀態會讓帳與實際出貨對不起來。');
+    return false;
+  }
+  return true;
+};
+
 window.cancelCustOrder=function(orderId){
   var o=(state.custOrders||[]).find(function(x){return x.id===orderId});
   if(!o)return;
+  if(!window.coGuard(o,'取消'))return;
   var reason=prompt('取消訂單原因 (選填):');
   if(reason===null)return;  // 按取消
   o.status='cancelled';
@@ -12893,6 +12997,7 @@ window.cancelCustOrder=function(orderId){
 window.shipCustOrder=function(orderId){
   var o=(state.custOrders||[]).find(function(x){return x.id===orderId});
   if(!o)return;
+  if(!window.coGuard(o,'出貨'))return;
   if(!confirm('確認此訂單已出貨?\n\n訂單: '+o.id+'\n客戶: '+(o.custName||'')+'\n金額: '+CUR()+fmt(o.total||0,0)))return;
   o.status='shipped';
   o.shippedAt=_nowStr();
@@ -12904,6 +13009,7 @@ window.shipCustOrder=function(orderId){
 window.invoiceCustOrder=function(orderId){
   var o=(state.custOrders||[]).find(function(x){return x.id===orderId});
   if(!o)return;
+  if(!window.coGuard(o,'開發票'))return;
   var invNo=prompt('請輸入發票號碼 (三聯式):\n\n格式範例: AB-12345678');
   if(invNo===null)return;
   if(!invNo.trim()){alert('發票號碼不能為空');return}
@@ -12917,6 +13023,7 @@ window.invoiceCustOrder=function(orderId){
 window.markCustOrderPaid=function(orderId){
   var o=(state.custOrders||[]).find(function(x){return x.id===orderId});
   if(!o)return;
+  if(!window.coGuard(o,'標記收款'))return;
   if(!confirm('確認此訂單已收款?\n\n訂單: '+o.id+'\n金額: '+CUR()+fmt(o.total||0,0)))return;
   o.status='paid';
   o.paidAt=_nowStr();
@@ -12928,6 +13035,7 @@ window.markCustOrderPaid=function(orderId){
 window.completeCustOrder=function(orderId){
   var o=(state.custOrders||[]).find(function(x){return x.id===orderId});
   if(!o)return;
+  if(!window.coGuard(o,'結案'))return;
   o.status='completed';
   o.completedAt=_nowStr();
   addAudit('客戶訂單結案',o.id+' '+(o.custName||''));
@@ -14671,6 +14779,36 @@ pushUndo(); // 初始快照
       // 但因原 saveIng 用 $('fi-...') 抓欄位，我們改寫整個函式
       const name = document.getElementById('fi-name')?.value?.trim();
       if(!name){ alert('請填入食材名稱'); return; }
+      /* 🐞 可食率欄位是「百分比」（80 代表 80%），但欄位名稱容易被當成小數。
+         填 0.8 會被存成 0.8% → 成本被放大 125 倍，而且完全沒有提示。
+         這裡明白擋下 0 < 值 < 1 的輸入。 */
+      (function(){
+        var _yEl=document.getElementById('fi-yield');
+        if(!_yEl)return;
+        var _yv=_yEl.value;
+        if(_yv===''||_yv==null)return;
+        var _yn=+_yv;
+        if(isNaN(_yn))return;
+        if(_yn>0&&_yn<1){
+          alert('可食率要填「百分比」，不是小數。\n\n'+
+                '你填的是 '+_yv+'，系統會當成 '+_yv+'%，成本會被放大 '+Math.round(100/_yn)+' 倍。\n\n'+
+                '如果你的意思是 '+Math.round(_yn*100)+'%，請改填 '+Math.round(_yn*100)+'。');
+          _yEl.focus();
+          window.__ingYieldBlocked=true;
+          return;
+        }
+        /* 填 1～9 多半是把「1 = 100%」搞混了（1% 代表 100 公斤只能用 1 公斤，實務上幾乎不存在）。
+           不硬擋，但要問一次 —— 這格算錯，整條成本線都會錯。 */
+        if(_yn>=1&&_yn<10){
+          if(!confirm('可食率填 '+_yn+'%？\n\n這代表買 100 公斤只有 '+_yn+' 公斤能用，'+
+                      '成本會被放大 '+Math.round(100/_yn)+' 倍。\n\n'+
+                      '如果你的意思是「全部可食」，請填 100。\n\n確定就是 '+_yn+'% 嗎？')){
+            _yEl.focus();window.__ingYieldBlocked=true;return;
+          }
+        }
+        window.__ingYieldBlocked=false;
+      })();
+      if(window.__ingYieldBlocked){window.__ingYieldBlocked=false;return}
       const id = eid || document.getElementById('fi-id')?.value || nxtId(state.ings, 'I');
       const taxType = document.getElementById('fi-tax')?.value || 'taxable';
       const taxNote = document.getElementById('fi-taxnote')?.value || '';
@@ -14717,7 +14855,7 @@ pushUndo(); // 初始快照
         totalWeight: +document.getElementById('fi-tw')?.value || 0,
         solidWeight: +document.getElementById('fi-sw')?.value || 0,
         // 可食率 (備料良率)
-        yieldRate: (function(){var yp=+document.getElementById('fi-yield')?.value;return (yp&&yp>0&&yp<=100)?yp/100:1})(),
+        yieldRate: (function(){var yp=+document.getElementById('fi-yield')?.value;return (yp&&yp>=1&&yp<=100)?yp/100:1})(),
         // 🆕 包裝採購資訊 (含稅/未稅,儲存未稅為主)
         pkgCount: +document.getElementById('fi-pkg-count')?.value || 0,
         pkgContent: +document.getElementById('fi-pkg-content')?.value || 0,
@@ -15451,6 +15589,29 @@ pushUndo(); // 初始快照
           '🔔【新增】雲端權限被拒時會明白告知:畫面底部出現紅色警示條「雲端同步已停止 —— 現在的變更只存在這台裝置」。原本只有 console 警告,使用者會以為資料有存到雲端。',
           '🛡️ 防護③改良:能區分「權限被拒」與「離線連不上」。被拒時不再放行推送,避免在權限異常時把資料推成半調子狀態。',
           '📌 已確認 Firebase 設定:Firestore 規則已收斂為「必須登入」且結尾有萬用路徑涵蓋所有集合(POS/HR/財會/生管共用同一資料庫,不會漏);Authentication 的「匿名」與「電子郵件/密碼」皆已啟用。'
+        ]
+      });
+      // v2.32.0 第三輪：同時操作、狀態流轉、輸入防呆
+      VERSION_HISTORY.unshift({
+        ver: '2.32.0',
+        build: '20260902-concurrency',
+        date: '2026-09-02',
+        changes: [
+          '🔴【重大修正】兩個地方同時使用會互相覆蓋:實測辦公室與門市各開一個分頁、各登錄一筆生產 → 只留下一筆、庫存只扣一次,另一個人的工作整批無聲消失。根因是每次存檔都把「整個資料」寫回去,沒有任何版本檢查。現在存檔前會比對戳記,發現別處改過就明白詢問(不自動合併,因為合併規則因表而異,錯了更難救)。',
+          '🔔【新增】跨分頁即時提醒:同一台電腦的其他分頁存檔時,畫面底部會出現黃色橫幅「另一個分頁剛更新了資料」並附重新載入按鈕;雲端偵測到別台裝置推送也會提示。單一分頁正常使用完全不會跳任何提示(已實測)。',
+          '🟡【修正】客戶訂單的終結狀態沒有鎖住:已完成的訂單可以被改回「已核准」「已出貨」甚至被取消,已取消的訂單還能被出貨、被收款。現在已完成/已取消/已退貨/已退款一律鎖住,並提示要用沖銷單處理而不是改回去。',
+          '🟡【修正】可食率欄位是百分比(80 = 80%),但填 0.8 會被當成 0.8% —— 成本瞬間被放大 125 倍而且毫無提示。現在會擋下並說明;填 1～9% 也會先問一次(多半是把「1 = 100%」搞混)。',
+          '✅ 第三輪實測範圍:新程式碼 30 組邊界案例(成品庫存負值/小數精度/配方已刪除、轉售比例 0 與負數/來源遺失/同來源合併、單位換算各種組合)、同時操作 4 情境、客戶訂單 13 種狀態流轉、食材與配方編輯、菜單多元件成本、品管/HACCP/設備/追溯/標籤。'
+        ]
+      });
+      // v2.33.0 正式站實測修正
+      VERSION_HISTORY.unshift({
+        ver: '2.33.0',
+        build: '20260902-density',
+        date: '2026-09-02',
+        changes: [
+          '🔴【重大修正】「配方寫 g、庫存單位是毫升/公升」的食材生產時完全不扣庫存。實際資料有 33 處(福壽沙拉油、米酒、冷凍檸檬汁、開元調味牛奶、魚露、紅酒…)。成本計算本來就會用密度表跨類別換算,但 v2.29.0 新增的扣料防呆沒有,判定「換算不過去」而略過不扣,還會每次生產跳一長串警告。現在扣料與成本共用同一套密度換算 —— 實測 920g 沙拉油正確扣 1 公升。',
+          '📌 這一項是拿正式站的真實資料實測才發現的:單靠測試資料不會出現「配方用重量、庫存用容量」這種組合。'
         ]
       });
     }
