@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.33.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.34.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -10561,7 +10561,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.33.0';
+var SYSTEM_VERSION='2.34.0';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -15663,6 +15663,203 @@ pushUndo(); // 初始快照
     setTimeout(bootUpgrade, 600);
   }
 })();
+
+
+
+
+
+/*PATCH-2340-START*/
+
+/* ═══════════════════════════════════════════════════════════════
+   🛠️ 安全修補層 v2.34.0 — 2026-09-02
+   ───────────────────────────────────────────────────────────────
+   本區塊為「集中式守門」，不修改上面任何一行原始程式碼。
+   要整包還原：把這個 <!--PATCH-2340-START--> 到 END 之間刪掉即可，
+   系統會回到修補前的行為。
+   ───────────────────────────────────────────────────────────────
+   修補 1（🔴A）重複執行防護：收貨/報廢/核准盤點/付款 重複點擊會重複
+        扣庫存、重複入帳。實測：同一張採購單點兩次收貨 → 進貨記錄 2 筆、
+        應付帳款 2 筆、庫存 +20（應為 +10）。
+   修補 2（🔴A）權限穿透：107 個會改資料的動作中有 103 個完全沒有權限
+        檢查。實測：員工帳號直接呼叫 delIng() 即可刪掉食材主檔，
+        而「食材庫存」根本不在員工的模組清單裡。畫面把按鈕藏起來
+        不等於做了權限。
+   修補 3（🟢C）左上角版本號寫死 v2.24.0，與實際版本不符。
+   修補 4（🔴A）異常輸入：食材/批次/菜單/內部商品/採購單 5 張表單把數字欄位
+        填 -999 會靜靜存進去。食材單價 -999 → 所有成本計算全錯；
+        採購單數量 -999 → 收貨時庫存反而減少。
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  /* ⚠️ 必須等 v2.1.0 稅務升級層把 receivePO / saveBuy 等函式包裝完才能套用，
+     否則我們的守門會被它覆蓋掉（實測過：同步執行會失效）。 */
+  var _tries = 0;
+  (function waitReady(){
+    if(window.HaomingTax || _tries > 100){ setTimeout(applyPatch, 80); return; }
+    _tries++; setTimeout(waitReady, 100);
+  })();
+
+  function applyPatch(){
+  if(window.__HM_SAFEPATCH_2340) return;
+  window.__HM_SAFEPATCH_2340 = true;
+
+  // ── 修補 1：重複執行守門 ──────────────────────────────────
+  window.__onceGuard = function(obj, doneStatuses, actLabel){
+    if(!obj) return false;
+    if(doneStatuses.indexOf(obj.status) >= 0){
+      alert('⚠️ 這筆已經是「' + obj.status + '」，不能重複' + actLabel + '。\n\n' +
+            '重複執行會重複扣庫存、重複入帳，帳就對不起來了。\n' +
+            '如果要修正，請另開沖銷單／退貨單，不要重按。');
+      return false;
+    }
+    return true;
+  };
+  function guardOnce(fnName, finder, doneStatuses, actLabel){
+    var orig = window[fnName];
+    if(typeof orig !== 'function') return;
+    window[fnName] = function(id){
+      var obj = finder(id);
+      if(obj && !window.__onceGuard(obj, doneStatuses, actLabel)) return;
+      return orig.apply(this, arguments);
+    };
+  }
+  guardOnce('receivePO',    function(id){return (state.poList||[]).find(function(x){return x.id===id})},    ['已到貨','已取消','已作廢'], '收貨');
+  guardOnce('approveCount', function(id){return (state.countList||[]).find(function(x){return x.id===id})}, ['已完成','已作廢'],          '核准');
+  guardOnce('disposeBatch', function(id){return (state.batchList||[]).find(function(x){return x.id===id})}, ['已用完','已報廢'],          '報廢');
+  guardOnce('payAP',        function(id){return (state.apList||[]).find(function(x){return x.id===id})},    ['已付款','已作廢'],          '付款');
+
+  // ── 修補 4：數值範圍守門（照表單自己宣告的 min / max 執行）──
+  /* 🐞 實測：食材、批次、菜單、內部商品、採購單這 5 張表單，把數字欄位填 -999
+        會靜靜存進去，沒有任何提示。食材單價變 -999 會讓所有成本計算全錯；
+        採購單數量 -999 收貨時庫存反而會減少。
+     這些欄位的 HTML 其實已經寫了 min="0"，只是從來沒有人檢查它 ——
+     瀏覽器的 min 只在表單 submit 時才生效，而這個系統是用 JS 直接存檔的。
+     所以這裡不自訂任何新規則，只是「把表單自己宣告的規則真的執行一次」。
+     沒有寫 min 的欄位（例如 QC 到貨溫度，冷凍本來就是負的）完全不受影響。 */
+  window.__checkNumRange = function(){
+    var ov = document.getElementById('modal-ov');
+    if(!ov || ov.style.display === 'none') return true;
+    var inputs = ov.querySelectorAll('input[type=number]');
+    for(var i = 0; i < inputs.length; i++){
+      var el = inputs[i];
+      if(el.disabled || el.readOnly) continue;
+      var raw = el.value;
+      if(raw == null || raw === '') continue;
+      var n = +raw;
+      if(!isFinite(n)) continue;
+      var fg = el.closest ? el.closest('.fg') : null;
+      var lb = fg ? fg.querySelector('label') : null;
+      var name = (lb && lb.textContent ? lb.textContent : (el.id || '這個欄位')).trim().replace(/[:：*]$/, '');
+      var min = el.getAttribute('min'), max = el.getAttribute('max');
+      if(min !== null && min !== '' && isFinite(+min) && n < +min){
+        alert('⚠️ 「' + name + '」不能小於 ' + min + '（你填的是 ' + raw + '）\n\n' +
+              '存進去會讓成本、庫存、毛利跟著算錯，所以先擋下來。');
+        try{ el.focus(); }catch(e){}
+        return false;
+      }
+      if(max !== null && max !== '' && isFinite(+max) && n > +max){
+        alert('⚠️ 「' + name + '」不能大於 ' + max + '（你填的是 ' + raw + '）');
+        try{ el.focus(); }catch(e){}
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // ── 修補 2：權限守門（模組層級）────────────────────────────
+  /* 每個動作屬於哪個模組。使用者的角色若沒有該模組權限，動作直接擋下。
+     老闆不受影響（checkPerm 對老闆一律回 true）。
+     未列在這裡的函式維持原行為，不做任何改變。 */
+  var ACTION_MODULE = {
+    ing:['saveIng','delIng','saveStockAdj','importSheetProducts','importMissingIngs','executeMissingImport',
+         'importPackagingFromSheets','executePackagingImport','collectSelectedPackaging','removePackageLevel',
+         'doUpgradePackageLevels','execVacuumBagFix','saveUnitDisplay','resetUnitDisplay','importIPExcel',
+         'importPoolSortExcel','applyIPSuggestPrice'],
+    recipe:['saveRecipe','delRecipe','delRI','restoreRecipeVer','restoreMenuVersion'],
+    menu:['saveMenu','delMenu','delMenuComp'],
+    sup:['saveSup','delSup'],
+    buy:['saveBuy','delBuy'],
+    po:['savePO','receivePO','savePOReturn'],
+    ap:['saveAP','payAP','saveAPDue'],
+    ar:['saveAR','collectAR','doCollectAR'],
+    batch:['saveBatch','saveBatchUse','disposeBatch'],
+    prod:['saveProd','saveFinishedAdj'],
+    waste:['saveWaste'],
+    transfer:['saveTransfer','cancelTransfer'],
+    order:['saveOrderLog','delOrderLog'],
+    count:['submitCount','approveCount'],
+    rtn:['saveReturn','submitReturnRequest','approveReturn','rejectReturn','completeRefund'],
+    contract:['saveContract','delContract'],
+    allergen:['saveAllergen'],
+    qc:['saveQC','saveHACCP'],
+    trace:['doTrace'],
+    schedule:['saveSchedule','deleteSchedule','execSchedule','completeSchedule','cancelSchedule'],
+    equip:['saveEquip'],
+    budget:['saveBudget'],
+    wo:['saveWO'],
+    asset:['saveAsset'],
+    sales:['importPOSData','saveManualSale'],
+    customer:['saveCust','delCustomer','approveCustOrder','cancelCustOrder','shipCustOrder','completeCustOrder'],
+    internal:['saveInternalProduct','delInternalProduct','saveInternalOrder','saveTiers','collectTierOverrides'],
+    'kitchen-cost':['saveKitchenCost','delKitchenCost'],
+    'alert-center':['clearOldAlertHistory'],
+    users:['saveUser','delUser','savePermissions','resetPermsToDefault',
+           'doRecoveryReset','doSecurityReset','doEmergencyReset'],
+    cloud:['saveCloudConfig','saveCloudConfigMulti','saveAutoBackupSettings',
+           'restoreAutoBackup','downloadAutoBackup','clearAutoBackups','importExcelFile'],
+    ref:['saveMetaSettings']
+  };
+  var MODULE_NAME = {};
+  try{
+    document.querySelectorAll('#nav-bar [data-cp]').forEach(function(b){
+      MODULE_NAME[b.getAttribute('data-cp')] = (b.textContent||'').trim();
+    });
+  }catch(e){}
+
+  var gated = 0, missing = [];
+  Object.keys(ACTION_MODULE).forEach(function(mod){
+    ACTION_MODULE[mod].forEach(function(fnName){
+      var orig = window[fnName];
+      if(typeof orig !== 'function'){ missing.push(fnName); return; }
+      window[fnName] = function(){
+        var u = state.currentUser;
+        if(!u){ alert('請先登入'); return; }
+        if(!window.__checkNumRange()) return;   // 修補4：數值範圍
+        var allowed = (typeof window.getAllowedModules === 'function')
+                        ? window.getAllowedModules(u.role) : null;
+        var ok = allowed ? (allowed.indexOf(mod) >= 0) : true;
+        if(!ok){
+          alert('⛔ 權限不足\n\n你的身分「' + u.role + '」沒有「' +
+                (MODULE_NAME[mod] || mod) + '」的權限，不能執行這個動作。\n\n' +
+                '需要的話請找老闆到「👤 帳號」開權限。');
+          try{ addAudit('權限阻擋', u.name + '(' + u.role + ') 嘗試 ' + fnName); }catch(e){}
+          return;
+        }
+        return orig.apply(this, arguments);
+      };
+      gated++;
+    });
+  });
+
+  // ── 修補 3：版本號改為動態讀取 ────────────────────────────
+  try{
+    var logo = document.querySelector('.logo');
+    if(logo){
+      var vs = logo.querySelectorAll('span');
+      var last = vs[vs.length-1];
+      if(last && /^v\d/.test((last.textContent||'').trim())){
+        last.textContent = 'v' + (window.SYSTEM_VERSION || (typeof SYSTEM_VERSION!=='undefined'?SYSTEM_VERSION:'?'));
+      }
+    }
+  }catch(e){}
+
+  console.log('🛠️ 安全修補層 v2.34.0 已套用｜重複執行守門 4 項｜權限+數值守門 ' + gated + ' 項' +
+              (missing.length ? '｜找不到的函式: ' + missing.join(',') : ''));
+  window.__HM_PATCH_INFO = {gated: gated, missing: missing};
+  }
+})();
+
+/*PATCH-2340-END*/
 
 </script>
 </body>
