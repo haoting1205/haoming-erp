@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.35.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.36.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -10561,7 +10561,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.35.0';
+var SYSTEM_VERSION='2.36.0';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -15674,6 +15674,9 @@ pushUndo(); // 初始快照
 
 
 
+
+
+
 /*PATCH-2340-START*/
 
 /* ═══════════════════════════════════════════════════════════════
@@ -15698,6 +15701,8 @@ pushUndo(); // 初始快照
         已完成的工單可以被改回生產中、已取消的排程可以被標成已完成。
    修補 6（🔴A）刪除不檢查關聯：刪掉還在配方裡用的食材，該配方成本從 200
         變 0，毫無提示，毛利虛高；刪供應商時掛著 9,999 元未付款也照刪。
+   修補 8（🔴A）客戶訂單狀態規則不完整：已收款／已開發票的訂單還能被取消，
+        錢收了、發票開了卻取消訂單，帳與稅都對不起來。
    修補 7（🟡B）「加密備份」其實只是 Base64 編碼，沒有加密。不改格式（避免
         既有備份打不開），改成匯出前明確警告 + 畫面用字不再誤導。
    ═══════════════════════════════════════════════════════════════ */
@@ -15756,6 +15761,59 @@ pushUndo(); // 初始快照
   guardOnce('approveReturn',    function(id){return (state.custReturns||[]).find(function(x){return x.id===id})}, ['approved','rejected','refunded'], '核准');
   guardOnce('rejectReturn',     function(id){return (state.custReturns||[]).find(function(x){return x.id===id})}, ['approved','rejected','refunded'], '駁回');
   guardOnce('completeRefund',   function(id){return (state.custReturns||[]).find(function(x){return x.id===id})}, ['refunded','rejected'], '退款');
+
+  // ── 修補 8：客戶訂單的狀態流轉規則不完整 ──
+  /* 🐞 實測：訂單走到「已收款」之後，按「取消訂單」還是取消得掉。
+        錢已經收了、發票可能也開了，訂單卻變成已取消 —— 帳、發票、實際出貨
+        三邊對不起來，而且發票已開又取消訂單是稅務問題。
+     原因：原本的終結狀態清單 CO_FINAL 只列了 已完成／已取消／已退貨／已退款，
+        漏掉了「已開發票 invoiced」與「已收款 paid」。
+     這裡不直接把它們加進 CO_FINAL —— 那會連正常的「開發票→收款→結案」
+        都一起擋死。改成每個動作各有自己的禁止清單。 */
+  (function(){
+    var LABEL = {
+      draft:'草稿', pending:'待核准', approved:'已核准', shipped:'已出貨',
+      invoiced:'已開發票', paid:'已收款', completed:'已完成',
+      cancelled:'已取消', returned:'已退貨', refunded:'已退款', rejected:'已駁回'
+    };
+    // 每個動作「不可以在哪些狀態下執行」
+    var BLOCK = {
+      shipCustOrder:     {list:['shipped','invoiced','paid','completed','cancelled','returned','refunded'], act:'出貨'},
+      invoiceCustOrder:  {list:['invoiced','paid','completed','cancelled','returned','refunded'],           act:'開發票'},
+      markCustOrderPaid: {list:['paid','completed','cancelled','returned','refunded'],                      act:'標記收款'},
+      completeCustOrder: {list:['completed','cancelled','returned','refunded'],                             act:'結案'},
+      cancelCustOrder:   {list:['paid','invoiced','completed','cancelled','returned','refunded'],           act:'取消'}
+    };
+    // 已出貨但還沒收款就要取消 → 不擋，但要問清楚（貨已經出去了）
+    var WARN = { cancelCustOrder: ['shipped'] };
+
+    Object.keys(BLOCK).forEach(function(fnName){
+      var orig = window[fnName];
+      if(typeof orig !== 'function') return;
+      var cfg = BLOCK[fnName];
+      window[fnName] = function(orderId){
+        var o = (state.custOrders||[]).find(function(x){return x.id===orderId});
+        if(o){
+          if(cfg.list.indexOf(o.status) >= 0){
+            var extra = '';
+            if(o.status === 'paid')     extra = '\n錢已經收了，直接取消會讓帳對不起來。請改開退款單。';
+            if(o.status === 'invoiced') extra = '\n發票已經開出去了，直接取消會有稅務問題。請先作廢發票或開折讓單。';
+            alert('⛔ 這張訂單目前是「' + (LABEL[o.status] || o.status) + '」，不能' + cfg.act + '。\n\n' +
+                  '訂單：' + o.id + (o.custName ? '　客戶：' + o.custName : '') + extra +
+                  '\n\n如果要修正，請另開沖銷／退貨／退款單，不要把已結案的訂單改回去。');
+            return;
+          }
+          var wl = WARN[fnName];
+          if(wl && wl.indexOf(o.status) >= 0){
+            if(!confirm('⚠️ 這張訂單已經是「' + (LABEL[o.status] || o.status) + '」，貨已經出去了。\n\n' +
+                        '直接取消的話，帳上看不出來東西還在客戶那邊。\n' +
+                        '建議改走退貨流程，讓庫存和金額都回得來。\n\n仍要取消嗎？')) return;
+          }
+        }
+        return orig.apply(this, arguments);
+      };
+    });
+  })();
 
   // ── 修補 6：刪除前先檢查有沒有人在用（孤兒資料）──
   /* 🐞 實測：刪掉一個還被配方使用的食材，系統二話不說就刪了。
