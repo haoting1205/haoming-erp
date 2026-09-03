@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.34.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.35.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -10561,7 +10561,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.34.0';
+var SYSTEM_VERSION='2.35.0';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -15668,6 +15668,12 @@ pushUndo(); // 初始快照
 
 
 
+
+
+
+
+
+
 /*PATCH-2340-START*/
 
 /* ═══════════════════════════════════════════════════════════════
@@ -15688,6 +15694,12 @@ pushUndo(); // 初始快照
    修補 4（🔴A）異常輸入：食材/批次/菜單/內部商品/採購單 5 張表單把數字欄位
         填 -999 會靜靜存進去。食材單價 -999 → 所有成本計算全錯；
         採購單數量 -999 → 收貨時庫存反而減少。
+   修補 5（🟡B）終結狀態沒鎖：已完成的調撥單可以被取消（庫存已搬走）、
+        已完成的工單可以被改回生產中、已取消的排程可以被標成已完成。
+   修補 6（🔴A）刪除不檢查關聯：刪掉還在配方裡用的食材，該配方成本從 200
+        變 0，毫無提示，毛利虛高；刪供應商時掛著 9,999 元未付款也照刪。
+   修補 7（🟡B）「加密備份」其實只是 Base64 編碼，沒有加密。不改格式（避免
+        既有備份打不開），改成匯出前明確警告 + 畫面用字不再誤導。
    ═══════════════════════════════════════════════════════════════ */
 (function(){
   'use strict';
@@ -15727,6 +15739,137 @@ pushUndo(); // 初始快照
   guardOnce('approveCount', function(id){return (state.countList||[]).find(function(x){return x.id===id})}, ['已完成','已作廢'],          '核准');
   guardOnce('disposeBatch', function(id){return (state.batchList||[]).find(function(x){return x.id===id})}, ['已用完','已報廢'],          '報廢');
   guardOnce('payAP',        function(id){return (state.apList||[]).find(function(x){return x.id===id})},    ['已付款','已作廢'],          '付款');
+
+  // ── 修補 5：終結狀態鎖住（已完成／已取消的單據不能再被動）──
+  /* 🐞 實測：
+       ・已完成的調撥單 → 按「取消」就變成已取消，但庫存早就搬走了，帳與實際對不起來
+       ・已完成的工單   → 按「開始生產」又變回生產中
+       ・已取消的排程   → 按「完成」又變成已完成
+       ・已完成的排程   → 按「取消」又變成已取消
+     單據一旦走到終結狀態就該鎖住。要反悔請開沖銷單，不要把已結案的改回去。 */
+  guardOnce('cancelTransfer',   function(id){return (state.transfers||[]).find(function(x){return x.id===id})},   ['已完成','已取消'], '取消');
+  guardOnce('woStartProd',      function(id){return (state.workOrders||[]).find(function(x){return x.id===id})},  ['已完成','已取消'], '開始生產');
+  guardOnce('completeSchedule', function(id){return (state.prodSchedule||[]).find(function(x){return x.id===id})},['已完成','已取消'], '標記完成');
+  guardOnce('cancelSchedule',   function(id){return (state.prodSchedule||[]).find(function(x){return x.id===id})},['已完成','已取消'], '取消');
+  guardOnce('execSchedule',     function(id){return (state.prodSchedule||[]).find(function(x){return x.id===id})},['已完成','已取消'], '執行');
+  guardOnce('markOrderShipped', function(id){return (state.orderLog||[]).find(function(x){return x.id===id})},    ['已出貨','已取消'], '標記出貨');
+  guardOnce('approveReturn',    function(id){return (state.custReturns||[]).find(function(x){return x.id===id})}, ['approved','rejected','refunded'], '核准');
+  guardOnce('rejectReturn',     function(id){return (state.custReturns||[]).find(function(x){return x.id===id})}, ['approved','rejected','refunded'], '駁回');
+  guardOnce('completeRefund',   function(id){return (state.custReturns||[]).find(function(x){return x.id===id})}, ['refunded','rejected'], '退款');
+
+  // ── 修補 6：刪除前先檢查有沒有人在用（孤兒資料）──
+  /* 🐞 實測：刪掉一個還被配方使用的食材，系統二話不說就刪了。
+        該配方的成本從 200 元變成 0 元 —— 沒有任何提示，毛利就這樣虛高。
+        刪供應商時掛著 9,999 元未付款的應付帳款，也是直接刪掉。
+     這裡不改成「軟刪除」（那要動到全系統的列表邏輯，風險太大），
+     只做一件事：刪之前先算清楚誰在用，講給你聽。
+       ・還有未結的錢或未完成的單 → 直接擋下（要先處理完）
+       ・只是被配方／菜單引用     → 列出來讓你自己決定要不要刪 */
+  function _plural(arr, max){
+    max = max || 5;
+    var s = arr.slice(0, max).join('、');
+    return arr.length > max ? s + ' …等 ' + arr.length + ' 筆' : s;
+  }
+  function guardDelete(fnName, checker){
+    var orig = window[fnName];
+    if(typeof orig !== 'function') return;
+    window[fnName] = function(id){
+      var r;
+      try{ r = checker(id); }catch(e){ r = null; }
+      if(r){
+        if(r.hard && r.hard.length){
+          alert('⛔ 不能刪除「' + r.name + '」\n\n' + r.hard.join('\n') +
+                '\n\n請先把上面這些處理完（結清或作廢），再回來刪。\n' +
+                '硬刪掉的話，這些單據會指向一個不存在的資料，帳就對不起來了。');
+          return;
+        }
+        if(r.soft && r.soft.length){
+          if(!confirm('⚠️ 「' + r.name + '」還在被使用中：\n\n' + r.soft.join('\n') +
+                      '\n\n刪掉之後，上面這些地方會算不到它 —— 成本會變少、毛利會虛高，\n' +
+                      '而且畫面上不會有任何錯誤訊息，你不會發現。\n\n確定還是要刪嗎？')) return;
+        }
+      }
+      return orig.apply(this, arguments);
+    };
+  }
+
+  guardDelete('delIng', function(id){
+    var o = (state.ings||[]).find(function(x){return x.id===id}); if(!o) return null;
+    var hard = [], soft = [];
+    var pos = (state.poList||[]).filter(function(p){return p.itemName===o.name && ['已到貨','已取消','已作廢'].indexOf(p.status)<0});
+    if(pos.length) hard.push('・還有 ' + pos.length + ' 張採購單沒收貨');
+    var recs = (state.recipes||[]).filter(function(r){return (r.ings||[]).some(function(g){return g.name===o.name})});
+    if(recs.length) soft.push('・被 ' + recs.length + ' 個配方使用：' + _plural(recs.map(function(r){return r.name})));
+    var bats = (state.batchList||[]).filter(function(b){return b.itemName===o.name && b.status!=='已用完'});
+    if(bats.length) soft.push('・還有 ' + bats.length + ' 個批次沒用完');
+    var stock = +o.stock || 0;
+    if(stock > 0) soft.push('・目前還有庫存 ' + stock + ' ' + (o.unit||''));
+    return {name:o.name, hard:hard, soft:soft};
+  });
+
+  guardDelete('delRecipe', function(id){
+    var o = (state.recipes||[]).find(function(x){return x.id===id}); if(!o) return null;
+    var hard = [], soft = [];
+    var wos = (state.workOrders||[]).filter(function(x){return x.recipeId===id && ['已完成','已取消'].indexOf(x.status)<0});
+    if(wos.length) hard.push('・還有 ' + wos.length + ' 張工單沒完成');
+    var scs = (state.prodSchedule||[]).filter(function(x){return x.recipeId===id && ['已完成','已取消'].indexOf(x.status)<0});
+    if(scs.length) hard.push('・還有 ' + scs.length + ' 筆生產排程沒完成');
+    var menus = (state.menu||[]).filter(function(m){
+      if(m.recipeId===id) return true;
+      return (m.comps||[]).some(function(c){return c.id===id});
+    });
+    if(menus.length) soft.push('・被 ' + menus.length + ' 道菜單品項使用：' + _plural(menus.map(function(m){return m.name})));
+    return {name:o.name, hard:hard, soft:soft};
+  });
+
+  guardDelete('delSup', function(id){
+    var o = (state.sups||[]).find(function(x){return x.id===id}); if(!o) return null;
+    var hard = [], soft = [];
+    var ap = (state.apList||[]).filter(function(a){return a.supplier===o.name && a.status!=='已付款' && a.status!=='已作廢'});
+    if(ap.length){
+      var amt = ap.reduce(function(s,a){return s + ((+a.amount||0) - (+a.paidAmt||0))}, 0);
+      hard.push('・還有 ' + ap.length + ' 筆應付帳款沒結清，共 ' + (typeof CUR==='function'?CUR():'NT$') + Math.round(amt).toLocaleString());
+    }
+    var pos = (state.poList||[]).filter(function(p){return p.supplier===o.name && ['已到貨','已取消','已作廢'].indexOf(p.status)<0});
+    if(pos.length) hard.push('・還有 ' + pos.length + ' 張採購單沒收貨');
+    var ct = (state.contracts||[]).filter(function(c){return c.supplier===o.name && c.status!=='已終止'});
+    if(ct.length) soft.push('・還有 ' + ct.length + ' 份合約');
+    var bl = (state.buyLog||[]).filter(function(b){return b.supId===o.name || b.supplier===o.name});
+    if(bl.length) soft.push('・有 ' + bl.length + ' 筆進貨記錄會查不到供應商');
+    return {name:o.name, hard:hard, soft:soft};
+  });
+
+  guardDelete('delCustomer', function(id){
+    var o = (state.customers||[]).find(function(x){return x.id===id}); if(!o) return null;
+    var hard = [], soft = [];
+    var co = (state.custOrders||[]).filter(function(x){return x.custId===id && ['completed','cancelled','refunded'].indexOf(x.status)<0});
+    if(co.length) hard.push('・還有 ' + co.length + ' 張訂單沒結案');
+    var ar = (state.arList||[]).filter(function(a){return (a.customer===o.name||a.custId===id) && a.status!=='已收款' && a.status!=='已作廢'});
+    if(ar.length){
+      var amt = ar.reduce(function(s,a){return s + ((+a.amount||0) - (+a.paidAmt||0))}, 0);
+      hard.push('・還有 ' + ar.length + ' 筆應收帳款沒收，共 ' + (typeof CUR==='function'?CUR():'NT$') + Math.round(amt).toLocaleString());
+    }
+    return {name:o.name, hard:hard, soft:soft};
+  });
+
+  guardDelete('delInternalProduct', function(id){
+    var o = (state.internalProducts||[]).find(function(x){return x.id===id}); if(!o) return null;
+    var hard = [];
+    var io = (state.internalOrders||[]).filter(function(x){
+      if(['已完成','已取消'].indexOf(x.status) >= 0) return false;
+      return (x.items||[]).some(function(it){return it.id===id || it.productId===id});
+    });
+    if(io.length) hard.push('・還有 ' + io.length + ' 張門市叫貨單沒完成');
+    return {name:o.name, hard:hard, soft:[]};
+  });
+
+  guardDelete('delMenu', function(id){
+    var o = (state.menu||[]).find(function(x){return x.id===id}); if(!o) return null;
+    var soft = [];
+    var sales = (state.salesData||[]).filter(function(s){return s.itemName===o.name || s.name===o.name || s.code===o.code});
+    if(sales.length) soft.push('・有 ' + sales.length + ' 筆銷售記錄會查不到這道菜（銷售分析、毛利分析會少算）');
+    return {name:o.name, hard:[], soft:soft};
+  });
 
   // ── 修補 4：數值範圍守門（照表單自己宣告的 min / max 執行）──
   /* 🐞 實測：食材、批次、菜單、內部商品、採購單這 5 張表單，把數字欄位填 -999
@@ -15841,6 +15984,56 @@ pushUndo(); // 初始快照
     });
   });
 
+  // ── 修補 7：「加密備份」其實沒有加密，先把話講清楚 ──
+  /* 🐞 實測：encryptedExport 只是把「密碼|||資料」做 Base64 編碼。
+        Base64 是編碼不是加密 —— 任何人拿到檔案，不需要知道密碼就能一秒還原
+        全部內容，連你設的那組密碼本身也是明文躺在裡面。
+     這個功能叫「加密備份」，會讓人誤以為可以安心用 email 寄、放公開雲端。
+
+     ⚠️ 這裡「不」偷偷改成真加密：真加密會改變檔案格式，你手上既有的 .enc
+        備份就變成打不開了 —— 修補不該讓你失去回頭路。而且加密屬於資安範疇，
+        沒有經過實機驗證的加密程式碼不應該直接上線。
+     所以這一版只做兩件事：匯出前明確警告、把畫面上的字改成不會誤導人的說法。
+     要真的加密請另外排一次，那是獨立的變更。 */
+  (function(){
+    var _origEncExport = window.encryptedExport;
+    if(typeof _origEncExport === 'function'){
+      window.encryptedExport = function(){
+        if(!confirm('⚠️ 請先看清楚：這個「加密備份」其實沒有加密。\n\n' +
+                    '它只是把資料做了 Base64 編碼。任何人拿到這個檔案，\n' +
+                    '不需要知道密碼就能還原全部內容 —— 連你設的密碼本身\n' +
+                    '也是明文寫在檔案裡。\n\n' +
+                    '可以用它搬資料、當離線備份；但不要當成安全的保管方式：\n' +
+                    '不要用 email 寄、不要放在公開的雲端硬碟。\n\n' +
+                    '了解了，仍要匯出嗎？')) return;
+        return _origEncExport.apply(this, arguments);
+      };
+    }
+    // 把畫面上會誤導的字換掉（每次換頁後跑一次）
+    function relabel(){
+      try{
+        var all = document.querySelectorAll('#cost-content button, #cost-content .btn, #cost-content label, #cost-content div');
+        for(var i = 0; i < all.length; i++){
+          var el = all[i];
+          if(el.children.length) continue;              // 只改最底層的純文字節點
+          var t = el.textContent;
+          if(t && t.indexOf('加密備份') >= 0){
+            el.textContent = t.replace(/加密備份/g, '打包備份（未加密）');
+          }
+        }
+      }catch(e){}
+    }
+    var _origRenderPage = window.renderPage || (typeof renderPage === 'function' ? renderPage : null);
+    if(typeof _origRenderPage === 'function'){
+      window.renderPage = function(){
+        var r = _origRenderPage.apply(this, arguments);
+        try{ relabel(); }catch(e){}
+        return r;
+      };
+    }
+    setTimeout(relabel, 500);
+  })();
+
   // ── 修補 3：版本號改為動態讀取 ────────────────────────────
   try{
     var logo = document.querySelector('.logo');
@@ -15853,7 +16046,7 @@ pushUndo(); // 初始快照
     }
   }catch(e){}
 
-  console.log('🛠️ 安全修補層 v2.34.0 已套用｜重複執行守門 4 項｜權限+數值守門 ' + gated + ' 項' +
+  console.log('🛠️ 安全修補層 v2.34.0 已套用｜狀態守門 13 項｜刪除守門 6 項｜權限+數值守門 ' + gated + ' 項' +
               (missing.length ? '｜找不到的函式: ' + missing.join(',') : ''));
   window.__HM_PATCH_INFO = {gated: gated, missing: missing};
   }
