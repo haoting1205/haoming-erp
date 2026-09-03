@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.36.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.37.0</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -10561,7 +10561,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.36.0';
+var SYSTEM_VERSION='2.37.0';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -15677,6 +15677,9 @@ pushUndo(); // 初始快照
 
 
 
+
+
+
 /*PATCH-2340-START*/
 
 /* ═══════════════════════════════════════════════════════════════
@@ -15701,6 +15704,9 @@ pushUndo(); // 初始快照
         已完成的工單可以被改回生產中、已取消的排程可以被標成已完成。
    修補 6（🔴A）刪除不檢查關聯：刪掉還在配方裡用的食材，該配方成本從 200
         變 0，毫無提示，毛利虛高；刪供應商時掛著 9,999 元未付款也照刪。
+   修補 9（🔴A）採購單退貨只寫備註：已收貨的採購單退貨後，庫存不減、應付
+        不減，等於退了貨還照付錢、庫存虛增；退貨量也沒有上限（實測採購 10
+        公斤可以累計退到 53 公斤）。
    修補 8（🔴A）客戶訂單狀態規則不完整：已收款／已開發票的訂單還能被取消，
         錢收了、發票開了卻取消訂單，帳與稅都對不起來。
    修補 7（🟡B）「加密備份」其實只是 Base64 編碼，沒有加密。不改格式（避免
@@ -15928,6 +15934,119 @@ pushUndo(); // 初始快照
     if(sales.length) soft.push('・有 ' + sales.length + ' 筆銷售記錄會查不到這道菜（銷售分析、毛利分析會少算）');
     return {name:o.name, hard:[], soft:soft};
   });
+
+  // ── 修補 9：採購單退貨只寫備註，庫存與應付都沒動 ──
+  /* 🐞 實測（採購 10 公斤 @100 元、已收貨入庫、已建 1,000 元應付）：
+        按「退貨」退 4 公斤 →
+          ・庫存：還是 10 公斤（沒減）
+          ・應付：還是 1,000 元（沒減）
+          ・只有備註多了一行「[退貨4公斤]」
+        等於貨退回去了，錢照付、庫存照算 —— 帳面比實際多 400 元的存貨。
+        而且退貨量沒有上限：採購 10 公斤可以一直退，實測累計退到 53 公斤。
+
+     修法：退貨時照著單據目前的狀態做該做的事。
+       ・還沒收貨的採購單 → 只記錄退貨量（本來就不該動庫存與應付）
+       ・已收貨的採購單   → 同步扣庫存、沖減應付，且只沖一次
+       ・已付款的應付     → 不動金額（錢已經付出去了），改為明白提醒要向
+                            供應商開折讓或請款，避免系統偷偷改掉已付的帳 */
+  (function(){
+    var _origSavePOReturn = window.savePOReturn;
+    if(typeof _origSavePOReturn !== 'function') return;
+
+    window.savePOReturn = function(id){
+      var p = (state.poList||[]).find(function(x){return x.id===id});
+      if(!p) return _origSavePOReturn.apply(this, arguments);
+
+      var el = document.getElementById('rt-qty');
+      var rq = +(el ? el.value : 0) || 0;
+      var poQty = +p.qty || 0;
+      var already = +p.returnQty || 0;
+
+      // ① 數量檢查
+      if(!(rq > 0)){
+        alert('⚠️ 退貨數量必須大於 0。');
+        return;
+      }
+      if(already + rq > poQty + 1e-9){
+        alert('⚠️ 退貨數量超過採購數量了。\n\n' +
+              '這張採購單：' + poQty + ' ' + (p.unit||'') + '\n' +
+              '已經退過：' + already + ' ' + (p.unit||'') + '\n' +
+              '這次要退：' + rq + ' ' + (p.unit||'') + '\n' +
+              '合計：' + (already + rq) + ' ' + (p.unit||'') + '　←　超過了\n\n' +
+              '最多還能退 ' + (Math.round((poQty - already) * 1000) / 1000) + ' ' + (p.unit||'') + '。');
+        return;
+      }
+
+      var received = (p.status === '已到貨');
+      var msgs = [];
+
+      // ② 已收貨才動庫存與應付
+      if(received){
+        var unitPrice = +p.unitPrice || (poQty ? (+p.totalAmt||0)/poQty : 0);
+        var refund = Math.round(rq * unitPrice * 100) / 100;
+
+        // 扣庫存
+        var ing = (state.ings||[]).find(function(i){return i.name===p.itemName});
+        if(!ing){
+          msgs.push('・食材庫找不到「' + p.itemName + '」，庫存沒有調整');
+        }else if(typeof window.qtyConvertible === 'function' &&
+                 !window.qtyConvertible(ing, p.unit || ing.unit)){
+          msgs.push('・退貨單位「' + (p.unit||'') + '」換算不成庫存單位「' + ing.unit + '」，庫存沒有調整');
+        }else{
+          var back = window.recipeQtyToStockQty(ing, rq, p.unit || ing.unit);
+          var old = +ing.stock || 0;
+          if(back > old + 1e-9){
+            if(!confirm('⚠️ 要退掉 ' + (Math.round(back*1000)/1000) + ' ' + ing.unit +
+                        '，但目前庫存只有 ' + (Math.round(old*1000)/1000) + ' ' + ing.unit + '。\n\n' +
+                        '（可能已經被生產扣掉了）\n\n仍要登錄這筆退貨嗎？庫存會扣到 0。')) return;
+          }
+          ing.stock = Math.max(0, old - back);
+          ing.updatedAt = toDay();
+          p.returnedStockQty = (+p.returnedStockQty || 0) + (old - ing.stock);
+          msgs.push('・庫存已扣 ' + (Math.round((old - ing.stock)*1000)/1000) + ' ' + ing.unit);
+          if(typeof logInvChange === 'function'){
+            try{ logInvChange('採購退貨', ing.name, '中央廚房', old, ing.stock, ing.unit,
+                              '採購單 ' + String(p.id).slice(-6) + ' 退貨'); }catch(e){}
+          }
+        }
+
+        // 沖減應付
+        var ap = (state.apList||[]).find(function(a){return a.poId === p.id;});
+        if(!ap){
+          msgs.push('・找不到對應的應付帳款，金額沒有調整（請自行到「💳 應付帳款」處理）');
+        }else if(ap.status === '已付款'){
+          msgs.push('・這筆應付「已付款」，金額不動 —— 錢已經付出去了。\n' +
+                    '　 請向供應商要折讓單或退款 ' + (typeof CUR==='function'?CUR():'NT$') + Math.round(refund).toLocaleString());
+        }else{
+          var oldAmt = +ap.amount || 0;
+          var ratio  = oldAmt > 0 ? Math.min(1, refund / oldAmt) : 0;
+          ap.amount  = Math.max(0, Math.round((oldAmt - refund) * 100) / 100);
+          if(ap.netAmt != null) ap.netAmt = Math.max(0, Math.round((+ap.netAmt||0) * (1 - ratio) * 100) / 100);
+          if(ap.taxAmt != null) ap.taxAmt = Math.max(0, Math.round((+ap.taxAmt||0) * (1 - ratio) * 100) / 100);
+          ap.note = (ap.note||'') + ' [退貨沖減 ' + rq + (p.unit||'') + ' -' +
+                    (typeof CUR==='function'?CUR():'NT$') + Math.round(refund).toLocaleString() + ']';
+          if(ap.amount <= 0.009){ ap.amount = 0; ap.status = '已作廢'; }
+          p.returnedApAmt = (+p.returnedApAmt || 0) + (oldAmt - ap.amount);
+          msgs.push('・應付已沖減 ' + (typeof CUR==='function'?CUR():'NT$') +
+                    Math.round(oldAmt - ap.amount).toLocaleString() +
+                    '（' + Math.round(oldAmt).toLocaleString() + ' → ' + Math.round(ap.amount).toLocaleString() + '）' +
+                    (ap.status === '已作廢' ? '，該筆應付已全數退完，標記為已作廢' : ''));
+        }
+      }else{
+        msgs.push('・這張採購單還沒收貨，庫存與應付本來就還沒動，只記錄退貨數量。');
+      }
+
+      var r = _origSavePOReturn.apply(this, arguments);
+      try{ addAudit('採購退貨', p.itemName + ' ' + rq + (p.unit||'')); }catch(e){}
+      if(msgs.length){
+        setTimeout(function(){
+          alert('✅ 退貨已登錄：' + p.itemName + ' ' + rq + (p.unit||'') + '\n\n' + msgs.join('\n'));
+        }, 60);
+      }
+      try{ saveState(); }catch(e){}
+      return r;
+    };
+  })();
 
   // ── 修補 4：數值範圍守門（照表單自己宣告的 min / max 執行）──
   /* 🐞 實測：食材、批次、菜單、內部商品、採購單這 5 張表單，把數字欄位填 -999
