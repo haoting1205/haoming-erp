@@ -261,6 +261,12 @@ body{font-family:var(--font);font-size:1rem;background:var(--bg);color:var(--g80
 <div id="saveToast" class="save-toast"></div>
 
 <script>
+/* [FIX 2026-09-05 ★] toISOString() 給的是 UTC。台灣 UTC+8，
+   每天 00:00~07:59 它回傳的是「昨天」。這一段時間門市已經在營運
+   （台積電店 02:00 開店），日期會整批少一天。集中成這一支本地日期函式。 */
+function hmDate(d){d=d||new Date();var p=function(n){return String(n).padStart(2,'0')};
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())}
+
 const DB_INGS=[{"id": "I002", "name": "鮭魚片", "cat": "海鮮", "unit": "公斤", "stock": 8, "safety": 5, "price": 520, "sup": "S002", "form": "整顆/原形", "meatSrc": "", "kcal": 208, "prot": 20, "fat": 13.4, "carb": 0, "sodium": 59}, {"id": "I003", "name": "高麗菜", "cat": "蔬菜", "unit": "公斤", "stock": 20, "safety": 8, "price": 25, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 25, "prot": 1.3, "fat": 0.1, "carb": 5.8, "sodium": 18}, {"id": "I004", "name": "白米", "cat": "穀物", "unit": "公斤", "stock": 50, "safety": 20, "price": 45, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 360, "prot": 7.5, "fat": 0.7, "carb": 78.9, "sodium": 2}, {"id": "I005", "name": "雞胸肉", "cat": "肉類", "unit": "公斤", "stock": 12, "safety": 8, "price": 120, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 106, "prot": 22.5, "fat": 1.7, "carb": 0, "sodium": 74}, {"id": "I006", "name": "豆腐", "cat": "豆製品", "unit": "塊", "stock": 30, "safety": 15, "price": 20, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I007", "name": "蝦仁", "cat": "海鮮", "unit": "公斤", "stock": 6, "safety": 4, "price": 380, "sup": "S002", "form": "整顆/原形", "meatSrc": "", "kcal": 99, "prot": 20.9, "fat": 1.4, "carb": 0.2, "sodium": 228}, {"id": "I008", "name": "醬油", "cat": "調味料", "unit": "公升", "stock": 10, "safety": 3, "price": 55, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 61, "prot": 8.1, "fat": 0.1, "carb": 7.5, "sodium": 5493}, {"id": "I009", "name": "玄米油", "cat": "食用油", "unit": "公升", "stock": 8, "safety": 3, "price": 120, "sup": "S005", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I010", "name": "洋蔥", "cat": "蔬菜", "unit": "公斤", "stock": 15, "safety": 5, "price": 30, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 40, "prot": 1.1, "fat": 0.1, "carb": 9.3, "sodium": 4}, {"id": "I011", "name": "雞蛋", "cat": "蛋類", "unit": "顆", "stock": 120, "safety": 60, "price": 7, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 143, "prot": 12.6, "fat": 9.5, "carb": 1.1, "sodium": 142}, {"id": "I012", "name": "麵粉", "cat": "穀物", "unit": "公斤", "stock": 25, "safety": 10, "price": 40, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 364, "prot": 9.9, "fat": 1.1, "carb": 76.3, "sodium": 2}, {"id": "I013", "name": "番茄", "cat": "蔬菜", "unit": "公斤", "stock": 10, "safety": 5, "price": 35, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 18, "prot": 0.9, "fat": 0.2, "carb": 3.9, "sodium": 5}, {"id": "I014", "name": "牛里肌", "cat": "肉類", "unit": "公斤", "stock": 5, "safety": 3, "price": 680, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 158, "prot": 22.8, "fat": 6.9, "carb": 0, "sodium": 55}, {"id": "I015", "name": "奶油", "cat": "乳製品", "unit": "公克", "stock": 500, "safety": 200, "price": 0.28, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 717, "prot": 0.9, "fat": 81.1, "carb": 0.1, "sodium": 643}, {"id": "I023", "name": "雞腿排", "cat": "肉類", "unit": "公斤", "stock": 30, "safety": 10, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I024", "name": "大蒜", "cat": "蔬菜", "unit": "公斤", "stock": 2, "safety": 1, "price": 158.75, "sup": "S001", "form": "泥狀", "meatSrc": "", "kcal": 149, "prot": 6.4, "fat": 0.5, "carb": 33.1, "sodium": 17}, {"id": "I025", "name": "沙拉油", "cat": "食用油", "unit": "公升", "stock": 5, "safety": 2, "price": 53.75, "sup": "S005", "form": "整顆/原形", "meatSrc": "", "kcal": 884, "prot": 0, "fat": 100, "carb": 0, "sodium": 0}, {"id": "I041", "name": "豬梅花肉片", "cat": "肉類", "unit": "公斤", "stock": 20, "safety": 8, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I044", "name": "芝麻香油", "cat": "食用油", "unit": "公升", "stock": 2, "safety": 1, "price": 80, "sup": "S005", "form": "整顆/原形", "meatSrc": "", "kcal": 884, "prot": 0, "fat": 100, "carb": 0, "sodium": 0}, {"id": "I080", "name": "三層肉", "cat": "肉類", "unit": "公斤", "stock": 20, "safety": 5, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 339, "prot": 14.6, "fat": 30.3, "carb": 0, "sodium": 59}, {"id": "I083", "name": "醬油膏", "cat": "調味料", "unit": "公斤", "stock": 5, "safety": 1, "price": 40, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 78, "prot": 6.2, "fat": 0.2, "carb": 11, "sodium": 3965}, {"id": "I087", "name": "酸菜絲(甲級)", "cat": "蔬菜", "unit": "公斤", "stock": 10, "safety": 2, "price": 200, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I089", "name": "老薑", "cat": "蔬菜", "unit": "公斤", "stock": 2, "safety": 0.5, "price": 27, "sup": "S001", "form": "切碎", "meatSrc": "", "kcal": 80, "prot": 1.8, "fat": 0.8, "carb": 17.8, "sodium": 13}, {"id": "I090", "name": "二砂", "cat": "穀物", "unit": "公斤", "stock": 5, "safety": 1, "price": 50, "sup": "S004", "form": "整顆/原形", "meatSrc": "", "kcal": 394, "prot": 0, "fat": 0, "carb": 98.9, "sodium": 4}, {"id": "I092", "name": "蘿蔔乾", "cat": "蔬菜", "unit": "公斤", "stock": 20, "safety": 5, "price": 36.33, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 0, "prot": 0, "fat": 0, "carb": 0, "sodium": 0}, {"id": "I094", "name": "大辣椒", "cat": "蔬菜", "unit": "公斤", "stock": 2, "safety": 0.5, "price": 167.5, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 40, "prot": 1.9, "fat": 0.4, "carb": 8.8, "sodium": 9}, {"id": "I111", "name": "豬絞肉", "cat": "肉類", "unit": "公斤", "stock": 10, "safety": 3, "price": 0, "sup": "S003", "form": "整顆/原形", "meatSrc": "", "kcal": 218, "prot": 17.2, "fat": 16.2, "carb": 0, "sodium": 70}, {"id": "I118", "name": "紅蘿蔔", "cat": "蔬菜", "unit": "公斤", "stock": 3, "safety": 1, "price": 0, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 41, "prot": 0.9, "fat": 0.2, "carb": 9.6, "sodium": 69}, {"id": "I125", "name": "杏鮑菇", "cat": "蔬菜", "unit": "公斤", "stock": 5, "safety": 2, "price": 0, "sup": "S001", "form": "整顆/原形", "meatSrc": "", "kcal": 38, "prot": 2.9, "fat": 0.4, "carb": 7.3, "sodium": 5}, {"id": "I129", "name": "鮪魚罐頭", "cat": "海鮮", "unit": "公克", "stock": 2000, "safety": 500, "price": 0, "sup": "S002", "form": "整顆/原形", "meatSrc": "", "kcal": 184, "prot": 25.5, "fat": 8.2, "carb": 0, "sodium": 396}];
 const DB_RECIPES=[{"id": "R001", "code": "M011", "name": "藍莓優格醬", "multiplier": 1, "perBatch": 3, "unit": "包", "cat": "醬料", "ings": [{"name": "桑葚果醬", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "藍莓果醬", "qty": 550, "unit": "g", "form": "整顆/原形"}, {"name": "優格", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 1200, "unit": "g", "form": "整顆/原形"}, {"name": "檸檬汁", "qty": 60, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3, "unit": "張", "form": "整顆/原形"}]}, {"id": "R002", "code": "M012", "name": "紐澳良雞腿排", "multiplier": 5, "perBatch": 65, "unit": "包", "cat": "醬料", "ings": [{"name": "雞腿排", "qty": 2400, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 28, "unit": "g", "form": "泥狀"}, {"name": "沙拉油", "qty": 72, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 24, "unit": "g", "form": "整顆/原形"}, {"name": "肯瓊粉", "qty": 24, "unit": "g", "form": "整顆/原形"}, {"name": "匈牙利紅椒粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 8, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 28, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "太白粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 2.6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R003", "code": "M013", "name": "蒜香雞肉", "multiplier": 5, "perBatch": 75, "unit": "包", "cat": "醬料", "ings": [{"name": "清雞胸肉片", "qty": 2400, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "牛奶", "qty": 140, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 80, "unit": "g", "form": "泥狀"}, {"name": "雞蛋", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "墨西哥香料粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "匈牙利紅椒粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "洋蔥粉", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "香蒜粉", "qty": 14, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 16, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 12, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "太白粉", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3, "unit": "張", "form": "整顆/原形"}]}, {"id": "R004", "code": "M014", "name": "炭香燒肉", "multiplier": 5, "perBatch": 40, "unit": "包", "cat": "醬料", "ings": [{"name": "豬梅花肉片", "qty": 1200, "unit": "g", "form": "整顆/原形"}, {"name": "炭燒醬", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "老抽", "qty": 6, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "芝麻香油", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 16, "unit": "g", "form": "整顆/原形"}, {"name": "生飲水", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 1.8, "unit": "g", "form": "整顆/原形"}, {"name": "太白粉", "qty": 4, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 1.6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R005", "code": "M015", "name": "羅勒青醬", "multiplier": 4.5, "perBatch": 20, "unit": "包", "cat": "醬料", "ings": [{"name": "葵花油", "qty": 222.222, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 222.222, "unit": "g", "form": "整顆/原形"}, {"name": "蒜味花生", "qty": 37.778, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 40, "unit": "g", "form": "整瓣"}, {"name": "九層塔", "qty": 333.333, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 11.111, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 8.889, "unit": "g", "form": "整顆/原形"}, {"name": "起司粉", "qty": 111.111, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 3.333, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 1.111, "unit": "張", "form": "整顆/原形"}]}, {"id": "R006", "code": "M016", "name": "凱薩醬", "multiplier": 2, "perBatch": 10, "unit": "包", "cat": "醬料", "ings": [{"name": "鯷魚泥", "qty": 48, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 115, "unit": "g", "form": "泥狀"}, {"name": "酸豆泥", "qty": 115, "unit": "g", "form": "整顆/原形"}, {"name": "起司粉", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "芥籽醬", "qty": 115, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "檸檬汁", "qty": 125, "unit": "g", "form": "整顆/原形"}, {"name": "梅林醬油", "qty": 22.5, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 1750, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 2.5, "unit": "張", "form": "整顆/原形"}]}, {"id": "R007", "code": "M017", "name": "蜂蜜芥末醬", "multiplier": 1, "perBatch": 5, "unit": "包", "cat": "醬料", "ings": [{"name": "黃芥末醬", "qty": 800, "unit": "g", "form": "整顆/原形"}, {"name": "芥籽醬", "qty": 230, "unit": "g", "form": "整顆/原形"}, {"name": "蜂蜜", "qty": 370, "unit": "g", "form": "整顆/原形"}, {"name": "檸檬汁", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 3500, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 5, "unit": "張", "form": "整顆/原形"}]}, {"id": "R008", "code": "M018", "name": "檸香塔塔醬", "multiplier": 1, "perBatch": 6, "unit": "包", "cat": "醬料", "ings": [{"name": "洋蔥", "qty": 700, "unit": "g", "form": "泥狀"}, {"name": "酸豆泥", "qty": 120, "unit": "g", "form": "整顆/原形"}, {"name": "酸黃瓜", "qty": 350, "unit": "g", "form": "泥狀"}, {"name": "雞蛋", "qty": 1380, "unit": "g", "form": "水煮"}, {"name": "檸檬汁", "qty": 240, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 120, "unit": "g", "form": "整顆/原形"}, {"name": "橙酒", "qty": 140, "unit": "g", "form": "整顆/原形"}, {"name": "美玉白汁", "qty": 3500, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R009", "code": "M019", "name": "杏仁奶酥醬", "multiplier": 1, "perBatch": 7, "unit": "盒", "cat": "醬料", "ings": [{"name": "杏仁角", "qty": 250, "unit": "g", "form": "整顆/原形"}, {"name": "發酵無鹽奶油", "qty": 2000, "unit": "g", "form": "整顆/原形"}, {"name": "糖粉", "qty": 650, "unit": "g", "form": "整顆/原形"}, {"name": "奶粉", "qty": 750, "unit": "g", "form": "整顆/原形"}, {"name": "玉米粉", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 12, "unit": "g", "form": "整顆/原形"}, {"name": "煉乳", "qty": 80, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 7, "unit": "盒", "form": "整顆/原形"}]}, {"id": "R010", "code": "M020", "name": "料理調味粉", "multiplier": 1, "perBatch": 11, "unit": "包", "cat": "醬料", "ings": [{"name": "雞粉", "qty": 4000, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 4000, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 3000, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 11, "unit": "張", "form": "整顆/原形"}]}, {"id": "R011", "code": "M021", "name": "匈牙利調味粉", "multiplier": 1, "perBatch": 4, "unit": "包", "cat": "醬料", "ings": [{"name": "鹽", "qty": 290, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 220, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 220, "unit": "g", "form": "整顆/原形"}, {"name": "匈牙利紅椒粉", "qty": 145, "unit": "g", "form": "整顆/原形"}, {"name": "義大利香料", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "俄力岡葉", "qty": 15, "unit": "g", "form": "整顆/原形"}, {"name": "羅勒葉", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 4, "unit": "張", "form": "整顆/原形"}]}, {"id": "R012", "code": "M022", "name": "爌肉", "multiplier": 1, "perBatch": 25, "unit": "份", "cat": "主食", "ings": [{"name": "三層肉", "qty": 24000, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 900, "unit": "g", "form": "整瓣"}, {"name": "青蔥", "qty": 1200, "unit": "g", "form": "整束"}, {"name": "醬油膏", "qty": 10000, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 16000, "unit": "g", "form": "整顆/原形"}, {"name": "味素", "qty": 170, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 25, "unit": "張", "form": "整顆/原形"}]}, {"id": "R013", "code": "M023", "name": "酸菜", "multiplier": 2, "perBatch": 11, "unit": "包", "cat": "配料", "ings": [{"name": "酸菜絲(甲級)", "qty": 1500, "unit": "g", "form": "整顆/原形"}, {"name": "酸菜絲(乙級)", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 300, "unit": "g", "form": "整顆/原形"}, {"name": "老薑", "qty": 100, "unit": "g", "form": "切碎"}, {"name": "二砂", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3, "unit": "張", "form": "整顆/原形"}]}, {"id": "R014", "code": "M024", "name": "菜脯", "multiplier": 1, "perBatch": 12, "unit": "包", "cat": "配料", "ings": [{"name": "蘿蔔乾", "qty": 12000, "unit": "g", "form": "整顆/原形"}, {"name": "沙拉油", "qty": 800, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 800, "unit": "g", "form": "切碎"}, {"name": "大辣椒", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 600, "unit": "g", "form": "整顆/原形"}, {"name": "醬油膏", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "芝麻香油", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 12, "unit": "張", "form": "整顆/原形"}]}, {"id": "R015", "code": "M025", "name": "茄汁紅醬", "multiplier": 2, "perBatch": 36, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "低筋麵粉", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "番茄糊", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 150, "unit": "g", "form": "切碎"}, {"name": "洋蔥", "qty": 1000, "unit": "g", "form": "切碎"}, {"name": "西洋芹", "qty": 500, "unit": "g", "form": "切碎"}, {"name": "整粒番茄", "qty": 2500, "unit": "g", "form": "泥狀"}, {"name": "濃縮番茄", "qty": 2000, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 1750, "unit": "g", "form": "整顆/原形"}, {"name": "番茄(醬)", "qty": 500, "unit": "g", "form": "整顆/原形"}, {"name": "義大利香料", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "料理調味粉(成品包)", "qty": 45, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 9, "unit": "張", "form": "整顆/原形"}]}, {"id": "R016", "code": "M026", "name": "奶油白醬", "multiplier": 4, "perBatch": 10, "unit": "包", "cat": "醬料", "ings": [{"name": "調味鮮奶", "qty": 250, "unit": "g", "form": "整顆/原形"}, {"name": "鮮奶油", "qty": 250, "unit": "ml", "form": "整顆/原形"}, {"name": "水", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "奶粉", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "奶油", "qty": 12.5, "unit": "g", "form": "整顆/原形"}, {"name": "洋蔥", "qty": 50, "unit": "g", "form": "泥狀"}, {"name": "低筋麵粉", "qty": 12.5, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 2.5, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 7.5, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 0.75, "unit": "張", "form": "整顆/原形"}]}, {"id": "R017", "code": "M027", "name": "泰式打拋豬", "multiplier": 3, "perBatch": 15, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 33.333, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 33.333, "unit": "g", "form": "切碎"}, {"name": "老薑", "qty": 33.333, "unit": "g", "form": "切碎"}, {"name": "紅蔥頭", "qty": 33.333, "unit": "g", "form": "切碎"}, {"name": "豬絞肉", "qty": 1000, "unit": "g", "form": "整顆/原形"}, {"name": "米酒", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "小番茄", "qty": 200, "unit": "g", "form": "切片"}, {"name": "醬油", "qty": 33.333, "unit": "g", "form": "整顆/原形"}, {"name": "醬油膏", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "魚露", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "老抽", "qty": 16.667, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 33.333, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 16.667, "unit": "g", "form": "整顆/原形"}, {"name": "九層塔", "qty": 66.667, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 1.667, "unit": "張", "form": "整顆/原形"}]}, {"id": "R018", "code": "M028", "name": "義式肉醬", "multiplier": 1, "perBatch": 31, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 450, "unit": "g", "form": "切碎"}, {"name": "洋蔥", "qty": 3000, "unit": "g", "form": "切碎"}, {"name": "西洋芹", "qty": 750, "unit": "g", "form": "切碎"}, {"name": "紅蘿蔔", "qty": 750, "unit": "g", "form": "切碎"}, {"name": "豬絞肉", "qty": 9000, "unit": "g", "form": "整顆/原形"}, {"name": "紅酒", "qty": 750, "unit": "g", "form": "整顆/原形"}, {"name": "墨西哥辣椒", "qty": 300, "unit": "g", "form": "切碎"}, {"name": "培根", "qty": 450, "unit": "g", "form": "切碎"}, {"name": "整粒番茄", "qty": 7500, "unit": "g", "form": "泥狀"}, {"name": "濃縮番茄", "qty": 6000, "unit": "g", "form": "醬狀"}, {"name": "番茄醬", "qty": 1500, "unit": "g", "form": "醬狀"}, {"name": "醬油膏", "qty": 300, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 1500, "unit": "g", "form": "整顆/原形"}, {"name": "荳蔻粉", "qty": 15, "unit": "g", "form": "整顆/原形"}, {"name": "俄力岡葉", "qty": 45, "unit": "g", "form": "整顆/原形"}, {"name": "羅勒葉", "qty": 45, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 90, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 240, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 75, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 90, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 31, "unit": "張", "form": "整顆/原形"}]}, {"id": "R019", "code": "M029", "name": "義式鮮菇", "multiplier": 2, "perBatch": 36, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "杏鮑菇", "qty": 6000, "unit": "g", "form": "切片"}, {"name": "秀珍菇", "qty": 1500, "unit": "g", "form": "切片"}, {"name": "香菇", "qty": 1500, "unit": "g", "form": "切片"}, {"name": "米酒", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "義大利香料", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "鮮雞精", "qty": 40, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 10, "unit": "g", "form": "整顆/原形"}, {"name": "粗黑胡椒粒", "qty": 15, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 9, "unit": "張", "form": "整顆/原形"}]}, {"id": "R020", "code": "M030", "name": "柚柚鮪魚醬", "multiplier": 2, "perBatch": 10, "unit": "包", "cat": "醬料", "ings": [{"name": "鮪魚罐頭", "qty": 1360, "unit": "g", "form": "醬狀"}, {"name": "洋蔥", "qty": 225, "unit": "g", "form": "切碎"}, {"name": "芹菜", "qty": 90, "unit": "g", "form": "切碎"}, {"name": "鮮雞精", "qty": 12.5, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "白胡椒粉", "qty": 2.5, "unit": "g", "form": "整顆/原形"}, {"name": "柚子醬", "qty": 150, "unit": "g", "form": "整顆/原形"}, {"name": "桂冠沙拉", "qty": 750, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 2.5, "unit": "張", "form": "整顆/原形"}]}, {"id": "R021", "code": "M031", "name": "香蒜抹醬", "multiplier": 1, "perBatch": 6, "unit": "盒", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 120, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 800, "unit": "g", "form": "泥狀"}, {"name": "奶油", "qty": 1816, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜調味粉", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "起司粉", "qty": 200, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 25, "unit": "g", "form": "整顆/原形"}, {"name": "特砂", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "洋香菜", "qty": 8, "unit": "g", "form": "乾燥/粉"}, {"name": "包材", "qty": 6, "unit": "張", "form": "整顆/原形"}]}, {"id": "R022", "code": "M032", "name": "紅麻辣椒醬", "multiplier": 1, "perBatch": 7, "unit": "包", "cat": "醬料", "ings": [{"name": "沙拉油", "qty": 900, "unit": "g", "form": "整顆/原形"}, {"name": "芝麻香油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "沙茶醬", "qty": 50, "unit": "g", "form": "醬狀"}, {"name": "大蒜", "qty": 200, "unit": "g", "form": "切碎"}, {"name": "紅蔥頭", "qty": 200, "unit": "g", "form": "切碎"}, {"name": "老薑", "qty": 200, "unit": "g", "form": "切碎"}, {"name": "大辣椒", "qty": 1200, "unit": "g", "form": "切碎"}, {"name": "小椒椒", "qty": 1200, "unit": "g", "form": "切碎"}, {"name": "鮮雞精", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "鹽", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "二砂", "qty": 30, "unit": "g", "form": "整顆/原形"}, {"name": "五香粉", "qty": 20, "unit": "g", "form": "整顆/原形"}, {"name": "花椒粉", "qty": 50, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 7, "unit": "張", "form": "整顆/原形"}]}, {"id": "R023", "code": "M033", "name": "香醇醬油膏", "multiplier": 2, "perBatch": 14, "unit": "包", "cat": "醬料", "ings": [{"name": "芝麻香油", "qty": 100, "unit": "g", "form": "整顆/原形"}, {"name": "大蒜", "qty": 125, "unit": "g", "form": "泥狀"}, {"name": "大辣椒", "qty": 50, "unit": "g", "form": "泥狀"}, {"name": "醬油膏", "qty": 900, "unit": "g", "form": "醬狀"}, {"name": "醬油", "qty": 400, "unit": "g", "form": "醬狀"}, {"name": "梅林醬油", "qty": 100, "unit": "g", "form": "醬狀"}, {"name": "二砂", "qty": 250, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 1250, "unit": "g", "form": "整顆/原形"}, {"name": "糯米粉", "qty": 75, "unit": "g", "form": "整顆/原形"}, {"name": "水", "qty": 400, "unit": "g", "form": "整顆/原形"}, {"name": "包材", "qty": 3.5, "unit": "張", "form": "整顆/原形"}]}];
 const DB_MENU=[{"id": "M001", "code": "M001", "name": "紅燒豬里肌", "price": 280, "ing1": "豬里肌肉", "qty1": 0.2, "unit1": "公斤"}, {"id": "M002", "code": "M002", "name": "香煎鮭魚", "price": 380, "ing1": "鮭魚片", "qty1": 0.18, "unit1": "公斤"}, {"id": "M003", "code": "M003", "name": "雞肉炒飯", "price": 160, "ing1": "雞胸肉", "qty1": 0.15, "unit1": "公斤"}, {"id": "M004", "code": "M004", "name": "麻婆豆腐", "price": 150, "ing1": "豆腐", "qty1": 2, "unit1": "塊"}, {"id": "M005", "code": "M005", "name": "蝦仁炒高麗菜", "price": 220, "ing1": "蝦仁", "qty1": 0.12, "unit1": "公斤"}, {"id": "M006", "code": "M006", "name": "牛排套餐", "price": 680, "ing1": "牛里肌", "qty1": 0.25, "unit1": "公斤"}, {"id": "M007", "code": "M007", "name": "番茄炒蛋", "price": 120, "ing1": "雞蛋", "qty1": 3, "unit1": "顆"}, {"id": "M008", "code": "M008", "name": "炸蝦天婦羅", "price": 320, "ing1": "蝦仁", "qty1": 0.15, "unit1": "公斤"}, {"id": "M009", "code": "M009", "name": "滷肉飯", "price": 90, "ing1": "豬里肌肉", "qty1": 0.1, "unit1": "公斤"}, {"id": "M010", "code": "M010", "name": "海鮮炒飯", "price": 200, "ing1": "蝦仁", "qty1": 0.08, "unit1": "公斤"}];
@@ -743,7 +749,41 @@ function _saveToFirebase(){
   var _hasData=(stateClone.ings&&stateClone.ings.length)||(stateClone.recipes&&stateClone.recipes.length)||(stateClone.customers&&stateClone.customers.length)||(stateClone.internalProducts&&stateClone.internalProducts.length);
   if(!_hasData){console.warn('[防護] 目前無核心資料,暫緩推送以免覆蓋雲端資料');return;}
   _cloudSyncing=true;
-  
+
+  /* [FIX 2026-09-06 ★] 客戶訂單只有「客戶端 APP」會新增（用 arrayUnion 追加），
+     而這裡是「整包覆蓋」。若訂單監聽還沒把新訂單帶進本機 state —— 剛開機、
+     剛斷線重連、或推送與下單只差幾秒 —— 這一推就會把雲端的訂單洗掉，
+     而且完全無聲無息。上面的防護②只檢查食材／配方／客戶／內部品項，
+     客戶訂單不在檢查範圍內，所以擋不住。
+     解法：推送前先讀一次雲端，把「雲端有、本機沒有」的訂單併回來再寫。 */
+  var _mergeCloudOrders=function(cb){
+    try{
+      _fbDb.collection('erp').doc('state').get().then(function(_d){
+        try{
+          var _cd=(_d&&_d.exists)?_d.data():null;
+          var _co=(_cd&&_cd.data&&_cd.data.custOrders)||[];
+          if(_co.length){
+            if(!stateClone.custOrders)stateClone.custOrders=[];
+            if(!state.custOrders)state.custOrders=[];
+            var _miss=0;
+            _co.forEach(function(o){
+              if(!o||!o.id)return;
+              if(!stateClone.custOrders.some(function(x){return x&&x.id===o.id})){
+                stateClone.custOrders.push(o);_miss++;
+                if(!state.custOrders.some(function(x){return x&&x.id===o.id}))state.custOrders.push(o);
+              }
+            });
+            if(_miss>0){
+              console.warn('[訂單保護] 推送前補回雲端 '+_miss+' 筆本機還沒有的客戶訂單');
+              try{toast('📥 同步時補回 '+_miss+' 筆新訂單')}catch(e){}
+            }
+          }
+        }catch(e){console.warn('[訂單保護] 合併失敗，仍照原樣推送',e)}
+        cb();
+      }).catch(function(){cb()});
+    }catch(e){cb()}
+  };
+  _mergeCloudOrders(function(){
   // 主資料存到 erp/state/main
   _fbDb.collection('erp').doc('state').set({
     data:stateClone,
@@ -758,6 +798,7 @@ function _saveToFirebase(){
   }).catch(function(e){
     _cloudSyncing=false;
     if(!window._cloudDeniedNotice(e,'寫入 erp/state'))console.error('Firestore save error:',e);
+  });
   });
 }
 
@@ -5186,7 +5227,7 @@ window.calcHistoricalLossRate=function(ingName){
   if(!ingName)return 0;
   var now=new Date();
   var cutoff=new Date(now.getTime()-90*24*60*60*1000);
-  var cutoffStr=cutoff.toISOString().substring(0,10);
+  var cutoffStr=hmDate(cutoff);
   
   // 過去 90 天的進貨總量 (公克單位)
   var totalBuyG=0;
@@ -6526,7 +6567,7 @@ function buildCustomerProfitTab(){
   var orders=[].concat(state.custOrders||[]).concat(state.internalOrders||[]);
   // 只算本月或近 30 天
   var thirty=new Date();thirty.setDate(thirty.getDate()-30);
-  var thirtyStr=thirty.toISOString().substring(0,10);
+  var thirtyStr=hmDate(thirty);
   
   var customerStats={};
   orders.forEach(function(o){
@@ -8700,8 +8741,8 @@ window.showProcurementFromSchedule=function(){
     var today=new Date();
     var d2=new Date();d2.setDate(d2.getDate()+14);
     state._procFilter={
-      dateFrom:today.toISOString().substring(0,10),
-      dateTo:d2.toISOString().substring(0,10)
+      dateFrom:hmDate(today),
+      dateTo:hmDate(d2)
     };
   }
   // 🆕 預設不扣庫存 (Tim 還沒開始用採購功能,純叫貨量比較直觀)
@@ -8810,8 +8851,8 @@ window.setProcRange=function(days){
   var today=new Date();
   var end=new Date();end.setDate(end.getDate()+days);
   state._procFilter={
-    dateFrom:today.toISOString().substring(0,10),
-    dateTo:end.toISOString().substring(0,10)
+    dateFrom:hmDate(today),
+    dateTo:hmDate(end)
   };
   closeModal();
   setTimeout(showProcurementFromSchedule,50);
@@ -8842,7 +8883,7 @@ window.exportProcurementCSV=function(){
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;
-  a.download='採購清單_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.download='採購清單_'+hmDate()+'.csv';
   a.click();
   setTimeout(function(){URL.revokeObjectURL(url)},100);
   toast('✅ 已匯出 CSV');
@@ -8976,7 +9017,7 @@ window.normalizeProdReports=function(rawData){
         var reportedAt=rpt.date||rpt.time||'';
         // 如果只有 time (HH:MM) 沒 date,組合今天
         if(reportedAt&&reportedAt.length<=5){
-          reportedAt=new Date().toISOString().substring(0,10)+'T'+reportedAt+':00.000Z';
+          reportedAt=hmDate()+'T'+reportedAt+':00.000Z';
         }
         
         // 計算實際數量 (主數量 + 額外數量, 額外換算需注意單位)
@@ -9500,7 +9541,7 @@ window.doLogin=function(){
   try{
     var cache=JSON.parse(localStorage.getItem('hm_hr_accounts_cache')||'{}');
     if(cache.accounts&&Array.isArray(cache.accounts)){
-      hrUser=cache.accounts.find(function(a){return a.user===un&&window.verifyPass(pw,a.pass)});
+      hrUser=cache.accounts.find(function(a){return a.user===un&&window.verifyPass(pw,a.pass,a.user)});
     }
   }catch(e){}
   if(hrUser){
@@ -9582,8 +9623,31 @@ window.hashPass=function(plain){
   for(var i=0;i<plain.length;i++){var ch=plain.charCodeAt(i);h=((h<<5)-h)+ch;h=h&h}
   return'hm$'+Math.abs(h).toString(36)+'$'+plain.length;
 };
-window.verifyPass=function(plain,hashed){
-  if(!hashed||hashed.indexOf('hm$')!==0)return plain===hashed;  // 舊明碼相容
+
+/* [FIX 2026-09-05 ★] 共用帳號的密碼格式是「四套系統的共同契約」。
+   人資系統 v4.9.6 起，新設定／變更的密碼會存成 hm2$ 格式（與員工APP 同一套：
+   _hashStrong，96 位元、12000 輪、以帳號名稱當鹽）。
+   本系統原本只認得舊的 hm$：碰到 hm2$ 時 indexOf('hm$')!==0 會落到「明文比對」，
+   永遠不相等 —— 只要有人在人資系統改過密碼，就再也登不進這套系統。
+   這裡只補上「看得懂 hm2$」的驗證能力，不產生新雜湊，對既有帳號完全沒有影響。 */
+function _hashStrong(plain,salt){
+  var a=0x811c9dc5,b=0x01000193,c=0x9e3779b9,str=(salt||'')+'\u0001'+plain;
+  for(var r=0;r<12000;r++){
+    for(var i=0;i<str.length;i++){
+      var ch=str.charCodeAt(i);
+      a=((a^ch)>>>0)*16777619>>>0;
+      b=(((b+ch)>>>0)^((b<<7)|(b>>>25)))>>>0;
+      c=(((c^(a+b))>>>0)*2654435761)>>>0;
+    }
+    a=(a^r)>>>0;b=(b+r)>>>0;
+  }
+  function hx(n){return('00000000'+(n>>>0).toString(16)).slice(-8)}
+  return'hm2$'+hx(a)+hx(b)+hx(c);
+}
+window.verifyPass=function(plain,hashed,salt){
+  if(!hashed)return plain===hashed;
+  if(String(hashed).indexOf('hm2$')===0)return _hashStrong(plain,salt||'')===hashed;
+  if(String(hashed).indexOf('hm$')!==0)return plain===hashed;  // 舊明碼相容
   return window.hashPass(plain)===hashed;
 };
 
@@ -10209,6 +10273,33 @@ window.firebaseSave=function(silent){
   // 🛡️ 防護:手動上傳遇空白資料時攔截(避免誤把空白蓋掉雲端)
   var _hasDataM=(stateClone.ings&&stateClone.ings.length)||(stateClone.recipes&&stateClone.recipes.length)||(stateClone.customers&&stateClone.customers.length)||(stateClone.internalProducts&&stateClone.internalProducts.length);
   if(!_hasDataM){if(silent)return;if(!confirm('⚠️ 目前系統幾乎沒有資料,確定要上傳並「覆蓋」雲端嗎?\n\n若你正要救回資料,請改用「從雲端載入」或「匯入備份」,千萬不要上傳!'))return;}
+  /* [FIX 2026-09-06 ★] 手動上傳同樣是整包覆蓋，一樣會洗掉客戶端剛下的訂單。 */
+  var _mergeCloudOrdersM=function(cb){
+    try{
+      _fbDb.collection('erp').doc('state').get().then(function(_d){
+        try{
+          var _cd=(_d&&_d.exists)?_d.data():null;
+          var _co=(_cd&&_cd.data&&_cd.data.custOrders)||[];
+          if(_co.length){
+            if(!stateClone.custOrders)stateClone.custOrders=[];
+            if(!state.custOrders)state.custOrders=[];
+            var _miss=0;
+            _co.forEach(function(o){
+              if(!o||!o.id)return;
+              if(!stateClone.custOrders.some(function(x){return x&&x.id===o.id})){
+                stateClone.custOrders.push(o);_miss++;
+                if(!state.custOrders.some(function(x){return x&&x.id===o.id}))state.custOrders.push(o);
+              }
+            });
+            if(_miss>0){console.warn('[訂單保護] 上傳前補回雲端 '+_miss+' 筆客戶訂單');
+              try{if(!silent)toast('📥 上傳時補回 '+_miss+' 筆新訂單')}catch(e){}}
+          }
+        }catch(e){console.warn('[訂單保護] 合併失敗，仍照原樣上傳',e)}
+        cb();
+      }).catch(function(){cb()});
+    }catch(e){cb()}
+  };
+  _mergeCloudOrdersM(function(){
   _fbDb.collection('erp').doc('state').set({
     data:stateClone,
     updated_at:firebase.firestore.FieldValue.serverTimestamp(),
@@ -10218,6 +10309,7 @@ window.firebaseSave=function(silent){
     if(!silent)toast('✅ 已同步到 Firestore');updateCloudStatus();
     _writeSharedData(stateClone);
   }).catch(function(e){if(!silent)toast('❌ Firestore 儲存失敗：'+e.message,'err')});
+  });
 };
 
 window.firebaseLoad=function(silent){
@@ -10561,7 +10653,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.37.0';
+var SYSTEM_VERSION='2.39.0';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -12739,7 +12831,7 @@ window.exportCustStatement=function(custId){
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
   a.href=url;
-  a.download='對帳單_'+c.name+'_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.download='對帳單_'+c.name+'_'+hmDate()+'.csv';
   a.click();
   setTimeout(function(){URL.revokeObjectURL(url)},100);
   toast('✅ 已匯出對帳單');
