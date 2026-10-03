@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.40.1</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.40.2</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -621,6 +621,14 @@ window._readStoredToken=function(key){
      ② 按「上一步／下一步」—— 還原的快照裡是舊戳記，同樣對不起來。
    這裡把寫入集中成一支函式，一律同步更新戳記，9 處全部改成呼叫它。
    注意：真正的多人衝突偵測完全不受影響 —— 別台裝置寫的戳記仍然不等於我的。 */
+/* 🐞 v2.40.2 修正 (🟡B級・誤報)：底部那條「另一台裝置（主系統）剛剛更新了資料」也會對自己誤報。
+   推上雲端時寫的是 deviceName||'主系統'，但回頭比對時用的是 deviceName||''（空字串）——
+   只要你沒設定裝置名稱，自己推上去的資料回來就會被判成「別台裝置」。
+   而且預設值在檔案裡有四種寫法：'主系統'、'未命名裝置'、'未命名'、''。這裡收斂成一支。 */
+window._deviceName=function(){
+  try{var n=((state.cloudConfig&&state.cloudConfig.deviceName)||'').trim();if(n)return n}catch(e){}
+  return '主系統';
+};
 window._writeStateLocal=function(newStamp){
   try{
     if(newStamp||!state._saveToken)state._saveToken=window._sessionTag+'_'+Date.now();
@@ -808,7 +816,8 @@ function _saveToFirebase(){
   _fbDb.collection('erp').doc('state').set({
     data:stateClone,
     updated_at:firebase.firestore.FieldValue.serverTimestamp(),
-    device:state.cloudConfig.deviceName||'主系統'
+    device:window._deviceName(),
+    pushBy:window._sessionTag   /* v2.40.2：帶上推送來源，讓「是不是我自己推的」判斷得準 */
   }).then(function(){
     _cloudSyncing=false;
     state.cloudConfig.lastSync=new Date().toISOString();
@@ -8592,7 +8601,16 @@ if(state._scheduleView==='calendar'){
   list.forEach(function(s){if(!byDate[s.date])byDate[s.date]=[];byDate[s.date].push(s)});
   
   var calCard=dv({cls:'card'});
-  var html='<div class="card-title">📆 '+year+' 年 '+(month+1)+' 月排程</div>';
+  var _thisMonthCount=Object.keys(byDate).filter(function(k){return k.indexOf(year+'-'+String(month+1).padStart(2,'0'))===0})
+                        .reduce(function(n,k){return n+byDate[k].length},0);
+  var html='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">'+
+    '<div class="card-title" style="margin:0">📆 '+year+' 年 '+(month+1)+' 月排程 '+
+      '<span style="font-size:0.8rem;font-weight:400;color:#706E68">（本月 '+_thisMonthCount+' 筆 ／ 全部 '+list.length+' 筆）</span></div>'+
+    '<div style="display:flex;gap:6px">'+
+      '<button class="btn btn-sm btn-outline" onclick="calShiftMonth(-1)">◀ 上個月</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="calShiftMonth(0)">今天</button>'+
+      '<button class="btn btn-sm btn-outline" onclick="calShiftMonth(1)">下個月 ▶</button>'+
+    '</div></div>';
   html+='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-weight:700;text-align:center;padding:8px 0;background:#F3F1EB;border-radius:6px;margin-bottom:8px">';
   weekNames.forEach(function(w,i){html+='<div style="color:'+(i===0||i===6?'#B82525':'#1E1E1C')+';font-size:0.86rem">'+w+'</div>'});
   html+='</div>';
@@ -8607,11 +8625,24 @@ if(state._scheduleView==='calendar'){
     var bg=isToday?'#FCEFE5':'#fff';
     var border=isToday?'2px solid #9A6210':'1px solid #E0E0E0';
     html+='<div style="background:'+bg+';border:'+border+';border-radius:6px;padding:6px;min-height:80px;font-size:0.78rem"><div style="font-weight:700;color:'+(isToday?'#9A6210':'#555')+';margin-bottom:3px">'+d+(isToday?' 今天':'')+'</div>';
-    dayItems.slice(0,3).forEach(function(s){
+    /* 🐞 v2.40.2 修正：原本只畫前 3 筆，「+N 筆」是一個純文字 div、沒有綁任何點擊事件 ——
+       看得到提示卻永遠展不開。改成全部都畫出來、第 4 筆之後先隱藏，「+N 筆」變成可點的展開鈕。
+       每一筆也改成可點，直接開那張排程的明細。 */
+    dayItems.forEach(function(s,idx){
       var stColor={'待生產':'#9A6210','生產中':'#1455A0','已完成':'#0A5A46','已取消':'#999'}[s.status]||'#555';
-      html+='<div style="background:'+stColor+';color:#fff;padding:2px 4px;border-radius:3px;margin-bottom:2px;font-size:0.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+esc(s.recipeName)+' x'+s.multiplier+' ['+s.status+']">'+esc(s.recipeName.substring(0,8))+(s.recipeName.length>8?'...':'')+'</div>';
+      var hid=(idx>=3);
+      html+='<div class="cal-item" data-cal-day="'+dStr+'" onclick="calOpenItem(\''+esc(s.id)+'\')" '+
+        'style="background:'+stColor+';color:#fff;padding:2px 4px;border-radius:3px;margin-bottom:2px;font-size:0.7rem;'+
+        'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer'+(hid?';display:none':'')+'" '+
+        'title="'+esc(s.recipeName)+' x'+s.multiplier+' ['+s.status+']　點擊查看">'+
+        esc(s.recipeName.substring(0,8))+(s.recipeName.length>8?'...':'')+'</div>';
     });
-    if(dayItems.length>3)html+='<div style="font-size:0.7rem;color:#666;text-align:center">+'+(dayItems.length-3)+' 筆</div>';
+    if(dayItems.length>3){
+      html+='<div class="cal-more" id="cal-more-'+dStr+'" onclick="calToggleDay(\''+dStr+'\')" '+
+        'style="font-size:0.7rem;color:#9A6210;text-align:center;cursor:pointer;font-weight:700;'+
+        'padding:2px;border-radius:3px;background:#FFF6E5;border:1px dashed #E8C098;margin-top:2px">'+
+        '＋'+(dayItems.length-3)+' 筆 ▼</div>';
+    }
     html+='</div>';
   }
   html+='</div>';
@@ -8666,6 +8697,49 @@ var obj={id:'SC'+Date.now(),date:$('sc-date')?$('sc-date').value:toDay(),timeSlo
 if(!state.prodSchedule)state.prodSchedule=[];state.prodSchedule.push(obj);addAudit('新增排程',rec.name+' x'+mult);saveState();closeModal();renderPage();toast('✅ 排程已建立')};
 
 // 🆕 編輯排程
+/* 🐞 v2.40.2：月曆「+N 筆」的展開 / 月份切換 / 點一筆看明細。
+   全部只動畫面，不碰任何排程資料。 */
+window.calToggleDay=function(dStr){
+  var items=document.querySelectorAll('[data-cal-day="'+dStr+'"]');
+  var btn=document.getElementById('cal-more-'+dStr);
+  if(!items.length)return;
+  var opening=false;
+  for(var i=0;i<items.length;i++){
+    if(i<3)continue;
+    if(items[i].style.display==='none'){items[i].style.display='';opening=true}
+    else{items[i].style.display='none'}
+  }
+  if(btn){
+    var hidden=items.length-3;
+    btn.innerHTML=opening?('▲ 收合'):('＋'+hidden+' 筆 ▼');
+  }
+};
+window.calShiftMonth=function(delta){
+  var base;
+  if(delta===0){ base=new Date() }
+  else{
+    var cur=state._calYM?state._calYM.split('-'):null;
+    base=cur?new Date(+cur[0],(+cur[1])-1+delta,1):new Date(new Date().getFullYear(),new Date().getMonth()+delta,1);
+  }
+  state._calYM=(delta===0)?null:(base.getFullYear()+'-'+String(base.getMonth()+1).padStart(2,'0'));
+  renderPage();
+};
+window.calOpenItem=function(id){
+  var s=(state.prodSchedule||[]).find(function(x){return x.id===id});
+  if(!s){alert('找不到此排程');return}
+  var canEdit=(s.status!=='生產中'&&s.status!=='已完成'&&s.status!=='已取消');
+  modal(mH('📅 '+esc(s.date)+'　'+esc(s.recipeName||''))+
+    '<div class="tip" style="line-height:1.9">'+
+      '時段：<b>'+esc(s.timeSlot||'—')+'</b><br>'+
+      '倍數：<b>x'+(s.multiplier||1)+'</b>　預計產出：<b>'+fmt(s.output||0,1)+' '+esc(s.unit||'')+'</b><br>'+
+      '狀態：<b>'+esc(s.status||'')+'</b>　負責人：<b>'+esc(s.assignee||'—')+'</b>'+
+      (s.note?'<br>備註：'+esc(s.note):'')+
+    '</div>'+
+    '<div class="save-btns">'+
+      '<button class="btn btn-outline" onclick="closeModal()">關閉</button>'+
+      (canEdit?'<button class="btn btn-primary" onclick="closeModal();setTimeout(function(){editSchedule(\''+esc(id)+'\')},80)">✏️ 編輯這筆</button>':'')+
+    '</div>');
+};
 window.editSchedule=function(id){
   var s=(state.prodSchedule||[]).find(function(x){return x.id===id});
   if(!s){alert('找不到此排程');return}
@@ -10358,10 +10432,15 @@ function initFirebaseSDK(){
           if(!(doc.metadata&&doc.metadata.fromCache)){window._cloudLoaded=true;window._cloudLoadOk=true;} // 🛡️ 收到伺服器快照=雲端確實已載入
           /* 🔀 別的裝置把資料推上雲端了 → 我畫面上的可能已是舊的 */
           try{
-            var _cdev=(doc.data()||{}).device||'';
-            var _mine=(state.cloudConfig&&state.cloudConfig.deviceName)||'';
-            if(!(doc.metadata&&doc.metadata.fromCache)&&window._cloudSeenOnce&&_cdev&&_cdev!==_mine){
-              window.showStaleBanner('另一台裝置（'+_cdev+'）');
+            /* 🐞 v2.40.2：原本比對 device 名稱，但推送時用 ||'主系統'、比對時用 ||''，
+               只要沒設定裝置名稱，自己推上去的資料回來就被判成「別台裝置」。
+               改成優先比對 pushBy（推送來源的 session），沒有 pushBy 的舊資料才退回比名稱。 */
+            var _cd=doc.data()||{};
+            var _cdev=_cd.device||'';
+            var _by=_cd.pushBy||'';
+            var _isMine=_by ? (_by===window._sessionTag) : (_cdev===window._deviceName());
+            if(!(doc.metadata&&doc.metadata.fromCache)&&window._cloudSeenOnce&&!_isMine){
+              window.showStaleBanner('另一台裝置（'+(_cdev||'未知')+'）');
             }
             window._cloudSeenOnce=true;
           }catch(_){}
@@ -10421,7 +10500,8 @@ window.firebaseSave=function(silent){
   _fbDb.collection('erp').doc('state').set({
     data:stateClone,
     updated_at:firebase.firestore.FieldValue.serverTimestamp(),
-    device:state.cloudConfig.deviceName||'未命名'
+    device:window._deviceName(),
+    pushBy:window._sessionTag   /* v2.40.2：統一裝置名稱來源並帶上推送來源 */
   }).then(function(){
     state.cloudConfig.lastSync=new Date().toISOString();window._writeStateLocal();   /* v2.40.1：改用單一寫入點 */
     if(!silent)toast('✅ 已同步到 Firestore');updateCloudStatus();
@@ -10452,7 +10532,7 @@ window.firebaseLoad=function(silent){
 // --- JSONBin.io ---
 window.jsonbinSave=function(silent){
   var cfg=state.cloudConfig;if(!cfg||cfg.provider!=='jsonbin'||!cfg.jbKey)return;
-  var payload={data:JSON.parse(JSON.stringify(state)),updated_at:new Date().toISOString(),device:cfg.deviceName||'未命名'};
+  var payload={data:JSON.parse(JSON.stringify(state)),updated_at:new Date().toISOString(),device:window._deviceName(),pushBy:window._sessionTag};   /* v2.40.2：統一裝置名稱來源 */
   delete payload.data.cloudConfig;
   var headers={'Content-Type':'application/json','X-Master-Key':cfg.jbKey};
   var url=cfg.jbBinId?'https://api.jsonbin.io/v3/b/'+cfg.jbBinId:'https://api.jsonbin.io/v3/b';
@@ -10775,7 +10855,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.40.1';
+var SYSTEM_VERSION='2.40.2';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
