@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.40.0</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.40.1</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -612,6 +612,22 @@ if(typeof window._lastKnownToken==='undefined')window._lastKnownToken=null;
 window._readStoredToken=function(key){
   try{var raw=localStorage.getItem(key);if(!raw)return null;return (JSON.parse(raw)||{})._saveToken||null}catch(e){return null}
 };
+/* 🐞 v2.40.1 修正 (🔴A級・誤報)：「這份資料在別的地方被改過了」在只有一台裝置時也會一直跳。
+   原因是「寫 localStorage」這件事在檔案裡寫了 10 份，但只有 saveState 那一份會同步更新
+   window._lastKnownToken。其他 9 份寫完之後，儲存區的戳記就跟 _lastKnownToken 對不起來，
+   下次存檔必定誤判成「別人改過」。最常觸發的兩條路徑：
+     ① 開啟頁面時從 Firestore 載入 —— 雲端資料裡帶著「上次存檔那台裝置的戳記」，
+        寫進 localStorage 後戳記被換掉，但 _lastKnownToken 還是本地的 → 第一次存檔就跳。
+     ② 按「上一步／下一步」—— 還原的快照裡是舊戳記，同樣對不起來。
+   這裡把寫入集中成一支函式，一律同步更新戳記，9 處全部改成呼叫它。
+   注意：真正的多人衝突偵測完全不受影響 —— 別台裝置寫的戳記仍然不等於我的。 */
+window._writeStateLocal=function(newStamp){
+  try{
+    if(newStamp||!state._saveToken)state._saveToken=window._sessionTag+'_'+Date.now();
+    localStorage.setItem(COST_KEY,JSON.stringify(state));
+    window._lastKnownToken=state._saveToken;
+  }catch(e){}
+};
 window.showStaleBanner=function(who){
   if(document.getElementById('stale-bar'))return;
   var bar=document.createElement('div');bar.id='stale-bar';
@@ -694,9 +710,7 @@ function saveState(){
           if(!ok){ window.showStaleBanner('別的裝置或分頁'); window._conflictAsked=false; return; }
         }
       }
-      state._saveToken=window._sessionTag+'_'+Date.now();
-      localStorage.setItem(COST_KEY,JSON.stringify(state));
-      window._lastKnownToken=state._saveToken;
+      window._writeStateLocal(true);   /* v2.40.1：改用單一寫入點（會蓋新戳記並同步 _lastKnownToken） */
       window._conflictAsked=false;
     }catch(e){}
   },300);
@@ -798,7 +812,7 @@ function _saveToFirebase(){
   }).then(function(){
     _cloudSyncing=false;
     state.cloudConfig.lastSync=new Date().toISOString();
-    try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){}
+    window._writeStateLocal();   /* v2.40.1：改用單一寫入點，避免戳記對不起來而誤報衝突 */
     // 同步寫入共用區（給財會系統讀取）
     _writeSharedData(stateClone);
   }).catch(function(e){
@@ -6992,7 +7006,7 @@ window.addEventListener('beforeunload',function(){
   try{
     // 1. localStorage 立刻寫 (取消防抖)
     if(typeof _saveTimer!=='undefined')clearTimeout(_saveTimer);
-    localStorage.setItem(COST_KEY,JSON.stringify(state));
+    window._writeStateLocal(true);   /* v2.40.1：改用單一寫入點 */
     
     // 2. Firebase 用 sendBeacon 不會被 unload 中斷 (best-effort)
     if(typeof _fbSaveTimer!=='undefined')clearTimeout(_fbSaveTimer);
@@ -8560,7 +8574,13 @@ if(!list.length){pg.appendChild(dv({cls:'card',style:'text-align:center;padding:
 
 // 日曆視圖
 if(state._scheduleView==='calendar'){
+  /* 🐞 v2.40.2：月曆原本寫死只顯示「今天所在的月份」，但排程有 227 筆跨好幾個月，
+     其他月份完全看不到。加上上/下月切換（純顯示，不動任何資料）。 */
   var now=new Date();
+  if(state._calYM){
+    var _p=String(state._calYM).split('-');
+    now=new Date(+_p[0], (+_p[1])-1, 1);
+  }
   var year=now.getFullYear(),month=now.getMonth();
   var firstDay=new Date(year,month,1);
   var lastDay=new Date(year,month+1,0);
@@ -10154,7 +10174,7 @@ window.cloudSave=function(silent){
         console.error('Cloud save error:',res.error);
       }else{
         state.cloudConfig.lastSync=new Date().toISOString();
-        localStorage.setItem(COST_KEY,JSON.stringify(state));
+        window._writeStateLocal();   /* v2.40.1：改用單一寫入點 */
         if(!silent)toast('✅ 已同步到雲端');
         updateCloudStatus();
       }
@@ -10353,7 +10373,7 @@ function initFirebaseSDK(){
             if(co&&co.id&&!state.custOrders.find(function(lo){return lo.id===co.id})){state.custOrders.push(co);added++}
           });
           if(added>0){
-            try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){}
+            window._writeStateLocal();   /* v2.40.1：改用單一寫入點 */
             if(typeof renderPage==='function'&&state.page==='cust')renderPage();
             if(typeof toast==='function')toast('📥 收到 '+added+' 筆新訂單');
           }
@@ -10403,7 +10423,7 @@ window.firebaseSave=function(silent){
     updated_at:firebase.firestore.FieldValue.serverTimestamp(),
     device:state.cloudConfig.deviceName||'未命名'
   }).then(function(){
-    state.cloudConfig.lastSync=new Date().toISOString();localStorage.setItem(COST_KEY,JSON.stringify(state));
+    state.cloudConfig.lastSync=new Date().toISOString();window._writeStateLocal();   /* v2.40.1：改用單一寫入點 */
     if(!silent)toast('✅ 已同步到 Firestore');updateCloudStatus();
     _writeSharedData(stateClone);
   }).catch(function(e){if(!silent)toast('❌ Firestore 儲存失敗：'+e.message,'err')});
@@ -10441,7 +10461,7 @@ window.jsonbinSave=function(silent){
   fetch(url,{method:method,headers:headers,body:JSON.stringify(payload)})
     .then(function(r){return r.json()}).then(function(res){
       if(res.metadata&&res.metadata.id&&!cfg.jbBinId){state.cloudConfig.jbBinId=res.metadata.id}
-      state.cloudConfig.lastSync=new Date().toISOString();localStorage.setItem(COST_KEY,JSON.stringify(state));
+      state.cloudConfig.lastSync=new Date().toISOString();window._writeStateLocal();   /* v2.40.1：改用單一寫入點 */
       if(!silent)toast('✅ 已同步到 JSONBin');updateCloudStatus();
     }).catch(function(e){if(!silent)toast('❌ JSONBin 儲存失敗','err')});
 };
@@ -10699,7 +10719,9 @@ window.doUndo=function(){
     });
     state.cloudConfig=savedCloud;
     state.page=savedPage;
-    localStorage.setItem(COST_KEY,JSON.stringify(state));
+    /* 🐞 v2.40.1：還原的快照裡是「拍快照當時的舊戳記」，原本直接寫回 localStorage
+       卻沒更新 _lastKnownToken → 按完上一步，下次存檔必定誤報「別的地方被改過」。 */
+    window._writeStateLocal();
     renderPage();
     updateUndoBtns();
     toast('↩️ 已復原上一步');
@@ -10721,7 +10743,9 @@ window.doRedo=function(){
     });
     state.cloudConfig=savedCloud;
     state.page=savedPage;
-    localStorage.setItem(COST_KEY,JSON.stringify(state));
+    /* 🐞 v2.40.1：還原的快照裡是「拍快照當時的舊戳記」，原本直接寫回 localStorage
+       卻沒更新 _lastKnownToken → 按完上一步，下次存檔必定誤報「別的地方被改過」。 */
+    window._writeStateLocal();
     renderPage();
     updateUndoBtns();
     toast('↪️ 已重做下一步');
@@ -10751,7 +10775,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.40.0';
+var SYSTEM_VERSION='2.40.1';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -14361,7 +14385,10 @@ document.addEventListener('DOMContentLoaded',()=>{
     state.cloudConfig=savedCloud;
     if(savedUsers&&savedUsers.length)state.users=state.users&&state.users.length?state.users:savedUsers;
     state.cloudConfig.lastSync=new Date().toISOString();
-    try{localStorage.setItem(COST_KEY,JSON.stringify(state))}catch(e){}
+    /* 🐞 v2.40.1（最常觸發的那一條）：雲端資料裡帶著「上次存檔那台裝置的戳記」。
+       原本寫進 localStorage 後沒更新 _lastKnownToken，所以每次開頁面載入雲端資料後，
+       第一次存檔就會跳「這份資料在別的地方被改過了」—— 即使只有你一台在用。 */
+    window._writeStateLocal();
     console.log('✅ Loaded from Firestore');window._cloudLoaded=true;window._cloudLoadOk=true;
     // 雲端資料載入後重新修正權限和帳號（雲端可能是舊版資料）
     (function(){
