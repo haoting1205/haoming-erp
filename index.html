@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>好洺餐飲事業有限公司 — 生產管理系統 v2.40.2</title>
+<title>好洺餐飲事業有限公司 — 生產管理系統 v2.40.3</title>
 <style>
 /* ══════════════════════════════════════════════════════
    好洺餐飲 生產管理系統 — Warm Kitchen Theme v1.0
@@ -6250,10 +6250,29 @@ if(!state.buyLog.length)pg.appendChild(dv({cls:'card',style:'text-align:center;p
 
 /* ⚠️ 這一份 openBuyModal 已經沒有在跑 —— 檔案後面有另一份同名定義會覆蓋它（改這裡不會生效）。
    實際生效的版本請往下找「openBuyModal」的最後一份定義。改功能請改那一份。 */
-function openBuyModal(supId){modal(mH('📥 登錄進貨')+`<div class="form-row c3"><div class="fg"><label>進貨日期</label><input id="b-date" type="date" value="${toDay()}"></div><div class="fg"><label>供應商</label><select id="b-sup">${state.sups.map(s=>`<option value="${s.id}"${s.id===supId?' selected':''}>${s.id} ${esc(s.name)}</option>`).join('')}</select></div><div class="fg"><label>發票號碼</label><input id="b-inv" type="text" placeholder="選填"></div></div><div class="form-row c4"><div class="fg" style="grid-column:span 2"><label>食材</label><select id="b-ing"><option value="">— 請選擇 —</option>${state.ings.map(i=>`<option value="${esc(i.name)}" data-unit="${esc(i.unit)}" data-price="${i.price}" data-id="${i.id}">${esc(i.name)}</option>`).join('')}</select></div><div class="fg"><label>數量</label><input id="b-qty" type="number" min="0" step="0.01"></div><div class="fg"><label>單位</label><input id="b-unit" type="text" placeholder="公斤"></div></div><div class="form-row c2"><div class="fg"><label>單價 (${CUR()})</label><input id="b-price" type="number" min="0" step="0.01"></div><div class="fg"><label>合計</label><input id="b-total" type="number" min="0" style="background:#DFF5EC"></div></div><div class="fg"><label>進貨後</label><select id="b-update"><option value="yes">✅ 自動加入庫存</option><option value="no">❌ 僅記錄</option></select></div>${mF('saveBuy()')}`)}
+/* 🐞 v2.40.3 修正 (🔴A級)：進貨的「單位」是一個空白文字框，選了食材也不會自動帶入，
+   而 saveBuy 讀到空值時一律當成「公斤」（原本寫死 ||'公斤'）。
+   實測：德紐無鹽奶油庫存單位是「磅」，進 10 @ 181 元 → 系統當成 10 公斤 = 22.046 磅，
+   而且回頭把進價從 181 元/磅 改寫成 13.6 元/磅 —— 用到它的配方成本全錯，毫無提示。
+   你的 120 項食材裡有 92 項不是「公斤」（光公克就 73 項），等於大多數進貨都踩得到。
+   每個選項其實早就帶了 data-unit / data-price，只是沒有人去用它。 */
+window.buyPickIng=function(){
+  try{
+    var sl=document.getElementById('b-ing'); if(!sl)return;
+    var op=sl.options[sl.selectedIndex]; if(!op||!sl.value)return;
+    var u=op.getAttribute('data-unit')||'', p=op.getAttribute('data-price')||'';
+    var eu=document.getElementById('b-unit'), ep=document.getElementById('b-price');
+    if(eu&&u)eu.value=u;                       // 一律帶成該食材的庫存單位
+    if(ep&&!(+ep.value>0)&&+p>0)ep.value=p;    // 單價只在還沒填時帶，不覆蓋使用者輸入
+    if(typeof recalcBuyTax==='function')try{recalcBuyTax()}catch(e){}
+  }catch(e){}
+};
+function openBuyModal(supId){modal(mH('📥 登錄進貨')+`<div class="form-row c3"><div class="fg"><label>進貨日期</label><input id="b-date" type="date" value="${toDay()}"></div><div class="fg"><label>供應商</label><select id="b-sup">${state.sups.map(s=>`<option value="${s.id}"${s.id===supId?' selected':''}>${s.id} ${esc(s.name)}</option>`).join('')}</select></div><div class="fg"><label>發票號碼</label><input id="b-inv" type="text" placeholder="選填"></div></div><div class="form-row c4"><div class="fg" style="grid-column:span 2"><label>食材</label><select id="b-ing" onchange="buyPickIng()"><option value="">— 請選擇 —</option>${state.ings.map(i=>`<option value="${esc(i.name)}" data-unit="${esc(i.unit)}" data-price="${i.price}" data-id="${i.id}">${esc(i.name)}</option>`).join('')}</select></div><div class="fg"><label>數量</label><input id="b-qty" type="number" min="0" step="0.01"></div><div class="fg"><label>單位</label><input id="b-unit" type="text" placeholder="選了食材會自動帶入"></div></div><div class="form-row c2"><div class="fg"><label>單價 (${CUR()})</label><input id="b-price" type="number" min="0" step="0.01"></div><div class="fg"><label>合計</label><input id="b-total" type="number" min="0" style="background:#DFF5EC"></div></div><div class="fg"><label>進貨後</label><select id="b-update"><option value="yes">✅ 自動加入庫存</option><option value="no">❌ 僅記錄</option></select></div>${mF('saveBuy()')}`)}
 /* ⚠️ 這一份 saveBuy 已經沒有在跑 —— 檔案後面有另一份同名定義會覆蓋它（改這裡不會生效）。
    實際生效的版本請往下找「saveBuy」的最後一份定義。改功能請改那一份。 */
-window.saveBuy=function(){const sl=$('b-ing'),ingName=sl?.value;if(!ingName){alert('請選擇食材');return}const op=sl.options[sl.selectedIndex];const ingId=op?.getAttribute('data-id')||'';const qty=+$('b-qty')?.value||0;if(!qty){alert('請填入數量');return}const unitPrice=+$('b-price')?.value||0;const total=+$('b-total')?.value||qty*unitPrice;const entry={id:'B'+Date.now(),date:$('b-date')?.value||toDay(),ingName,ingId,supId:$('b-sup')?.value||'',qty,unit:$('b-unit')?.value||'公斤',unitPrice,total,totalAmt:total,itemName:ingName,invoice:$('b-inv')?.value||''};state.buyLog.push(entry);if($('b-update')?.value==='yes'){const found=state.ings.find(i=>i.id===ingId||i.name===ingName);if(found){
+window.saveBuy=function(){const sl=$('b-ing'),ingName=sl?.value;if(!ingName){alert('請選擇食材');return}const op=sl.options[sl.selectedIndex];const ingId=op?.getAttribute('data-id')||'';const qty=+$('b-qty')?.value||0;if(!qty){alert('請填入數量');return}const unitPrice=+$('b-price')?.value||0;const total=+$('b-total')?.value||qty*unitPrice;const entry={id:'B'+Date.now(),date:$('b-date')?.value||toDay(),ingName,ingId,supId:$('b-sup')?.value||'',qty,/* 🐞 v2.40.3：原本是 ||'公斤'（寫死）。單位沒填時應該用「這項食材自己的庫存單位」，
+   而不是假設每樣東西都論公斤 —— 那會讓磅/公升/公克/張的食材數量與進價全錯。 */
+unit:($('b-unit')?.value||'').trim()||(op?.getAttribute('data-unit'))||((state.ings||[]).find(x=>x.name===ingName)||{}).unit||'公斤',unitPrice,total,totalAmt:total,itemName:ingName,invoice:$('b-inv')?.value||''};state.buyLog.push(entry);if($('b-update')?.value==='yes'){const found=state.ings.find(i=>i.id===ingId||i.name===ingName);if(found){
   /* 🐞 原本直接 stock+=qty、price=unitPrice，完全沒有把「進貨單位」換算成「庫存單位」。
      例：庫存單位公斤、進 5000 g，庫存會變成 +5000 公斤，單價被寫成 0.1/公斤，
      連帶所有配方成本全部算錯。改為統一換算後再入庫。 */
@@ -10855,7 +10874,7 @@ document.addEventListener('keydown',function(e){
 // ══════════════════════════════════════════════════════
 // 📌 系統版本管理
 // ══════════════════════════════════════════════════════
-var SYSTEM_VERSION='2.40.2';
+var SYSTEM_VERSION='2.40.3';
 var BUILD_NUMBER='20260902-density';
 var VERSION_HISTORY=[
   {ver:'2.0.0',build:'20260423-002',date:'2026-04-23',changes:[
@@ -15349,7 +15368,16 @@ pushUndo(); // 初始快照
         ingId,
         supId: document.getElementById('b-sup')?.value || '',
         qty,
-        unit: document.getElementById('b-unit')?.value || '公斤',
+        /* 🐞 v2.40.3 (🔴A級)：原本是 ||'公斤'（寫死）。「單位」是一個空白文字框、
+           選了食材也不會自動帶入，所以留空時每一樣東西都被當成論公斤進貨。
+           實測：德紐無鹽奶油庫存單位是「磅」，進 10 @ 200 元 → 系統記成 22.046 磅，
+           而且把進價從 181 改寫成 13.6 元/磅 —— 用到它的配方成本全錯且毫無提示。
+           你的 120 項食材有 92 項不是公斤（光公克就 73 項）。
+           沒填時應該退回「這項食材自己的庫存單位」，不是假設論公斤。 */
+        unit: (document.getElementById('b-unit')?.value || '').trim()
+              || (op?.getAttribute('data-unit'))
+              || ((state.ings||[]).find(function(x){return x.name===ingName})||{}).unit
+              || '公斤',
         unitPrice,
         total,                   // 含稅總額（保持原行為）
         totalAmt: total,         // 🆕 給財會推送用 (別名)
